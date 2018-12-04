@@ -86,6 +86,19 @@ void LaserField::DeallocateField()
 	m_Bfield = NULL;
 }
 
+void LaserField::InitField()
+{
+	for (int i = 0; i < m_dims[0]; i++)
+	{
+		for (int j = 0; j < m_dims[1]; j++)
+		{
+			for (int k = 0; k < m_dims[2]; k++)
+			{
+				m_Bfield[1][i][j][k] = 1.0;
+			}
+		}
+	}
+}
 
 double LaserField::GetEfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const
 {

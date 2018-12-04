@@ -1,4 +1,5 @@
 #include <vector>
+#include "H5Cpp.h"
 
 class LaserField
 {
@@ -14,9 +15,14 @@ public:
 
 	void DeallocateField();
 
+	void InitField();	// Test function used to initilise the field
+
+	void InitFieldHDF5(std::string fileName);	// Initilises the field using a HDF5 data file
+
 	double GetEfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const;
 
 	double GetBfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const;
+
 
 private:
 	double**** m_Efield;	// array containing Electric field information, first index gives direction
