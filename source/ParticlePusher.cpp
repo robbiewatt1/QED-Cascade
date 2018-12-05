@@ -1,7 +1,7 @@
 #include "ParticlePusher.hh"
 
-ParticlePusher::ParticlePusher(double dt):
-m_dt(dt), m_time(0)
+ParticlePusher::ParticlePusher(LaserField* field, double dt):
+m_dt(dt), m_time(0), m_field(field)
 {
 }
 
@@ -11,6 +11,7 @@ ParticlePusher::~ParticlePusher()
 
 void ParticlePusher::PushParticle(Particle &part)
 {
+	/*
 	if (part.GetCharge() == 0)	// Particle is Chargless
 	{
 		// Only chargeless particles are photons. Propagate by p_i/P^2 in each direction
@@ -28,22 +29,30 @@ void ParticlePusher::PushParticle(Particle &part)
 	{
 		std::vector<double> positionNew(3);
 		std::vector<double> momentumNew(3);
-		for (int i = 0; i < 3; i++)	// update each component using RK4 method
-		{
-			double posk1, posk2, posk3, posk4;
+
+		std::vector<double> posk1(3), posk2(3), posk3(3), posk4(3);
+		std::vector<double> momK1(3), momK2(3), momK3(3), momK4(3);
 			
-		}
+		posK1 = PushPosition(part.GetMass(), part.GetGamma(), part.GetMomentum()[i]);
+		momK1 = PushMomentum(part.GetMass(), part.GetCharge(), part.GetGamma(), )
+
 	}
 
 }
 
-double ParticlePusher::PushPosition(double mass, double gamma, double P)
+std::vector<double> ParticlePusher::PushPosition(double mass, double gamma, const std::vector<double> &momentum)
 {
+	std::vector<double> UpdatePosition;
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		updatePos[i] = momentum[i] / (mass * gamma)
+	}
 	return P / (mass * gamma)
 }
 
-double ParticlePusher::PushMomentum(double mass, double charge, double gamma,double P1, double P2,
+double ParticlePusher::PushMomentum(double mass, double charge, double gamma, double P1, double P2,
 									double E, double B1, double B2)
 {
-	return charge / (mass * gamma) * ( gamma * mass * E + (P1 * B2 - P2 * B1));
+	return charge * (E + (P1 * B2 - P2 * B1) / (mass * gamma));
 }
+*/

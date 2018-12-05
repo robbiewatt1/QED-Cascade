@@ -1,3 +1,6 @@
+#ifndef LASERFIELD_HH
+#define LASERFIELD_HH
+
 #include <vector>
 #include "H5Cpp.h"
 
@@ -23,6 +26,9 @@ public:
 
 	double GetBfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const;
 
+	double GetEfield(unsigned int dir, const std::vector<double> &position);
+
+	double GetBfield(unsigned int dir, const std::vector<double> &position);
 
 private:
 	double**** m_Efield;	// array containing Electric field information, first index gives direction
@@ -33,3 +39,4 @@ private:
 	std::vector<double> m_yAxis;
 	std::vector<double> m_zAxis;
 };
+#endif

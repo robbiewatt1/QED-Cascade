@@ -1,4 +1,8 @@
+#ifndef PARTICLE_HH
+#define PARTICLE_HH
+
 #include <vector>
+#include "ThreeVector.hh"
 
 class Particle
 {
@@ -8,18 +12,18 @@ public:
 
 	Particle(double mass, double charge, bool tracking = false);
 
-	Particle(double mass, double charge, const std::vector<double> &position, 
-			 const std::vector<double> &momentum, bool tracking = false);
+	Particle(double mass, double charge, ThreeVector &position, 
+			 const ThreeVector &momentum, bool tracking = false);
 	
 	virtual ~Particle() = 0;
 	
-	std::vector<double> GetPosition() const {return m_position;}
+	ThreeVector GetPosition() const {return m_position;}
 
-	std::vector<double> GetMomentum() const {return m_momentum;}
+	ThreeVector GetMomentum() const {return m_momentum;}
 
-	void UpdatePosition(const std::vector<double> &position);
+	void UpdatePosition(const ThreeVector &position);
 	
-	void UpdateMomentum(const std::vector<double> &velocity);
+	void UpdateMomentum(const ThreeVector &velocity);
 
 	double GetMass() const {return m_mass;}
 
@@ -32,9 +36,10 @@ private:
 	double m_mass;	//mass normilised to electron mass
 	double m_charge;	//charge normilised to -electron charge
 
-	std::vector<double> m_position;	// current position of particle
-	std::vector<double> m_momentum;	// current velcoity of particle
-
-	std::vector<std::vector<double>> m_posHistory;	// Only used if tracking is on
-	std::vector<std::vector<double>> m_momHistory;	// only used if tracking is on
+	ThreeVector m_position;	// current position of particle
+	ThreeVector m_momentum;	// current velcoity of particle
+	std::vector<ThreeVector> m_posHistory;	// Only used if tracking is on
+	std::vector<ThreeVector> m_momHistory;	// only used if tracking is on
 };
+
+#endif
