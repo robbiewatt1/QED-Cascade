@@ -6,7 +6,7 @@ LaserField::LaserField()
 	m_Bfield = NULL;
 }
 
-LaserField::LaserField(std::vector<unsigned int> dims, std::vector<double> max):
+LaserField::LaserField(const std::vector<unsigned int> &dims, const std::vector<double> &max):
 m_dims(dims), m_max(max)
 {
 	AllocateField();
@@ -108,4 +108,14 @@ double LaserField::GetEfield(unsigned int dir, unsigned int i, unsigned int j, u
 double LaserField::GetBfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const
 {
 	return m_Bfield[dir][i][j][k];
+}
+
+ThreeVector LaserField::GetEfield(const ThreeVector &position) const
+{
+	return ThreeVector(0,0,0);
+}
+
+ThreeVector LaserField::GetBfield(const ThreeVector &position) const
+{
+	return ThreeVector(1,0,0);
 }

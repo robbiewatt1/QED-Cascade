@@ -43,7 +43,7 @@ public:
 	}
 
 	// Returns the cross product
-	ThreeVector Cross(const ThreeVector& vector)
+	ThreeVector Cross(const ThreeVector& vector) const
 	{
 		ThreeVector newVector;
 		newVector.m_data[0] = m_data[1] * vector.m_data[2] - m_data[2] * vector.m_data[1];
@@ -53,21 +53,33 @@ public:
 	}
 
 	// Returns the dot product
-	double Dot(const ThreeVector& vector)
+	double Dot(const ThreeVector& vector) const
 	{
 		return m_data[0] * vector.m_data[0] + m_data[1] * vector.m_data[1] 
 			 								 + m_data[2] * vector.m_data[2];
 	}
 
 	// Returns the magnitude
-	double Mag()
+	double Mag() const
 	{
 		return std::sqrt(Dot(*this));
+	}
+
+	// Returns the magnitude squared
+	double Mag2() const
+	{
+		return Dot(*this);
 	}
 
 public:
 	// returns the value of the vector at elementIndex. This method allows you to edit the vector data.
 	double operator[](unsigned int index)
+	{
+		assert(index >= 0 && index < 3);
+		return m_data[index];
+	}
+
+	double operator[](unsigned int index) const
 	{
 		assert(index >= 0 && index < 3);
 		return m_data[index];
@@ -136,12 +148,30 @@ public:
 		return newVector;
 	};
 
+	friend ThreeVector operator+(const ThreeVector &vector, double scalar)
+	{
+		ThreeVector newVector;
+		newVector.m_data[0] = vector.m_data[0] + scalar;
+		newVector.m_data[1] = vector.m_data[1] + scalar;
+		newVector.m_data[2] = vector.m_data[2] + scalar;
+		return newVector;
+	};
+
 	friend ThreeVector operator-(double scalar, const ThreeVector &vector)
 	{
 		ThreeVector newVector;
 		newVector.m_data[0] = scalar - vector.m_data[0];
 		newVector.m_data[1] = scalar - vector.m_data[1];
 		newVector.m_data[2] = scalar - vector.m_data[2];
+		return newVector;
+	};
+
+	friend ThreeVector operator-(const ThreeVector &vector, double scalar)
+	{
+		ThreeVector newVector;
+		newVector.m_data[0] = vector.m_data[0] - scalar;
+		newVector.m_data[1] = vector.m_data[1] - scalar;
+		newVector.m_data[2] = vector.m_data[2] - scalar;
 		return newVector;
 	};
 
@@ -154,12 +184,30 @@ public:
 		return newVector;
 	};
 
+	friend ThreeVector operator*(const ThreeVector &vector, double scalar)
+	{
+		ThreeVector newVector;
+		newVector.m_data[0] = vector.m_data[0] * scalar;
+		newVector.m_data[1] = vector.m_data[1] * scalar;
+		newVector.m_data[2] = vector.m_data[2] * scalar;
+		return newVector;
+	};
+
 	friend ThreeVector operator/(double scalar, const ThreeVector &vector)
 	{
 		ThreeVector newVector;
 		newVector.m_data[0] = scalar / vector.m_data[0];
 		newVector.m_data[1] = scalar / vector.m_data[1];
 		newVector.m_data[2] = scalar / vector.m_data[2];
+		return newVector;
+	};
+
+	friend ThreeVector operator/(const ThreeVector &vector, double scalar)
+	{
+		ThreeVector newVector;
+		newVector.m_data[0] = vector.m_data[0] / scalar;
+		newVector.m_data[1] = vector.m_data[1] / scalar;
+		newVector.m_data[2] = vector.m_data[2] / scalar;
 		return newVector;
 	};
 };

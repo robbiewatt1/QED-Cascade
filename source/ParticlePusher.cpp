@@ -11,48 +11,54 @@ ParticlePusher::~ParticlePusher()
 
 void ParticlePusher::PushParticle(Particle &part)
 {
-	/*
 	if (part.GetCharge() == 0)	// Particle is Chargless
 	{
-		// Only chargeless particles are photons. Propagate by p_i/P^2 in each direction
-		double momMag2 = part.GetMomentum()[0] * part.GetMomentum()[0] +
-							  part.GetMomentum()[1] * part.GetMomentum()[1] +
-							  part.GetMomentum()[2] * part.GetMomentum()[2];
-		std::vector<double> positionNew(3);
-		positionNew[0] = part.GetPosition()[0] + m_dt * part.GetMomentum()[0] / momMag2;
-		positionNew[1] = part.GetPosition()[1] + m_dt * part.GetMomentum()[1] / momMag2;
-		positionNew[2] = part.GetPosition()[2] + m_dt * part.GetMomentum()[2] / momMag2;
-
+		// Only chargeless particles are photons. Propagate by p_i/P^2 in each direction.
+		// For some reason this isn't RK4 yet
+		ThreeVector positionNew = part.GetPosition() + (m_dt / part.GetMomentum().Mag2())
+								 * part.GetMomentum();
 		part.UpdatePosition(positionNew);
-		
 	} else	// Particle is charged
 	{
-		std::vector<double> positionNew(3);
-		std::vector<double> momentumNew(3);
+		ThreeVector posK1, posK2, posK3, posK4;
+		ThreeVector momK1, momK2, momK3, momK4;
+		posK1 = PushPosition(part.GetMass(), part.GetMomentum());
+		momK1 = PushMomentum(part.GetMass(), part.GetCharge(), posK1,
+							 m_field->GetEfield(part.GetPosition()),
+							 m_field->GetBfield(part.GetPosition()));
+		posK2 = PushPosition(part.GetMass(), part.GetMomentum() + momK1 * m_dt / 2.0);
+		momK2 = PushMomentum(part.GetMass(), part.GetCharge(), posK2,
+							 m_field->GetEfield(part.GetPosition() + posK1 * m_dt / 2.0),
+							 m_field->GetBfield(part.GetPosition() + posK1 * m_dt / 2.0));
+		posK3 = PushPosition(part.GetMass(), part.GetMomentum() + momK2 * m_dt / 2.0);
+		momK3 = PushMomentum(part.GetMass(), part.GetCharge(), posK3,
+							 m_field->GetEfield(part.GetPosition() + posK2 * m_dt / 2.0),
+							 m_field->GetBfield(part.GetPosition() + posK2 * m_dt / 2.0));
+		posK4 = PushPosition(part.GetMass(), part.GetMomentum() + momK3 * m_dt);
+		momK4 = PushMomentum(part.GetMass(), part.GetCharge(), posK4,
+							 m_field->GetEfield(part.GetPosition() + posK3 * m_dt),
+							 m_field->GetBfield(part.GetPosition() + posK3 * m_dt));
 
-		std::vector<double> posk1(3), posk2(3), posk3(3), posk4(3);
-		std::vector<double> momK1(3), momK2(3), momK3(3), momK4(3);
-			
-		posK1 = PushPosition(part.GetMass(), part.GetGamma(), part.GetMomentum()[i]);
-		momK1 = PushMomentum(part.GetMass(), part.GetCharge(), part.GetGamma(), )
-
+		ThreeVector positionNew = part.GetPosition() + (m_dt / 6.0) 
+								  * (posK1 + 2.0 * posK2 + 2.0 * posK3 + posK4);
+		ThreeVector momentumNew = part.GetMomentum() + (m_dt / 6.0) 
+								  * (momK1 + 2.0 * momK2 + 2.0 * momK3 + momK4);
+		part.UpdatePosition(positionNew);
+		part.UpdateMomentum(positionNew);
 	}
-
 }
 
-std::vector<double> ParticlePusher::PushPosition(double mass, double gamma, const std::vector<double> &momentum)
+ThreeVector ParticlePusher::PushPosition(double mass, const ThreeVector &momentum)
 {
-	std::vector<double> UpdatePosition;
-	for (unsigned int i = 0; i < 3; i++)
-	{
-		updatePos[i] = momentum[i] / (mass * gamma)
-	}
-	return P / (mass * gamma)
+	double gamma  = std::sqrt(1.0 + momentum.Mag2() / (mass * mass));
+	ThreeVector newPosition = momentum / (mass * gamma);
+	return newPosition;
 }
 
-double ParticlePusher::PushMomentum(double mass, double charge, double gamma, double P1, double P2,
-									double E, double B1, double B2)
+ThreeVector ParticlePusher::PushMomentum(double mass, double charge, const ThreeVector &momentum,
+										 const ThreeVector &Efield, const ThreeVector &Bfield)
 {
-	return charge * (E + (P1 * B2 - P2 * B1) / (mass * gamma));
+	double gamma  = std::sqrt(1.0 + momentum.Mag2() / (mass * mass));
+	ThreeVector newMomentum = charge * (Efield + (momentum.Cross(Bfield) / (mass * gamma)));
+	return newMomentum;
 }
-*/

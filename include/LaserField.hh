@@ -2,7 +2,8 @@
 #define LASERFIELD_HH
 
 #include <vector>
-#include "H5Cpp.h"
+
+#include "ThreeVector.hh"
 
 class LaserField
 {
@@ -10,7 +11,7 @@ public:
 
 	LaserField();
 
-	LaserField(std::vector<unsigned int> dims, std::vector<double> max);
+	LaserField(const std::vector<unsigned int> &dims, const std::vector<double> &max);
 	
 	~LaserField();
 
@@ -26,9 +27,9 @@ public:
 
 	double GetBfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const;
 
-	double GetEfield(unsigned int dir, const std::vector<double> &position);
+	ThreeVector GetEfield(const ThreeVector &position) const;
 
-	double GetBfield(unsigned int dir, const std::vector<double> &position);
+	ThreeVector GetBfield(const ThreeVector &position) const;
 
 private:
 	double**** m_Efield;	// array containing Electric field information, first index gives direction

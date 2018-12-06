@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "ThreeVector.hh"
+#include "HDF5Output.hh"
 
 class Particle
 {
@@ -12,10 +13,10 @@ public:
 
 	Particle(double mass, double charge, bool tracking = false);
 
-	Particle(double mass, double charge, ThreeVector &position, 
+	Particle(double mass, double charge, const ThreeVector &position, 
 			 const ThreeVector &momentum, bool tracking = false);
 	
-	virtual ~Particle() = 0;
+	~Particle();
 	
 	ThreeVector GetPosition() const {return m_position;}
 
@@ -30,6 +31,8 @@ public:
 	double GetCharge() const {return m_charge;}
 
 	double GetGamma() const;
+
+	void SaveTrack(HDF5Output &file) const;
 
 private:
 	bool m_tracking;	// If set to true, particle tracking turned on

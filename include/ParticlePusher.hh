@@ -14,14 +14,15 @@ public:
 	
 	void PushParticle(Particle &part);
 
-	double GetTime() const {return time;}
+	double GetTime() const {return m_time;}
 
 private:
+	// position update function for charged particle
+	ThreeVector PushPosition(double mass, const ThreeVector &momentum);
 
-	double PushPosition(double mass, double P);	// position update function for charged particle
-
-	double PushMomentum(double mass, double charge, double gamma, double P1, double P2,
-						double E, double B1, double B2);	// momentum update fuinction for charged particle
+	// momentum update fuinction for charged particle
+	ThreeVector PushMomentum(double mass, double charge, const ThreeVector &momentum,
+						const ThreeVector &Efield, const ThreeVector &Bfield);	
 
 	LaserField* m_field;	// Field which particles are pushed through
 	double m_dt;	// Time of each step
