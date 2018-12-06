@@ -74,7 +74,6 @@ void Particle::SaveTrack(HDF5Output &file) const
 		}
 		file.AddMatrix(posBuff, m_posHistory.size(), 3, "Position");
 		file.AddMatrix(momBuff, m_momHistory.size(), 3, "Momentum");
-		std::cerr << "failed" << std::endl;
 	} else
 	{
 		std::cerr << "Error: Output failed. Tracking not turned on." << std::endl; 

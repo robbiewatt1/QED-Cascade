@@ -12,10 +12,10 @@ m_fileName(fileName)
 {
 	if (append == true)
 	{
-		H5::H5File* m_file = new H5::H5File(m_fileName, H5F_ACC_RDWR);
+		m_file = new H5::H5File(m_fileName, H5F_ACC_RDWR);
 	} else
 	{
-		H5::H5File* m_file = new H5::H5File(m_fileName, H5F_ACC_TRUNC);
+		m_file = new H5::H5File(m_fileName, H5F_ACC_TRUNC);
 	}
 }
 
@@ -35,12 +35,7 @@ void HDF5Output::AddVector(double* data, hsize_t length, std::string dataName)
 void HDF5Output::AddMatrix(double* data, hsize_t xLength, hsize_t yLength,
 						   std::string dataName)
 {
-	hsize_t dimensions[2];// = {xLength, yLength};
-	dimensions[0] = xLength;
-	dimensions[1] = yLength;
-	std::cerr << xLength << yLength << std::endl;
-
-	std::cerr << "failed" << std::endl;
+	hsize_t dimensions[2] = {xLength, yLength};
 
 	H5::DataSet* set = new H5::DataSet(m_file->createDataSet(dataName, H5::PredType::NATIVE_DOUBLE,
 								  						 	   H5::DataSpace(2, dimensions)));
