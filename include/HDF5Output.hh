@@ -13,10 +13,14 @@ public:
 	~HDF5Output();
 
 	// Adds 1D vector data structure to the  
-	void AddVector(double* data, hsize_t length, std::string name);
+	void AddArray1D(double* data, hsize_t length, std::string name);
 
 	// Adds 2D matrix data srtucture
-	void AddMatrix(double* data, hsize_t xLength, hsize_t yLength, std::string name);
+	void AddArray2D(double* data, hsize_t xLength, hsize_t yLength, std::string name);
+
+	// Adds 3D matrix data structure
+	void AddArray3D(double* data, hsize_t xLength, hsize_t yLength, hsize_t zLength, 
+					std::string dataName);
 
 private:
 	H5::H5File* m_file;

@@ -7,7 +7,7 @@ Particle::Particle()
 }
 
 Particle::Particle(double mass, double charge, bool tracking):
-m_charge(charge), m_mass(mass), m_tracking(tracking)
+m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(0)
 {
 }
 
@@ -17,7 +17,7 @@ Particle::~Particle()
 
 Particle::Particle(double mass, double charge, const ThreeVector &position, 
 			 	   const ThreeVector &momentum, bool tracking):
-m_charge(charge), m_mass(mass), m_tracking(tracking)
+m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(0)
 {
 	m_momentum = momentum;
 	m_position = position;
@@ -72,8 +72,8 @@ void Particle::SaveTrack(HDF5Output &file) const
 				momBuff[3*i+j] = m_momHistory[i][j];
 			}
 		}
-		file.AddMatrix(posBuff, m_posHistory.size(), 3, "Position");
-		file.AddMatrix(momBuff, m_momHistory.size(), 3, "Momentum");
+		file.AddArray2D(posBuff, m_posHistory.size(), 3, "Position");
+		file.AddArray2D(momBuff, m_momHistory.size(), 3, "Momentum");
 	} else
 	{
 		std::cerr << "Error: Output failed. Tracking not turned on." << std::endl; 

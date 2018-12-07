@@ -73,7 +73,7 @@ public:
 
 public:
 	// returns the value of the vector at elementIndex. This method allows you to edit the vector data.
-	double operator[](unsigned int index)
+	double& operator[](unsigned int index)
 	{
 		assert(index >= 0 && index < 3);
 		return m_data[index];

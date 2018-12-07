@@ -1,121 +1,60 @@
+#include <cmath>
+
 #include "LaserField.hh"
+#include "Constants.hh"
 
 LaserField::LaserField()
 {
-	m_Efield = NULL;
-	m_Bfield = NULL;
 }
 
-LaserField::LaserField(const std::vector<unsigned int> &dims, const std::vector<double> &max):
-m_dims(dims), m_max(max)
+LaserField::LaserField(double maxI, double tau, double lambda, double waist, 
+					   const ThreeVector &waveNum):
+m_maxI(maxI), m_tau(tau), m_lambda(lambda), m_waveNum(waveNum), m_waist(waist)
 {
-	AllocateField();
 }
 
 LaserField::~LaserField()
 {
-	if (m_Efield != NULL || m_Bfield != NULL)
-	{
-		DeallocateField();
-	}
 }
 
-void LaserField::AllocateField()
+ThreeVector LaserField::GetEfield(const ThreeVector &position, double time) const
 {
-	m_xAxis = std::vector<double>(m_dims[0]);
-	for (unsigned int i = 0; i < m_dims[0]; i++)
-	{
-		m_xAxis[i] = (double)i * m_max[0] / (double)m_dims[0];
-	}
-	m_yAxis = std::vector<double>(m_dims[1]);
-	for (unsigned int i = 0; i < m_dims[1]; i++)
-	{
-		m_yAxis[i] = (double)i * m_max[1] / (double)m_dims[1];
-	}
-	m_zAxis = std::vector<double>(m_dims[2]);
-	for (unsigned int i = 0; i < m_dims[2]; i++)
-	{
-		m_yAxis[i] = (double)i * m_max[2] / (double)m_dims[2];
-	}
+	// At the moment just assume in z direction and x polerisation
+	ThreeVector Efield;
+	double r2 = position[0] * position[0] + position[1] * position[1];
+	Efield[0] = m_maxI * m_waist / BeamWaist(position[2])
+				* std::exp(-1.0 * r2 /(BeamWaist(position[2]) * BeamWaist(position[2])))
+				* std::sin(position[2] / m_lambda) * std::exp();
+	Efield[1] = 0;
+	Efield[2] = 0;
 
-	m_Efield = new double*** [3];
-	m_Bfield = new double*** [3];
-	for (unsigned int dir = 0; dir < 3; dir++)
+	return Efield;
+}
+
+ThreeVector LaserField::GetBfield(const ThreeVector &position, double time) const
+{
+}
+
+double LaserField::BeamWaist(double z) const
+{
+	double rayleigh = Constants::pi * m_waist * m_waist / m_lambda;
+	return m_waist * std::sqrt(1.0 + ((z * z) / (rayleigh * rayleigh)));
+}
+
+void LaserField::SaveField(HDF5Output &file, double initT, double endT, const std::vector<double> &xAxis,
+				   const std::vector<double> &yAxis, const std::vector<double> &zAxis)
+{
+	double dataBuff[xAxis.size()*yAxis.size()*zAxis.size()];
+	for (unsigned int i = 0; i < xAxis.size(); i++)
 	{
-		m_Efield[dir] = new double** [m_dims[0]];
-		m_Bfield[dir] = new double** [m_dims[0]];
-		for (unsigned int i = 0; i < m_dims[0]; i++)
+		for (unsigned int j = 0; j < yAxis.size(); j++)
 		{
-			m_Efield[dir][i] = new double* [m_dims[1]];
-			m_Bfield[dir][i] = new double* [m_dims[1]];
-			for (unsigned int j = 0; j < m_dims[1]; j++)
+			for (unsigned int k = 0; k < zAxis.size(); k++)
 			{
-				m_Efield[dir][i][j] = new double [m_dims[2]];
-				m_Bfield[dir][i][j] = new double [m_dims[2]];
-				for (unsigned int k = 0; k < m_dims[2]; k++)
-				{
-					m_Efield[dir][i][j][k] = 0.0;
-					m_Bfield[dir][i][j][k] = 0.0;
-				}
+				unsigned int index = (i*yAxis.size()*zAxis.size()) + (j*zAxis.size()) + k;
+				dataBuff[index] = GetEfield(ThreeVector(xAxis[i], yAxis[j], zAxis[k]), 0)[0];
 			}
 		}
 	}
-}
-
-void LaserField::DeallocateField()
-{
-	for (unsigned int dir = 0; dir < 3; dir++)
-	{
-		for (unsigned int i = 0; i < m_dims[0]; i++)
-		{
-
-			for (unsigned int j = 0; j < m_dims[1]; j++)
-			{
-				delete [] m_Efield[dir][i][j];
-				delete [] m_Bfield[dir][i][j];
-			}
-			delete [] m_Efield[dir][i];
-			delete [] m_Bfield[dir][i];
-		}
-		delete [] m_Efield[dir];
-		delete [] m_Bfield[dir];
-	}
-	delete [] m_Efield;
-	delete [] m_Bfield;
-	m_Efield = NULL;
-	m_Bfield = NULL;
-}
-
-void LaserField::InitField()
-{
-	for (int i = 0; i < m_dims[0]; i++)
-	{
-		for (int j = 0; j < m_dims[1]; j++)
-		{
-			for (int k = 0; k < m_dims[2]; k++)
-			{
-				m_Bfield[1][i][j][k] = 1.0;
-			}
-		}
-	}
-}
-
-double LaserField::GetEfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const
-{
-	return m_Efield[dir][i][j][k];
-}
-
-double LaserField::GetBfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const
-{
-	return m_Bfield[dir][i][j][k];
-}
-
-ThreeVector LaserField::GetEfield(const ThreeVector &position) const
-{
-	return ThreeVector(0,0,0);
-}
-
-ThreeVector LaserField::GetBfield(const ThreeVector &position) const
-{
-	return ThreeVector(1,0,0);
+	file.AddArray3D(dataBuff, xAxis.size(), xAxis.size(), xAxis.size(), "Efield");
 }

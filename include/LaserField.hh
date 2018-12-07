@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ThreeVector.hh"
+#include "HDF5Output.hh"
 
 class LaserField
 {
@@ -11,33 +12,31 @@ public:
 
 	LaserField();
 
-	LaserField(const std::vector<unsigned int> &dims, const std::vector<double> &max);
+	LaserField(double maxI, double tau, double lambda, double waist, const ThreeVector &waveNum);
 	
 	~LaserField();
 
-	void AllocateField();
+	void SaveField(HDF5Output &file, double initT, double endT, const std::vector<double> &xAxis,
+				   const std::vector<double> &yAxis, const std::vector<double> &zAxis);
 
-	void DeallocateField();
+	ThreeVector GetEfield(const ThreeVector &position, double time) const;
 
-	void InitField();	// Test function used to initilise the field
+	ThreeVector GetBfield(const ThreeVector &position, double time) const;
 
-	void InitFieldHDF5(std::string fileName);	// Initilises the field using a HDF5 data file
-
-	double GetEfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const;
-
-	double GetBfield(unsigned int dir, unsigned int i, unsigned int j, unsigned int k) const;
-
-	ThreeVector GetEfield(const ThreeVector &position) const;
-
-	ThreeVector GetBfield(const ThreeVector &position) const;
 
 private:
-	double**** m_Efield;	// array containing Electric field information, first index gives direction
-	double**** m_Bfield;	// array containing Magnetic field information, first index gives direction
-	std::vector<unsigned int> m_dims;	// array of size of dimsensions
-	std::vector<double> m_max;	// array of maximum spacial value of field
-	std::vector<double> m_xAxis;
-	std::vector<double> m_yAxis;
-	std::vector<double> m_zAxis;
+
+	double BeamWaist(double z) const;
+
+private:
+	double m_maxI;	// Beam max intensity
+	double m_tau;	// beam duration
+	double m_lambda;	// wavelength
+	double m_waist;	// Waist of the beam at focus
+	double m_polAngle; // Polerisation angle
+
+	ThreeVector m_waveNum;
+
+
 };
 #endif

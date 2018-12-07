@@ -30,6 +30,8 @@ public:
 
 	double GetCharge() const {return m_charge;}
 
+	double GetTime() const {return m_time;}
+
 	double GetGamma() const;
 
 	void SaveTrack(HDF5Output &file) const;
@@ -38,6 +40,7 @@ private:
 	bool m_tracking;	// If set to true, particle tracking turned on
 	double m_mass;	//mass normilised to electron mass
 	double m_charge;	//charge normilised to -electron charge
+	double m_time;	// global time of particle
 
 	ThreeVector m_position;	// current position of particle
 	ThreeVector m_momentum;	// current velcoity of particle
