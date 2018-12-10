@@ -3,15 +3,17 @@
 #include "ThreeVector.hh"
 #include "ParticlePusher.hh"
 #include "HDF5Output.hh"
+#include "ThreeMatrix.hh"
 
 int main(int argc, char* argv[])
 {
 	Particle electron = Particle(1, -1, true);
 	electron.UpdatePosition(ThreeVector(0, 0, 0));
 	electron.UpdateMomentum(ThreeVector(10, 10, 10));
-	LaserField* field = new LaserField(1.0, 1.0, 0.01, 1.0, ThreeVector(0,0,1));
+
+	LaserField* field = new LaserField(1.0, 2.0, 1.0, 20, 0, ThreeVector(0,0,0), ThreeVector(0,30,30));
 	ParticlePusher pusher = ParticlePusher(field, 0.01);
-	for (int i = 0; i < 100000000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	{
 		pusher.PushParticle(electron);
 	}
@@ -24,8 +26,11 @@ int main(int argc, char* argv[])
 	{
 		xax[i] = -5.0 + (double)i /10.0;
 	}
-	std::cout << "hi" << std::endl;
-
-	field->SaveField(file, 0, 0, xax, xax, xax);
+	std::vector<double> time(20);
+	for(int i = 0; i < 20; i++)
+	{
+		time[i] = (double) i;
+	}
+	field->SaveField(file, time, xax, xax, xax);
 	return 0;
 }

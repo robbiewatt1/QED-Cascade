@@ -6,6 +6,8 @@
 #include <cmath>
 #include <cassert>
 
+#include "ThreeMatrix.hh"
+
 class ThreeVector
 {
 private:
@@ -15,6 +17,9 @@ public:
 	// Defult Constructor
 	ThreeVector()
 	{
+		m_data[0] = 0.0;
+		m_data[1] = 0.0;
+		m_data[2] = 0.0;
 	}
 
 	// Copy constructor
@@ -52,11 +57,16 @@ public:
 		return newVector;
 	}
 
+	ThreeVector Norm() const
+	{
+		return *this / Mag();
+	}
+
 	// Returns the dot product
 	double Dot(const ThreeVector& vector) const
 	{
 		return m_data[0] * vector.m_data[0] + m_data[1] * vector.m_data[1] 
-			 								 + m_data[2] * vector.m_data[2];
+											+ m_data[2] * vector.m_data[2];
 	}
 
 	// Returns the magnitude
@@ -69,6 +79,29 @@ public:
 	double Mag2() const
 	{
 		return Dot(*this);
+	}
+
+	// Returns the matrix required to rotate the vecotor onto the second
+	ThreeMatrix RotateToAxis(const ThreeVector &axis) const
+	{
+		ThreeVector norm1 = this->Norm();
+		ThreeVector norm2 = axis.Norm();
+		ThreeVector crossVec = norm1.Cross(norm2);
+
+		double sin = crossVec.Mag();
+		double cos = norm1.Dot(norm2);
+
+		ThreeMatrix skewMat;
+		skewMat[0][1] = -crossVec[2];
+		skewMat[0][2] =  crossVec[1];
+		skewMat[1][0] =  crossVec[2];
+		skewMat[1][2] = -crossVec[0];
+		skewMat[2][0] = -crossVec[1];
+		skewMat[2][1] =  crossVec[0];
+
+		ThreeMatrix ident;
+		ident.Ideneity();
+		return ident + skewMat + skewMat * skewMat * (1.0 / (1.0 + cos));
 	}
 
 public:
@@ -210,5 +243,20 @@ public:
 		newVector.m_data[2] = vector.m_data[2] / scalar;
 		return newVector;
 	};
+
+	//Matrix-Vector operations
+	friend ThreeVector operator*(const ThreeMatrix &matrix, const ThreeVector &vector)
+	{
+		ThreeVector newVector;
+		for (unsigned int i = 0; i < 3; i++)
+		{
+			for (unsigned int j = 0; j < 3; j++)
+			{
+				newVector[i] += matrix[i][j] * vector[j];
+
+			}
+		}
+		return newVector;
+	}
 };
 #endif

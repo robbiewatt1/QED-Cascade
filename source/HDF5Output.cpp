@@ -21,7 +21,26 @@ m_fileName(fileName)
 
 HDF5Output::~HDF5Output()
 {
+	delete m_group;
 	delete m_file;
+}
+
+void HDF5Output::AddGroup(std::string groupName)
+{
+	if (m_group != NULL)
+	{
+		delete m_group;
+	}
+	m_group = new H5::Group(m_file->createGroup(groupName));
+}
+
+void HDF5Output::AddSubGroup(std::string subGroupName)
+{
+	if (m_subGroup != NULL)
+	{
+		delete m_subGroup;
+	}
+	m_subGroup = new H5::Group(m_file->createGroup(subGroupName));
 }
 
 void HDF5Output::AddArray1D(double* data, hsize_t length, std::string dataName)

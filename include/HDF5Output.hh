@@ -12,6 +12,10 @@ public:
 	
 	~HDF5Output();
 
+	void AddGroup(std::string groupName);
+
+	void AddSubGroup(std::string subGroup);
+	
 	// Adds 1D vector data structure to the  
 	void AddArray1D(double* data, hsize_t length, std::string name);
 
@@ -23,6 +27,8 @@ public:
 					std::string dataName);
 
 private:
+	H5::Group* m_group;
+	H5::Group* m_subGroup;
 	H5::H5File* m_file;
 	std::string m_fileName;
 };
