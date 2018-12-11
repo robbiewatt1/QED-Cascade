@@ -7,13 +7,14 @@
 
 int main(int argc, char* argv[])
 {
-	Particle electron = Particle(1, -1, true);
-	electron.UpdatePosition(ThreeVector(0, 0, 0));
-	electron.UpdateMomentum(ThreeVector(10, 10, 10));
+	// define time using laser frequency with 
 
-	LaserField* field = new LaserField(1.0, 2.0, 1.0, 20, 0, ThreeVector(0,0,0), ThreeVector(0,30,30));
-	ParticlePusher pusher = ParticlePusher(field, 0.01);
-	for (int i = 0; i < 1000; ++i)
+	Particle electron = Particle(1, -1, true);
+	electron.UpdateTrack(ThreeVector(0.0, 0.0, 0.0), ThreeVector(0.0, 0.0, 0.0));
+
+	LaserField* field = new LaserField(20.0, 2.0, 2.0, 10.0, 0.0, ThreeVector(0,0,0), ThreeVector(0,0,10000));
+	ParticlePusher pusher = ParticlePusher(field, 0.0001);
+	for (int i = 0; i < 100000; ++i)
 	{
 		pusher.PushParticle(electron);
 	}
@@ -21,16 +22,22 @@ int main(int argc, char* argv[])
 	electron.SaveTrack(file);
 
 
-	std::vector<double> xax(100);
-	for (int i = 0; i < 100; ++i)
+	std::vector<double> zax(400);
+	for (int i = 0; i < 400; ++i)
 	{
-		xax[i] = -5.0 + (double)i /10.0;
+		zax[i] = -5.0 + (double)i / 40.0;
 	}
-	std::vector<double> time(20);
-	for(int i = 0; i < 20; i++)
+	std::vector<double> xax(3);
+        for (int i = 0; i < 3; ++i)
+        {
+                xax[i] = -5.0 + (double)i / 0.3;
+        }
+	std::vector<double> time(50);
+	for(int i = 0; i < 50; i++)
 	{
 		time[i] = (double) i;
 	}
-	field->SaveField(file, time, xax, xax, xax);
+	field->SaveField(file, time, xax, zax, zax);
+
 	return 0;
 }

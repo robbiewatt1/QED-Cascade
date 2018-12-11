@@ -18,13 +18,15 @@ public:
 	
 	~Particle();
 	
+	void UpdateTrack(const ThreeVector &position, const ThreeVector &momentum);
+	
+	void UpdateTime(double dt);
+
 	ThreeVector GetPosition() const {return m_position;}
 
 	ThreeVector GetMomentum() const {return m_momentum;}
 
-	void UpdatePosition(const ThreeVector &position);
-	
-	void UpdateMomentum(const ThreeVector &velocity);
+	ThreeVector GetVelocity() const;
 
 	double GetMass() const {return m_mass;}
 
@@ -46,6 +48,9 @@ private:
 	ThreeVector m_momentum;	// current velcoity of particle
 	std::vector<ThreeVector> m_posHistory;	// Only used if tracking is on
 	std::vector<ThreeVector> m_momHistory;	// only used if tracking is on
+	std::vector<double> m_timeHistory;
+	std::vector<double> m_gammaHistory;
+
 };
 
 #endif

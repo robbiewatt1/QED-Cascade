@@ -17,7 +17,8 @@ void ParticlePusher::PushParticle(Particle &part)
 		// For some reason this isn't RK4 yet
 		ThreeVector positionNew = part.GetPosition() + (m_dt / part.GetMomentum().Mag2())
 								 * part.GetMomentum();
-		part.UpdatePosition(positionNew);
+		part.UpdateTrack(positionNew, part.GetMomentum());
+		part.UpdateTime(m_dt);
 	} else	// Particle is charged
 	{
 		ThreeVector posK1, posK2, posK3, posK4;
@@ -48,8 +49,8 @@ void ParticlePusher::PushParticle(Particle &part)
 								  * (posK1 + 2.0 * posK2 + 2.0 * posK3 + posK4);
 		ThreeVector momentumNew = part.GetMomentum() + (m_dt / 6.0) 
 								  * (momK1 + 2.0 * momK2 + 2.0 * momK3 + momK4);
-		part.UpdatePosition(positionNew);
-		part.UpdateMomentum(momentumNew);
+		part.UpdateTrack(positionNew, momentumNew);
+		part.UpdateTime(m_dt);
 	}
 }
 
@@ -63,7 +64,6 @@ ThreeVector ParticlePusher::PushPosition(double mass, const ThreeVector &momentu
 ThreeVector ParticlePusher::PushMomentum(double mass, double charge, const ThreeVector &momentum,
 										 const ThreeVector &Efield, const ThreeVector &Bfield)
 {
-	double gamma  = std::sqrt(1.0 + momentum.Mag2() / (mass * mass));
-	ThreeVector newMomentum = charge * (Efield + (momentum.Cross(Bfield) / (mass * gamma)));
+	ThreeVector newMomentum = charge * (Efield + (momentum.Cross(Bfield) / mass));
 	return newMomentum;
 }
