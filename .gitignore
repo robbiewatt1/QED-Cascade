@@ -3,7 +3,8 @@ CMakeFiles
 cmake_install.cmake
 Makefile
 
-Data/*
 *.h5
+*.xmf
+*.m
 
 QEDCASC

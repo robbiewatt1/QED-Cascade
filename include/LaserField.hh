@@ -13,8 +13,8 @@ public:
 
 	LaserField();
 
-	LaserField(double maxI, double tau, double waist, double start, double polAngle,
-			   const ThreeVector &waveNum, const ThreeVector &focus);
+	LaserField(double maxI, double tau, double waveLength, double waist, double start,
+			   double polAngle, const ThreeVector &waveNum, const ThreeVector &focus);
 	
 	~LaserField();
 
@@ -29,6 +29,7 @@ public:
 private:
 	double m_maxI;	// Beam max intensity
 	double m_tau;	// beam duration
+	double m_waveLength;	// wavelength
 	double m_waveNum;	// Wave number
 	double m_waist;	// Waist of the beam at focus
 	double m_polAngle; // Polerisation angle

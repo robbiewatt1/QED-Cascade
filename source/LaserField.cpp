@@ -7,15 +7,17 @@ LaserField::LaserField()
 {
 }
 
-LaserField::LaserField(double maxI, double tau, double waist, double start, double polAngle,
-					   const ThreeVector &focus, const ThreeVector &waveVec):
-m_maxI(maxI), m_tau(tau), m_waist(waist), m_start(start), m_waveVec(waveVec), m_focus(focus),
+LaserField::LaserField(double maxI, double tau, double waveLength, double waist, 
+					   double start, double polAngle, const ThreeVector &focus,
+					   const ThreeVector &waveVec):
+m_maxI(maxI), m_tau(tau), m_waist(waist), m_start(start), m_focus(focus), m_waveLength(waveLength),
 m_polAngle(polAngle)
 {
+	m_waveVec = waveVec.Norm();
 	m_rotaion = m_waveVec.RotateToAxis(ThreeVector(0,0,1));
 	m_rotationInv = m_rotaion.Inverse();
-	m_waveNum = m_waveVec.Mag();
-	std::cout << m_waveNum << std::endl;
+	m_waveNum = 2.0 * Constants::pi / m_waveLength;
+	std::cout << m_waveLength << std::endl;
 }
 
 LaserField::~LaserField()
@@ -36,7 +38,7 @@ ThreeVector LaserField::GetEfield(const ThreeVector &position, double time) cons
 				* (m_waist / beamWaist) 
 				* std::exp(-1.0 * r2 / (beamWaist * beamWaist))
 				* std::cos(position_p[2] * m_waveNum + r2 * m_waveNum / (2.0 * curvature)) 
-				* std::exp(-1.0 * (time - m_start - position_p[2]) * (time - m_start - position_p[2]) / (m_tau * m_tau));
+				* std::exp(-1.0 * (time + m_start - position_p[2]) * (time + m_start - position_p[2]) / (m_tau * m_tau));
 	
 	ThreeVector Efield;
 	Efield[0] = E0 * std::cos(m_polAngle);
@@ -60,7 +62,7 @@ ThreeVector LaserField::GetBfield(const ThreeVector &position, double time) cons
 	double B0 = 0.5 * std::sqrt(m_maxI) 
 				* (m_waist / beamWaist) 
 				* std::exp(-1.0 * r2 / (beamWaist * beamWaist))
-				* std::cos(position_p[2] * m_waveNum)// + r2 * m_waveNum / (2.0 * curvature)) 
+				* std::cos(position_p[2] * m_waveNum + r2 * m_waveNum / (2.0 * curvature)) 
 				* std::exp(-1.0 * (time - m_start - position_p[2]) * (time - m_start - position_p[2]) / (m_tau * m_tau));
 
 	ThreeVector Bfield;
@@ -77,6 +79,7 @@ void LaserField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 	file.AddGroup("Field");
 	for (int t = 0; t < tAxis.size(); t++)
 	{
+
 		std::string groupName = "Field/" + std::to_string(tAxis[t]);
 		groupName.erase(groupName.find_last_not_of('0') + 1, std::string::npos);
 		file.AddGroup(groupName);
