@@ -8,13 +8,13 @@ import numpy as np
 #test.keys()[:] # this contains all the data files' name inside hdf5
 
 # defining the grid
-Nx,Ny,Nz =100, 100, 100
+Nx,Ny,Nz =500, 500, 500
 
 # Total time steps
-tEnd = 10
+tEnd = 15
 
 # Data dumping step
-nOutput = 10
+nOutput = 15
 
 # Not taking initial points
 waittime = 3400

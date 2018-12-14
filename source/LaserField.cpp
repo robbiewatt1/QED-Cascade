@@ -79,13 +79,12 @@ void LaserField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 	file.AddGroup("Field");
 	for (int t = 0; t < tAxis.size(); t++)
 	{
-
 		std::string groupName = "Field/" + std::to_string(tAxis[t]);
 		groupName.erase(groupName.find_last_not_of('0') + 1, std::string::npos);
 		file.AddGroup(groupName);
 		for (int dir = 0; dir < 3; dir++)
 		{
-			double dataBuff[xAxis.size()*yAxis.size()*zAxis.size()];
+			double* dataBuff = new double[xAxis.size()*yAxis.size()*zAxis.size()];
 			for (unsigned int i = 0; i < xAxis.size(); i++)
 			{
 				for (unsigned int j = 0; j < yAxis.size(); j++)
@@ -100,6 +99,7 @@ void LaserField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 			}
 			std::string dataName = groupName + "/E" + std::to_string(dir);
 			file.AddArray3D(dataBuff, xAxis.size(), yAxis.size(), zAxis.size(), dataName);
+			delete dataBuff;
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "ParticlePusher.hh"
 #include "HDF5Output.hh"
 #include "ThreeMatrix.hh"
+#include "ParticleList.hh"
 
 int main(int argc, char* argv[])
 {
@@ -22,10 +23,10 @@ int main(int argc, char* argv[])
 	electron.SaveTrack(file);
 
 
-	std::vector<double> zax(100);
-	for (int i = 0; i < 100; ++i)
+	std::vector<double> zax(500);
+	for (int i = 0; i < 500; ++i)
 	{
-		zax[i] = -4.0 + (double)i / 10.0;
+		zax[i] = -20.0 + (double)i / 12.5;
 	}
 	std::vector<double> xax(3);
         for (int i = 0; i < 3; ++i)

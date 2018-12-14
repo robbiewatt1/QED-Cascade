@@ -6,8 +6,8 @@ Particle::Particle()
 {
 }
 
-Particle::Particle(double mass, double charge, bool tracking):
-m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(0)
+Particle::Particle(double mass, double charge, double time, bool tracking):
+m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(time)
 {
 }
 
@@ -16,8 +16,8 @@ Particle::~Particle()
 }
 
 Particle::Particle(double mass, double charge, const ThreeVector &position, 
-			 	   const ThreeVector &momentum, bool tracking):
-m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(0)
+			 	   const ThreeVector &momentum, double time, bool tracking):
+m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(time)
 {
 	m_momentum = momentum;
 	m_position = position;

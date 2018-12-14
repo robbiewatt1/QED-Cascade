@@ -11,10 +11,10 @@ public:
 	
 	Particle();
 
-	Particle(double mass, double charge, bool tracking = false);
+	Particle(double mass, double charge, double time = 0, bool tracking = false);
 
 	Particle(double mass, double charge, const ThreeVector &position, 
-			 const ThreeVector &momentum, bool tracking = false);
+			 const ThreeVector &momentum, double time = 0, bool tracking = false);
 	
 	~Particle();
 	
