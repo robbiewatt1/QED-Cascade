@@ -9,6 +9,7 @@ namespace MCTools
 
 	double RandDouble(double low, double high);
 
-	double SampleNorm(double mean, double variance);
+	std::vector<double> SampleNorm(double mean, double variance, int nSamples);
 
 }
+#endif

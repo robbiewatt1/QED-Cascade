@@ -26,6 +26,10 @@ public:
 
 	ThreeVector GetMomentum() const {return m_momentum;}
 
+	std::vector<ThreeVector> GetPosHist() const {return m_posHistory;}
+
+	std::vector<ThreeVector> GetMomHist() const {return m_momHistory;}
+
 	ThreeVector GetVelocity() const;
 
 	double GetMass() const {return m_mass;}
@@ -36,7 +40,7 @@ public:
 
 	double GetGamma() const;
 
-	void SaveTrack(HDF5Output &file) const;
+	void SaveTrack(HDF5Output *file, int partIndex = 0) const;
 
 private:
 	bool m_tracking;	// If set to true, particle tracking turned on

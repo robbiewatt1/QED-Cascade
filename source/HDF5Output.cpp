@@ -3,12 +3,12 @@
 #include "HDF5Output.hh"
 
 HDF5Output::HDF5Output():
-m_file(NULL)
+m_file(NULL), m_group(NULL)
 {
 }
 
 HDF5Output::HDF5Output(std::string fileName, bool append):
-m_fileName(fileName) 
+m_fileName(fileName), m_group(NULL)
 {
 	if (append == true)
 	{

@@ -17,7 +17,6 @@ m_polAngle(polAngle)
 	m_rotaion = m_waveVec.RotateToAxis(ThreeVector(0,0,1));
 	m_rotationInv = m_rotaion.Inverse();
 	m_waveNum = 2.0 * Constants::pi / m_waveLength;
-	std::cout << m_waveLength << std::endl;
 }
 
 LaserField::~LaserField()

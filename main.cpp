@@ -5,11 +5,52 @@
 #include "HDF5Output.hh"
 #include "ThreeMatrix.hh"
 #include "ParticleList.hh"
+#include "MCTools.hh"
+#include <fstream>
 
 int main(int argc, char* argv[])
 {
-	// define time using laser frequency with 
+	// Set up the laser field
+	LaserField* field = new LaserField(100.0, 10.0, 1.0, 2.0, 0.0, 0.0, 
+					   ThreeVector(0,0,0), ThreeVector(0,0,1));
 
+	// Set up the primary and secondary particle lists
+	ParticleList* primaries   = new ParticleList();
+	ParticleList* secondaries = new ParticleList(); 
+	primaries->GenericSource(100, 1, 1, 10, 1, ThreeVector(0,0,-0.5), ThreeVector(0,0,-1));
+
+	// Set the particle pusher
+	ParticlePusher* pusher = new ParticlePusher(field, 0.001);
+
+	// Set the output file
+	HDF5Output* file = new HDF5Output("./Data/test.h");
+
+	// Enter the main pushing loop
+	int n = 0;
+	while(true)
+	{
+		// Push primary particles
+		for (unsigned int i = 0; i < primaries->GetNPart(); i++)
+		{
+			pusher->PushParticle(primaries->GetParticle(i));
+		}
+		// Push secondary particles
+		for (unsigned int i = 0; i < secondaries->GetNPart(); i++)
+		{
+			pusher->PushParticle(secondaries->GetParticle(i));
+		}
+
+		// add up optical depth and check if process occurs
+		if (n == 10000)
+		{
+			break;
+		}
+		n++;
+	}
+	primaries->SaveTracks(file);
+
+	// define time using laser frequency with 
+/*
 	Particle electron = Particle(1, -1, true);
 	electron.UpdateTrack(ThreeVector(0.0, 0.0, 0.0), ThreeVector(0.0, 0.0, 0.0));
 
@@ -39,6 +80,6 @@ int main(int argc, char* argv[])
 		time[i] = (double) i;
 	}
 	field->SaveField(file, time, zax, zax, zax);
-
+*/
 	return 0;
 }

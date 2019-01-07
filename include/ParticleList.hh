@@ -13,17 +13,19 @@ public:
 	
 	~ParticleList();
 
+	int GetNPart() const {return m_particleList.size();}
+
+	Particle& GetParticle(unsigned int index) {m_particleList[index];}	
+
 	// Adds a particle to the source. Not very fast for large arrays
 	void AddParticle(const Particle &part);
 
 	// Generates a generic particle source
-	void GenericSource(unsigned int nPart, double mass, double charge, double energy, 
-					   const ThreeVector &position, const ThreeVector &direction);
+	void GenericSource(unsigned int nPart, double mass, double charge, double energy,
+					   double deltaPos, const ThreeVector &position,
+					   const ThreeVector &direction);
 
-	void SaveTracks(HDF5Output &file) const;
-
-	Particle& operator[](unsigned int index){return m_particleList[index];}
-
+	void SaveTracks(HDF5Output *file) const;
 
 private:
 	std::vector<Particle> m_particleList;

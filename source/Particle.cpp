@@ -58,7 +58,7 @@ double Particle::GetGamma() const
 	}
 }
 
-void Particle::SaveTrack(HDF5Output &file) const
+void Particle::SaveTrack(HDF5Output *file, int partIndex) const
 {
 	if (m_tracking == true)
 	{
@@ -88,11 +88,12 @@ void Particle::SaveTrack(HDF5Output &file) const
 		{
 			gammaBuff[i] = m_gammaHistory[i];
 		}
-		file.AddGroup("Particle");
-		file.AddArray2D(posBuff, m_posHistory.size(), 3, "Particle/Position");
-		file.AddArray2D(momBuff, m_momHistory.size(), 3, "Particle/Momentum");
-		file.AddArray1D(timeBuff, m_posHistory.size(), "Particle/Time");
-		file.AddArray1D(gammaBuff, m_momHistory.size(), "Particle/Gamma");
+		std::string groupName = "Particles/part" + std::to_string(partIndex);
+		file->AddGroup(groupName);
+		file->AddArray2D(posBuff, m_posHistory.size(), 3, groupName + "/Position");
+		file->AddArray2D(momBuff, m_momHistory.size(), 3, groupName + "/Momentum");
+		file->AddArray1D(timeBuff, m_posHistory.size(), groupName + "/Time");
+		file->AddArray1D(gammaBuff, m_momHistory.size(), groupName + "/Gamma");
 	} else
 	{
 		std::cerr << "Error: Output failed. Tracking not turned on." << std::endl; 
