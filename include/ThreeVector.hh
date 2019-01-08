@@ -84,24 +84,35 @@ public:
 	// Returns the matrix required to rotate the vecotor onto the second
 	ThreeMatrix RotateToAxis(const ThreeVector &axis) const
 	{
-		ThreeVector norm1 = this->Norm();
-		ThreeVector norm2 = axis.Norm();
-		ThreeVector crossVec = norm1.Cross(norm2);
+		ThreeMatrix rotation;
+		// Fist we need to check if the vectors are ainti parallel as this method fails
+		if ((this->Norm() + axis.Norm()).Mag2() <= 1e-8)
+		{
+			rotation[0][0] = -1.0;
+			rotation[1][1] = -1.0;
+			rotation[2][2] = -1.0;
+		} else
+		{
+			ThreeVector norm1 = this->Norm();
+			ThreeVector norm2 = axis.Norm();
+			ThreeVector crossVec = norm1.Cross(norm2);
 
-		double sin = crossVec.Mag();
-		double cos = norm1.Dot(norm2);
+			double sin = crossVec.Mag();
+			double cos = norm1.Dot(norm2);
 
-		ThreeMatrix skewMat;
-		skewMat[0][1] = -crossVec[2];
-		skewMat[0][2] =  crossVec[1];
-		skewMat[1][0] =  crossVec[2];
-		skewMat[1][2] = -crossVec[0];
-		skewMat[2][0] = -crossVec[1];
-		skewMat[2][1] =  crossVec[0];
+			ThreeMatrix skewMat;
+			skewMat[0][1] = -crossVec[2];
+			skewMat[0][2] =  crossVec[1];
+			skewMat[1][0] =  crossVec[2];
+			skewMat[1][2] = -crossVec[0];
+			skewMat[2][0] = -crossVec[1];
+			skewMat[2][1] =  crossVec[0];
 
-		ThreeMatrix ident;
-		ident.Ideneity();
-		return ident + skewMat + skewMat * skewMat * (1.0 / (1.0 + cos));
+			ThreeMatrix ident;
+			ident.Ideneity();
+			rotation = ident + skewMat + skewMat * skewMat * (1.0 / (1.0 + cos));
+		}
+		return rotation;
 	}
 
 public:

@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "Particle.hh"
+#include "MCTools.hh"
 
 Particle::Particle()
 {
@@ -9,18 +10,20 @@ Particle::Particle()
 Particle::Particle(double mass, double charge, double time, bool tracking):
 m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(time)
 {
-}
-
-Particle::~Particle()
-{
+	InitOpticalDepth();
 }
 
 Particle::Particle(double mass, double charge, const ThreeVector &position, 
 			 	   const ThreeVector &momentum, double time, bool tracking):
 m_charge(charge), m_mass(mass), m_tracking(tracking), m_time(time)
 {
+	InitOpticalDepth();
 	m_momentum = momentum;
 	m_position = position;
+}
+
+Particle::~Particle()
+{
 }
 
 void Particle::UpdateTrack(const ThreeVector &position, const ThreeVector &momentum)
@@ -41,6 +44,11 @@ void Particle::UpdateTime(double dt)
 	m_time += dt;
 }
 
+void Particle::UpdateOpticalDepth(double dtau)
+{
+	m_opticalDepth -= dtau;
+}
+
 ThreeVector Particle::GetVelocity() const
 {
 	ThreeVector velcoity = m_momentum / (m_mass * GetGamma());
@@ -58,7 +66,7 @@ double Particle::GetGamma() const
 	}
 }
 
-void Particle::SaveTrack(HDF5Output *file, int partIndex) const
+void Particle::SaveTrack(HDF5Output *file, std::string partName, int partIndex) const
 {
 	if (m_tracking == true)
 	{
@@ -88,7 +96,7 @@ void Particle::SaveTrack(HDF5Output *file, int partIndex) const
 		{
 			gammaBuff[i] = m_gammaHistory[i];
 		}
-		std::string groupName = "Particles/part" + std::to_string(partIndex);
+		std::string groupName = "Particles/" + partName + "/part" + std::to_string(partIndex);
 		file->AddGroup(groupName);
 		file->AddArray2D(posBuff, m_posHistory.size(), 3, groupName + "/Position");
 		file->AddArray2D(momBuff, m_momHistory.size(), 3, groupName + "/Momentum");
@@ -98,4 +106,9 @@ void Particle::SaveTrack(HDF5Output *file, int partIndex) const
 	{
 		std::cerr << "Error: Output failed. Tracking not turned on." << std::endl; 
 	}
+}
+
+void Particle::InitOpticalDepth()
+{
+	m_opticalDepth = -1.0 * std::log(1.0 - MCTools::RandDouble(0.0, 1.0));
 }

@@ -6,21 +6,26 @@
 #include "ThreeMatrix.hh"
 #include "ParticleList.hh"
 #include "MCTools.hh"
+#include "NonLinearCompton.hh"
 #include <fstream>
 
 int main(int argc, char* argv[])
 {
 	// Set up the laser field
-	LaserField* field = new LaserField(100.0, 10.0, 1.0, 2.0, 0.0, 0.0, 
+	LaserField* field = new LaserField(1000.0, 10.0, 1.0, 2.0, 0.0, 0.0, 
 					   ThreeVector(0,0,0), ThreeVector(0,0,1));
 
 	// Set up the primary and secondary particle lists
-	ParticleList* primaries   = new ParticleList();
-	ParticleList* secondaries = new ParticleList(); 
-	primaries->GenericSource(100, 1, 1, 10, 1, ThreeVector(0,0,-0.5), ThreeVector(0,0,-1));
+	ParticleList* electrons = new ParticleList();
+	ParticleList* positrons = new ParticleList();
+	ParticleList* gammas	= new ParticleList();
+	electrons->GenericSource(1, 1, 1, 1, 0, ThreeVector(0,0,-1), ThreeVector(0,0,1));
 
 	// Set the particle pusher
 	ParticlePusher* pusher = new ParticlePusher(field, 0.001);
+
+	// Set the physical processes 
+	NonLinearCompton* compton = new NonLinearCompton(field, 0.001);
 
 	// Set the output file
 	HDF5Output* file = new HDF5Output("./Data/test.h");
@@ -29,15 +34,22 @@ int main(int argc, char* argv[])
 	int n = 0;
 	while(true)
 	{
-		// Push primary particles
-		for (unsigned int i = 0; i < primaries->GetNPart(); i++)
+		// Push electrons
+		for (unsigned int i = 0; i < electrons->GetNPart(); i++)
 		{
-			pusher->PushParticle(primaries->GetParticle(i));
+			pusher->PushParticle(electrons->GetParticle(i));
+			compton->Interact(electrons->GetParticle(i), gammas);
 		}
-		// Push secondary particles
-		for (unsigned int i = 0; i < secondaries->GetNPart(); i++)
+		// Push positrons
+		for (unsigned int i = 0; i < positrons->GetNPart(); i++)
 		{
-			pusher->PushParticle(secondaries->GetParticle(i));
+			pusher->PushParticle(positrons->GetParticle(i));
+			compton->Interact(positrons->GetParticle(i), gammas);
+		}
+		// Push gammas
+		for (unsigned int i = 0; i < gammas->GetNPart(); i++)
+		{
+			pusher->PushParticle(gammas->GetParticle(i));
 		}
 
 		// add up optical depth and check if process occurs
@@ -47,7 +59,16 @@ int main(int argc, char* argv[])
 		}
 		n++;
 	}
-	primaries->SaveTracks(file);
+
+	gammas->SaveTracks(file, "Gamma");
+	electrons->SaveTracks(file, "Electron");
+
+	delete field;
+	delete electrons;
+	delete positrons;
+	delete gammas;
+	delete compton;
+	delete file;
 
 	// define time using laser frequency with 
 /*

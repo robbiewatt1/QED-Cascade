@@ -3,8 +3,10 @@
 #include "Constants.hh"
 #include <fstream>
 
-ParticleList::ParticleList()
+ParticleList::ParticleList(unsigned int maxParticles):
+m_maxParticles(maxParticles), m_particleNumber(0)
 {
+	m_particleList = std::vector<Particle>(m_maxParticles);
 }
 
 ParticleList::~ParticleList()
@@ -13,14 +15,15 @@ ParticleList::~ParticleList()
 
 void ParticleList::AddParticle(const Particle &part)
 {
-	m_particleList.push_back(part);
+	m_particleList[m_particleNumber] = part;
+	m_particleNumber++;
 }
 
 void ParticleList::GenericSource(unsigned int nPart, double mass, double charge, double energy,
 							 	 double deltaPos, const ThreeVector &position,
 							 	 const ThreeVector &direction)
 {
-	m_particleList = std::vector<Particle>(nPart);
+	m_particleNumber = nPart;
 	std::vector<double> rPos = MCTools::SampleNorm(0, deltaPos, nPart);
 	ThreeMatrix m_rotaion = direction.RotateToAxis(ThreeVector(0, 0, 1));
 	for (unsigned int i = 0; i < nPart; i++)
@@ -38,11 +41,11 @@ void ParticleList::GenericSource(unsigned int nPart, double mass, double charge,
 	}
 }
 
-void ParticleList::SaveTracks(HDF5Output *file) const
+void ParticleList::SaveTracks(HDF5Output *file, std::string partName) const
 {
-	file->AddGroup("Particles");
-	for (unsigned int i = 0; i < m_particleList.size(); i++)
+	file->AddGroup("Particles/" + partName);
+	for (unsigned int i = 0; i < m_particleNumber; i++)
 	{
-		m_particleList[i].SaveTrack(file, i);
+		m_particleList[i].SaveTrack(file, partName, i);
 	}
 }

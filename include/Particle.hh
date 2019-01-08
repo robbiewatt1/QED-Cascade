@@ -22,6 +22,8 @@ public:
 	
 	void UpdateTime(double dt);
 
+	void UpdateOpticalDepth(double dtau);
+
 	ThreeVector GetPosition() const {return m_position;}
 
 	ThreeVector GetMomentum() const {return m_momentum;}
@@ -38,15 +40,20 @@ public:
 
 	double GetTime() const {return m_time;}
 
+	double GetOpticalDepth() const {return m_opticalDepth;}
+
 	double GetGamma() const;
 
-	void SaveTrack(HDF5Output *file, int partIndex = 0) const;
+	void SaveTrack(HDF5Output *file,  std::string partName, int partIndex = 0) const;
+
+	void InitOpticalDepth();
 
 private:
 	bool m_tracking;	// If set to true, particle tracking turned on
 	double m_mass;	//mass normilised to electron mass
 	double m_charge;	//charge normilised to -electron charge
 	double m_time;	// global time of particle
+	double m_opticalDepth;	// optical depth of particle
 
 	ThreeVector m_position;	// current position of particle
 	ThreeVector m_momentum;	// current velcoity of particle
