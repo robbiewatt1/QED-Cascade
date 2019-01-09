@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(QEDCASC)
 
 enable_language(CXX)
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_FLAGS "-fopenmp")
 
 find_package(HDF5 REQUIRED COMPONENTS C CXX)

@@ -49,6 +49,11 @@ void Particle::UpdateOpticalDepth(double dtau)
 	m_opticalDepth -= dtau;
 }
 
+ThreeVector Particle::GetDirection() const
+{
+	return m_momentum.Norm();
+}
+
 ThreeVector Particle::GetVelocity() const
 {
 	ThreeVector velcoity = m_momentum / (m_mass * GetGamma());
@@ -63,6 +68,17 @@ double Particle::GetGamma() const
 	} else
 	{
 		return 0;
+	}
+}
+
+double Particle::GetBeta() const
+{
+	if (m_mass > 0)
+	{
+		return std::sqrt(1.0 - 1.0 /(GetGamma() * GetGamma()));
+	} else
+	{
+		return 1.00;
 	}
 }
 

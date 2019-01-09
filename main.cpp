@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 	ParticleList* electrons = new ParticleList();
 	ParticleList* positrons = new ParticleList();
 	ParticleList* gammas	= new ParticleList();
-	electrons->GenericSource(1, 1, 1, 1, 0, ThreeVector(0,0,-1), ThreeVector(0,0,1));
+	electrons->GenericSource(1, 1, 1, 10, 0, ThreeVector(0,0,-1), ThreeVector(0,0,1));
 
 	// Set the particle pusher
 	ParticlePusher* pusher = new ParticlePusher(field, 0.001);
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 		}
 
 		// add up optical depth and check if process occurs
-		if (n == 10000)
+		if (n == 20000)
 		{
 			break;
 		}

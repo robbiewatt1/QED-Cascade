@@ -8,6 +8,7 @@ struct Constants
     static constexpr double me = 9.10938356e-31;
     static constexpr double eV = 1.60217662e-19;
     static constexpr double c  = 2.99792458e8;
+    static constexpr double alpha = 0.0072973525664;
 };
 
 #endif

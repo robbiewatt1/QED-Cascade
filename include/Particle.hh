@@ -28,11 +28,13 @@ public:
 
 	ThreeVector GetMomentum() const {return m_momentum;}
 
+	ThreeVector GetDirection() const;
+	
+	ThreeVector GetVelocity() const;
+
 	std::vector<ThreeVector> GetPosHist() const {return m_posHistory;}
 
 	std::vector<ThreeVector> GetMomHist() const {return m_momHistory;}
-
-	ThreeVector GetVelocity() const;
 
 	double GetMass() const {return m_mass;}
 
@@ -43,6 +45,8 @@ public:
 	double GetOpticalDepth() const {return m_opticalDepth;}
 
 	double GetGamma() const;
+
+	double GetBeta() const;
 
 	void SaveTrack(HDF5Output *file,  std::string partName, int partIndex = 0) const;
 

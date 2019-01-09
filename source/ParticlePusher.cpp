@@ -13,9 +13,9 @@ void ParticlePusher::PushParticle(Particle &part)
 {
 	if (part.GetCharge() == 0)	// Particle is Chargless
 	{
-		// Only chargeless particles are photons. Propagate by p_i/P^2 in each direction.
-		// For some reason this isn't RK4 yet
-		ThreeVector positionNew = part.GetPosition() + (m_dt / part.GetMomentum().Mag2())
+		// Only chargeless particles are photons. Propagate by dt each time step.
+		// No need for RK4
+		ThreeVector positionNew = part.GetPosition() + (m_dt / part.GetMomentum().Mag())
 								 * part.GetMomentum();
 		part.UpdateTrack(positionNew, part.GetMomentum());
 		part.UpdateTime(m_dt);
