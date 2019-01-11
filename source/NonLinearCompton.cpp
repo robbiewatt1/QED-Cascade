@@ -6,8 +6,8 @@
 #include "Constants.hh"
 
 
-NonLinearCompton::NonLinearCompton(LaserField* field, double dt):
-m_filed(field), m_dt(dt)
+NonLinearCompton::NonLinearCompton(LaserField* field, UnitsSystem* units, double dt):
+m_filed(field), m_units(units), m_dt(dt)
 {
 	LoadTables();
 }

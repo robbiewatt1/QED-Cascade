@@ -8,5 +8,6 @@ Data/
 *.h5
 *.xmf
 *.m
+*.ini
 
 QEDCASC

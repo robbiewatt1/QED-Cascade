@@ -8,29 +8,109 @@
 #include "MCTools.hh"
 #include "NonLinearCompton.hh"
 #include <fstream>
+#include <string>
+#include <cstring>
+#include "INIReader.hh"
+#include "UnitsSystem.hh"
 
 int main(int argc, char* argv[])
 {
-	// Set up the laser field
-	LaserField* field = new LaserField(1000.0, 10.0, 1.0, 2.0, 0.0, 0.0, 
-					   ThreeVector(0,0,0), ThreeVector(0,0,1));
+	INIReader inputFile;
+	if (argc == 1)
+	{
+		std::cerr << "Error: Input file was not provided\n";
+		std::cerr << "Please provide an input file via the command line.\n";
+		std::cerr << "For help on using \"QED-Cascade\", and for a full list of command line " 
+					 "options, please provide the command line argument \"-h\".\n";
+		return 1;
+	} else if (argc > 2)
+	{
+		std::cerr << "Error: " << argc << " command line arguments provided\n";
+		std::cerr << "\"QED-Cascade\" only accepts 1 command line argument\n";
+		std::cerr << "For help on using \"QED-Cascade\", and for a full list of command line" 
+					 " options, please provide the command line argument \"-h\".\n";
+		return 1;
+	} else
+	{
+		std::string argument(argv[1]);
+		if (argument == "-h")
+		{
+			std::cout << "This is how to use the code\n";
+			return 1;
+		} else if (argument.substr(argument.size() - 4) == ".ini")
+		{
+			inputFile = INIReader(argument);
+			if (inputFile.ParseError() < 0)
+			{
+        		std::cerr << "Error: File \"" << argument << "\" does not exist!\n";
+        		return 1;
+        	}
+		} else
+		{
+			std::cerr << "Error: unrecognised command line argument \"" << argv[1] << "\" provided.\n";
+			std::cerr << "For help on using \"QED-Cascade\", and for a full list of command line "
+					 	 "options, please provide the command line argument \"-h\".\n";
+			return 1;
+		}
+	}
 
-	// Set up the primary and secondary particle lists
+	// First check that all fields that need to be set are
+	if (!(inputFile.HasValue("General", "time_step")))
+	{
+		std::cerr << "Error: Simulation time step not found.\n";
+		return 1;
+	} else if (!(inputFile.HasValue("General", "time_end")))
+	{
+		std::cerr << "Error: Simulation time end not found.\n";
+		return 1;
+	}
+
+	// General
+	double timeStep 	= inputFile.GetReal("General", "time_step", 0);
+	double timeEnd 		= inputFile.GetReal("General", "time_end", 0);
+	double refFrequency = inputFile.GetReal("General", "frequency_ref_SI", 0);
+	// Laser
+	double l_intensity 		= inputFile.GetReal("Laser", "intensity", 0);
+	double l_duration 		= inputFile.GetReal("Laser", "duration", 0);
+	double l_waleLength 	= inputFile.GetReal("Laser", "waleLength", 0);
+	double l_waist			= inputFile.GetReal("Laser", "waist", 0);
+	double l_polarisation	= inputFile.GetReal("Laser", "polarisation", 0);
+	ThreeVector l_location 	= inputFile.GetThreeVector("Laser", "location", ThreeVector(0,0,0));
+	l_location.Print();
+	ThreeVector l_direction = inputFile.GetThreeVector("Laser", "direction", ThreeVector(0,0,1));
+	l_direction.Print();
+	// Electrons
+	int e_number = inputFile.GetInteger("Electrons", "number", 0);
+	int e_energy = inputFile.GetInteger("Electrons", "energy", 1);
+	int e_deltaR = inputFile.GetInteger("Electrons", "delta_r", 0);
+	ThreeVector e_location 	= inputFile.GetThreeVector("Electrons", "location", ThreeVector(0,0,0));
+	e_location.Print();
+	ThreeVector e_direction = inputFile.GetThreeVector("Electrons", "direction", ThreeVector(0,0,1));
+	e_direction.Print();
+	// Positrons
+	// Gammas
+	// Output
+
+
+	// Set up the simulation
+	UnitsSystem* units = new UnitsSystem();
+	units->SetReferenceFrequencySI(1);
+	LaserField* field = new LaserField(l_intensity, l_duration, l_waleLength, l_waist, 0.0, 
+									   l_polarisation, l_direction, l_location);
+	
+	ParticlePusher* pusher = new ParticlePusher(field, timeStep);
+	
+	NonLinearCompton* compton = new NonLinearCompton(field, timeStep);
+	
+	HDF5Output* file = new HDF5Output("./Data/test.h");
+	
 	ParticleList* electrons = new ParticleList();
 	ParticleList* positrons = new ParticleList();
 	ParticleList* gammas	= new ParticleList();
-	electrons->GenericSource(1, 1, 1, 10, 0, ThreeVector(0,0,-1), ThreeVector(0,0,1));
+	electrons->GenericSource(e_number, 1, -1, e_energy, e_deltaR, e_location, e_direction);
+/*
 
-	// Set the particle pusher
-	ParticlePusher* pusher = new ParticlePusher(field, 0.001);
-
-	// Set the physical processes 
-	NonLinearCompton* compton = new NonLinearCompton(field, 0.001);
-
-	// Set the output file
-	HDF5Output* file = new HDF5Output("./Data/test.h");
-
-	// Enter the main pushing loop
+	// Enter the main simulation loop
 	int n = 0;
 	while(true)
 	{
@@ -60,9 +140,10 @@ int main(int argc, char* argv[])
 		n++;
 	}
 
+
 	gammas->SaveTracks(file, "Gamma");
 	electrons->SaveTracks(file, "Electron");
-
+*/
 	delete field;
 	delete electrons;
 	delete positrons;

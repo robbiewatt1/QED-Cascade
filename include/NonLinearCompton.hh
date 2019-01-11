@@ -4,11 +4,12 @@
 #include "LaserField.hh"
 #include "Particle.hh"
 #include "ParticleList.hh"
+#include "UnitsSystem.hh"
 
 class NonLinearCompton
 {
 public:
-	NonLinearCompton(LaserField* field, double dt);
+	NonLinearCompton(LaserField* field, UnitsSystem* units, double dt);
 	
 	~NonLinearCompton();
 
@@ -27,6 +28,7 @@ private:
 
 private:
 	LaserField* m_filed;	// LaserField interacting with particle
+	UnitsSystem* m_units;
 	double m_dt;	// simulation time step	
 
 	std::vector<double> m_hVector;
