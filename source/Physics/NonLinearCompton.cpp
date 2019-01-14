@@ -3,7 +3,6 @@
 
 #include "NonLinearCompton.hh"
 #include "Numerics.hh"
-#include "Constants.hh"
 
 
 NonLinearCompton::NonLinearCompton(LaserField* field, UnitsSystem* units, double dt):

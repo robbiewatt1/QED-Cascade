@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	
 	ParticlePusher* pusher = new ParticlePusher(field, timeStep);
 	
-	NonLinearCompton* compton = new NonLinearCompton(field, timeStep);
+	NonLinearCompton* compton = new NonLinearCompton(field, units, timeStep);
 	
 	HDF5Output* file = new HDF5Output("./Data/test.h");
 	

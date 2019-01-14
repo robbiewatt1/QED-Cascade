@@ -1,6 +1,6 @@
 #include "ParticleList.hh"
 #include "MCTools.hh"
-#include "Constants.hh"
+#include "UnitsSystem.hh"
 #include <fstream>
 
 ParticleList::ParticleList(unsigned int maxParticles):
@@ -30,7 +30,7 @@ void ParticleList::GenericSource(unsigned int nPart, double mass, double charge,
 	{
 		// This method samples from circle at origin, then rotates to surface normal and
 		// adds to position to generate source at arb location and direction 
-		double angle = MCTools::RandDouble(0, 2.0 * Constants::pi);
+		double angle = MCTools::RandDouble(0, 2.0 * UnitsSystem::pi);
 		ThreeVector partPosition = ThreeVector(std::cos(angle) * rPos[i], 
 											   std::sin(angle) * rPos[i], 0.0);
 		partPosition = m_rotaion * partPosition + position;

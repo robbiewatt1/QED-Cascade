@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "LaserField.hh"
-#include "Constants.hh"
+#include "UnitsSystem.hh"
 
 LaserField::LaserField()
 {
@@ -16,7 +16,7 @@ m_polAngle(polAngle)
 	m_waveVec = waveVec.Norm();
 	m_rotaion = m_waveVec.RotateToAxis(ThreeVector(0,0,1));
 	m_rotationInv = m_rotaion.Inverse();
-	m_waveNum = 2.0 * Constants::pi / m_waveLength;
+	m_waveNum = 2.0 * UnitsSystem::pi / m_waveLength;
 }
 
 LaserField::~LaserField()
