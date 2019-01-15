@@ -30,10 +30,11 @@ private:
 	double m_maxI;	// Beam max intensity
 	double m_tau;	// beam duration
 	double m_waveLength;	// wavelength
-	double m_waveNum;	// Wave number
 	double m_waist;	// Waist of the beam at focus
-	double m_polAngle; // Polerisation angle
 	double m_start;	// distance from focus of start of beam
+	double m_polAngle; // Polerisation angle
+	double m_waveNum;	// Wave number
+
 
 	ThreeMatrix m_rotaion;	// Matrix to rotate so beam goes inb z axis
 	ThreeMatrix m_rotationInv;	// Matrix to rotate back

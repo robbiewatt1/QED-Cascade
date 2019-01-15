@@ -15,6 +15,5 @@ target_link_libraries(IO ${HDF5_LIBRARIES} Tools)
 target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${HDF5_INCLUDE_DIRS})
 
 install(TARGETS IO
-	COMPONENT application
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib)

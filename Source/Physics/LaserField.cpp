@@ -10,8 +10,8 @@ LaserField::LaserField()
 LaserField::LaserField(double maxI, double tau, double waveLength, double waist, 
 					   double start, double polAngle, const ThreeVector &focus,
 					   const ThreeVector &waveVec):
-m_maxI(maxI), m_tau(tau), m_waist(waist), m_start(start), m_focus(focus), m_waveLength(waveLength),
-m_polAngle(polAngle)
+m_maxI(maxI), m_tau(tau), m_waveLength(waveLength), m_waist(waist), m_start(start),
+m_polAngle(polAngle), m_focus(focus)
 {
 	m_waveVec = waveVec.Norm();
 	m_rotaion = m_waveVec.RotateToAxis(ThreeVector(0,0,1));
@@ -76,7 +76,7 @@ void LaserField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 						   const std::vector<double> &zAxis)
 {
 	file.AddGroup("Field");
-	for (int t = 0; t < tAxis.size(); t++)
+	for (unsigned int t = 0; t < tAxis.size(); t++)
 	{
 		std::string groupName = "Field/" + std::to_string(tAxis[t]);
 		groupName.erase(groupName.find_last_not_of('0') + 1, std::string::npos);

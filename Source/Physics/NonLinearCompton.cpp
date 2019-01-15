@@ -17,6 +17,7 @@ NonLinearCompton::~NonLinearCompton()
 
 void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 {
+	/*
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
@@ -36,9 +37,11 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 		partList->AddParticle(gamma);
 		part.InitOpticalDepth();
 	}
+	*/
 }
 double NonLinearCompton::CalculateEta(const Particle &part)
 {
+	/*
 	// The direction of the particle
 	ThreeVector partDir = part.GetDirection();
 
@@ -53,27 +56,75 @@ double NonLinearCompton::CalculateEta(const Particle &part)
 	double eleCrit = 1.0;
 	double eta = std::sqrt((ePerp + part.GetBeta() * partDir.Cross(bField)).Mag2() 
 						    + std::pow(partDir.Dot(eField), 2.0)) * part.GetGamma() / eleCrit;
-	return eta; 
+	return eta;
+	*/
+	return 0;
 }
 
 void NonLinearCompton::LoadTables()
 {
-	std::ifstream hFile("./Tables/hsokolov.table");
+	// Load the table for h
+	std::ifstream hFile("../../Tables/hsokolov.table");
 	if (!hFile)
 	{
 		std::cerr << "ERROR: Data table for h not found!" << std::endl;
 		std::cerr << "Please download required data tables." << std::endl;
-		exit(1); 
+		exit(1);
 	}
-	int nValues;
+
+	hFile >> m_h_length;
+	m_h_dataTable = new double [m_h_length];
+	m_h_etaAxis   = new double [m_h_length];
 	double  logEta, logH;
-	hFile >> nValues;
-	m_hVector = std::vector<double>(nValues);
-	m_etaVector = std::vector<double>(nValues);
-	for (unsigned int i = 0; i < nValues; ++i)
+	for (unsigned int i = 0; i < m_h_length; i++)
 	{
 		hFile >> logEta >> logH;
-		m_hVector[i] = std::pow(10.0, logH);
-		m_etaVector[i] = std::pow(10.0, logEta);
+		m_h_dataTable[i] = std::pow(10.0, logEta);
+		m_h_etaAxis[i] = std::pow(10.0, logH);
 	}
+
+	// Load the table photon energy
+	std::ifstream phEnFile("../../Tables/ksi_sokolov.table");
+	if (!phEnFile)
+	{
+		std::cerr << "ERROR: Data table for photon energy sampling not found!" << std::endl;
+		std::cerr << "Please download required data tables." << std::endl;
+		exit(1); 
+	}
+
+	double logMaxEta, logMinEta;
+	phEnFile >> m_phEn_etaLength >> m_phEn_chiLength >> logMinEta >> logMaxEta;
+	m_phEn_etaAxis = new double [m_phEn_etaLength];
+	m_phEn_chiAxis = new double* [m_phEn_etaLength];
+	m_phEn_dataTable = new double* [m_phEn_etaLength];
+	for (unsigned int i = 0; i < m_phEn_etaLength; i++)
+	{
+		m_phEn_chiAxis[i] = new double [m_phEn_chiLength];
+		m_phEn_dataTable[i] = new double [m_phEn_chiLength];
+	}
+
+	for (unsigned int i = 0; i < m_phEn_etaLength; i++)
+	{
+		for (unsigned int j = 0; j < m_phEn_chiLength; j++)
+		{
+			phEnFile >> m_phEn_dataTable[i][j];
+			std::cout << m_phEn_dataTable[i][j] << "\t";
+		}
+		std::cout << "\n";
+	}
+}
+
+void NonLinearCompton::UnloadTables()
+{
+	delete [] m_h_dataTable;
+	delete [] m_h_etaAxis;
+
+	for (unsigned int i = 0; i < m_phEn_etaLength; i++)
+	{
+		delete [] m_phEn_chiAxis[i];
+		delete [] m_phEn_dataTable[i];
+	}
+	delete [] m_phEn_chiAxis;
+	delete [] m_phEn_dataTable;
+	delete [] m_phEn_etaAxis;
 }

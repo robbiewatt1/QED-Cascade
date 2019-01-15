@@ -27,10 +27,10 @@ public:
 					std::string dataName);
 
 private:
+	std::string m_fileName;
+	H5::H5File* m_file;
 	H5::Group* m_group;
 	H5::Group* m_subGroup;
-	H5::H5File* m_file;
-	std::string m_fileName;
 };
 
 #endif

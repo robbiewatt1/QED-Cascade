@@ -1,7 +1,7 @@
 #include "ParticlePusher.hh"
 
 ParticlePusher::ParticlePusher(LaserField* field, double dt):
-m_dt(dt), m_time(0), m_field(field)
+m_field(field), m_dt(dt), m_time(0)
 {
 }
 

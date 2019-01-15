@@ -1,4 +1,10 @@
 Data/*
+Tables/*
+Build/*
+build/*
+
+bin/
+lib/
 
 *.h5
 *.xmf

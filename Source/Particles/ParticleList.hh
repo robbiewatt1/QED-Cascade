@@ -17,7 +17,7 @@ public:
 
 	unsigned int GetNPart() const {return m_particleNumber;}
 
-	Particle& GetParticle(unsigned int index) {m_particleList[index];}	
+	Particle& GetParticle(unsigned int index) {return m_particleList[index];}	
 
 	// Adds a particle to the source. Not very fast for large arrays
 	void AddParticle(const Particle &part);

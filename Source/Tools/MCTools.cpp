@@ -16,7 +16,7 @@ double MCTools::RandDouble(double low, double high)
     return low + (double)randInt / maxInt * (high - low);
 }
 
-std::vector<double> MCTools::SampleNorm(double mean, double variance, int nSamples)
+std::vector<double> MCTools::SampleNorm(double mean, double variance, unsigned int nSamples)
 {
 	std::random_device rd;
 	std::mt19937 generator(rd());

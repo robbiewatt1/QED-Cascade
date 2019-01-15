@@ -97,9 +97,7 @@ public:
 			ThreeVector norm2 = axis.Norm();
 			ThreeVector crossVec = norm1.Cross(norm2);
 
-			double sin = crossVec.Mag();
 			double cos = norm1.Dot(norm2);
-
 			ThreeMatrix skewMat;
 			skewMat[0][1] = -crossVec[2];
 			skewMat[0][2] =  crossVec[1];

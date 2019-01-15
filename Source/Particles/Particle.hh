@@ -53,11 +53,11 @@ public:
 	void InitOpticalDepth();
 
 private:
-	bool m_tracking;	// If set to true, particle tracking turned on
 	double m_mass;	//mass normilised to electron mass
 	double m_charge;	//charge normilised to -electron charge
 	double m_time;	// global time of particle
 	double m_opticalDepth;	// optical depth of particle
+	bool m_tracking;	// If set to true, particle tracking turned on
 
 	ThreeVector m_position;	// current position of particle
 	ThreeVector m_momentum;	// current velcoity of particle
