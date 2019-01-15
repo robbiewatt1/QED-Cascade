@@ -10,15 +10,15 @@ project(QEDCASC)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/../lib)
-set(TOOLS_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/Tools)
+#set(INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/../lib)
+#set(TOOLS_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/Tools)
 #set(Tools_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/Tools)
 #set(Tools_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/Tools)
 
-INCLUDE_DIRECTORIES(source)
-add_subdirectory(source/IO)
-add_subdirectory(source/Physics)
-add_subdirectory(source/Particles)
-add_subdirectory(source/Tools)
-add_subdirectory(source/Exec)
+INCLUDE_DIRECTORIES(Source)
+add_subdirectory(Source/IO)
+add_subdirectory(Source/Physics)
+add_subdirectory(Source/Particles)
+add_subdirectory(Source/Tools)
+add_subdirectory(Source/Exec)
 
