@@ -8,11 +8,13 @@ UnitsSystem::UnitsSystem()
 void UnitsSystem::SetReferenceFrequencySI(double frequency)
 {
 	// dimension refrence values
-	ref_freq   = frequency;
-	ref_time   = 1.0 / frequency;
-	ref_length = SI_c / frequency;
-	ref_eField = SI_me * SI_c * frequency / SI_qe;
-	ref_bField = SI_me * frequency / SI_qe;
+	ref_freq     = frequency;
+	ref_time     = 1.0 / frequency;
+	ref_length   = SI_c / frequency;
+	ref_eField   = SI_me * SI_c * frequency / SI_qe;
+	ref_bField   = SI_me * frequency / SI_qe;
+	ref_momentum = SI_me * SI_c;
+	ref_energy   = SI_me * SI_c * SI_c;
 
 	// Constants in terms of refrence
 	lComp = SI_lComp / ref_length;

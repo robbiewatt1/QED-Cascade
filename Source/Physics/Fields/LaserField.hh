@@ -3,11 +3,11 @@
 
 #include <vector>
 
+#include "Field.hh"
 #include "ThreeVector.hh"
 #include "ThreeMatrix.hh"
-#include "HDF5Output.hh"
 
-class LaserField
+class LaserField: public Field
 {
 public:
 
@@ -16,15 +16,18 @@ public:
 	LaserField(double maxI, double tau, double waveLength, double waist, double start,
 			   double polAngle, const ThreeVector &waveNum, const ThreeVector &focus);
 	
-	~LaserField();
+	virtual ~LaserField();
 
-	void SaveField(HDF5Output &file, const std::vector<double> &tAxis,
-				   const std::vector<double> &xAxis, const std::vector<double> &yAxis,
-				   const std::vector<double> &zAxis);
+//	void SaveField(HDF5Output &file, const std::vector<double> &tAxis,
+//				   const std::vector<double> &xAxis, const std::vector<double> &yAxis,
+//				   const std::vector<double> &zAxis);
 
-	ThreeVector GetEfield(const ThreeVector &position, double time) const;
+	virtual void GetField(double time, const ThreeVector &position,
+						  ThreeVector &eField, ThreeVector &bField) const;
 
-	ThreeVector GetBfield(const ThreeVector &position, double time) const;
+//	ThreeVector GetEfield(const ThreeVector &position, double time) const;
+
+//	ThreeVector GetBfield(const ThreeVector &position, double time) const;
 
 private:
 	double m_maxI;	// Beam max intensity

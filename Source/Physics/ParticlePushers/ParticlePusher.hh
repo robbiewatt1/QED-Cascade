@@ -2,13 +2,13 @@
 #define PARTICLEPUSHER_HH
 
 #include "Particle.hh"
-#include "LaserField.hh"
+#include "Field.hh"
 
 class ParticlePusher
 {
 public:
 	
-	ParticlePusher(LaserField* field, double dt);
+	ParticlePusher(Field* field, double dt);
 
 	~ParticlePusher();
 	
@@ -24,7 +24,7 @@ private:
 	ThreeVector PushMomentum(double mass, double charge, const ThreeVector &momentum,
 						const ThreeVector &Efield, const ThreeVector &Bfield);	
 
-	LaserField* m_field;	// Field which particles are pushed through
+	Field* m_field;	// Field which particles are pushed through
 	double m_dt;	// Time of each step
 	double m_time;	// global time of simulation
 };

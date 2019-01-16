@@ -30,9 +30,13 @@ public:
 
 	double RefLength() const {return ref_length;}
 
-	double RefEField() const {return ref_freq;}
+	double RefEField() const {return ref_eField;}
 
 	double RefBField() const {return ref_bField;}
+
+	double RefMomentum() const {return ref_momentum;}
+
+	double RefEnergy() const {return ref_energy;}
 
 	// Method for getting physical constants in terms of reference values
 	double HBar() const {return hBar;}
@@ -71,6 +75,8 @@ private:
 	double ref_length;
 	double ref_eField;
 	double ref_bField;
+	double ref_momentum;
+	double ref_energy;
 
 	// Physical constant in terms of refrence values
 	double hBar;	// reduce planks constant

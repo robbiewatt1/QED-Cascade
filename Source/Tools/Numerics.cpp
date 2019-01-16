@@ -23,9 +23,8 @@ double Numerics::SimpsonsRule(const std::vector<double> &axis, const std::vector
 }
 
 
-double Numerics::Interpolate1D(const std::vector<double> &samplePoints, 
-							   const std::vector<double> &sampleData,
-							   double queryPoint)
+double Numerics::Interpolate1D(double* samplePoints, double* sampleData, unsigned int sampleSize,
+					 		   double queryPoint)
 {
 	double queryData;
 	if (queryPoint < samplePoints[0])
@@ -33,17 +32,17 @@ double Numerics::Interpolate1D(const std::vector<double> &samplePoints,
 		// value is not within the range so we need to use extrapolation
 		queryData = sampleData[0] + (sampleData[1] - sampleData[0]) * ((queryPoint - samplePoints[0])
 									/ (samplePoints[1] - samplePoints[0]));
-	} else if (queryPoint > samplePoints.back())
+	} else if (queryPoint > samplePoints[sampleSize-1])
 	{
 		// value is not within the range so we need to use extrapolation
-		int end = samplePoints.size() - 1;
+		int end = sampleSize - 1;
 		queryData = sampleData[end] + (sampleData[end] - sampleData[end-1]) 
 									  * ((queryPoint - samplePoints[end-1])
 		               				  / (samplePoints[end] - samplePoints[end-1]));
 	} else
 	{
 		int lIndex, hIndex;
-		for (unsigned int i = 0; i < samplePoints.size(); i++)
+		for (unsigned int i = 0; i < sampleSize; i++)
 		{
 			if (queryPoint < samplePoints[i])
 			{

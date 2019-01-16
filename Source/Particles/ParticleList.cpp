@@ -41,6 +41,7 @@ void ParticleList::GenericSource(unsigned int nPart, double mass, double charge,
 	}
 }
 
+/*
 void ParticleList::SaveTracks(HDF5Output *file, std::string partName) const
 {
 	file->AddGroup("Particles/" + partName);
@@ -49,3 +50,4 @@ void ParticleList::SaveTracks(HDF5Output *file, std::string partName) const
 		m_particleList[i].SaveTrack(file, partName, i);
 	}
 }
+*/

@@ -17,9 +17,6 @@ m_fileName(fileName), m_group(NULL)
 	{
 		m_file = new H5::H5File(m_fileName, H5F_ACC_TRUNC);
 	}
-	AddGroup("Particles");
-	AddGroup("Fields");
-	AddGroup("Histograms");
 }
 
 HDF5Output::~HDF5Output()

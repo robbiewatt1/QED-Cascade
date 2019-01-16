@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "ThreeVector.hh"
-#include "HDF5Output.hh"
 
 class Particle
 {
@@ -32,10 +31,6 @@ public:
 	
 	ThreeVector GetVelocity() const;
 
-	std::vector<ThreeVector> GetPosHist() const {return m_posHistory;}
-
-	std::vector<ThreeVector> GetMomHist() const {return m_momHistory;}
-
 	double GetMass() const {return m_mass;}
 
 	double GetCharge() const {return m_charge;}
@@ -48,7 +43,15 @@ public:
 
 	double GetBeta() const;
 
-	void SaveTrack(HDF5Output *file,  std::string partName, int partIndex = 0) const;
+	bool GetTracking() const {return m_tracking;}
+
+	std::vector<ThreeVector> GetPosHist() const {return m_posHistory;}
+
+	std::vector<ThreeVector> GetMomHist() const {return m_momHistory;}
+
+	std::vector<double> GetTimeHist() const {return m_timeHistory;}
+
+	std::vector<double> GetGammaHist() const {return m_gammaHistory;}
 
 	void InitOpticalDepth();
 

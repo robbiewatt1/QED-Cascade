@@ -82,48 +82,6 @@ double Particle::GetBeta() const
 	}
 }
 
-void Particle::SaveTrack(HDF5Output *file, std::string partName, int partIndex) const
-{
-	if (m_tracking == true)
-	{
-		double posBuff[3*m_posHistory.size()];
-		double momBuff[3*m_momHistory.size()];
-		double timeBuff[m_timeHistory.size()];
-		double gammaBuff[m_gammaHistory.size()];		
-		for (unsigned int i = 0; i < m_posHistory.size(); i++)
-		{
-			for (unsigned int j = 0; j < 3; j++)
-			{
-				posBuff[3*i+j] = m_posHistory[i][j];
-			}
-		}
-		for (unsigned int i = 0; i < m_momHistory.size(); i++)
-		{
-			for (unsigned int j = 0; j < 3; j++)
-			{
-				momBuff[3*i+j] = m_momHistory[i][j];
-			}
-		}
-		for (unsigned int i = 0; i < m_timeHistory.size(); i++)
-		{
-			timeBuff[i] = m_timeHistory[i];
-		}
-		for (unsigned int i = 0; i < m_gammaHistory.size(); i++)
-		{
-			gammaBuff[i] = m_gammaHistory[i];
-		}
-		std::string groupName = "Particles/" + partName + "/part" + std::to_string(partIndex);
-		file->AddGroup(groupName);
-		file->AddArray2D(posBuff, m_posHistory.size(), 3, groupName + "/Position");
-		file->AddArray2D(momBuff, m_momHistory.size(), 3, groupName + "/Momentum");
-		file->AddArray1D(timeBuff, m_posHistory.size(), groupName + "/Time");
-		file->AddArray1D(gammaBuff, m_momHistory.size(), groupName + "/Gamma");
-	} else
-	{
-		std::cerr << "Error: Output failed. Tracking not turned on." << std::endl; 
-	}
-}
-
 void Particle::InitOpticalDepth()
 {
 	m_opticalDepth = -1.0 * std::log(1.0 - MCTools::RandDouble(0.0, 1.0));

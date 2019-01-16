@@ -1,6 +1,6 @@
 #include "ParticlePusher.hh"
 
-ParticlePusher::ParticlePusher(LaserField* field, double dt):
+ParticlePusher::ParticlePusher(Field* field, double dt):
 m_field(field), m_dt(dt), m_time(0)
 {
 }
@@ -23,28 +23,38 @@ void ParticlePusher::PushParticle(Particle &part)
 	{
 		ThreeVector posK1, posK2, posK3, posK4;
 		ThreeVector momK1, momK2, momK3, momK4;
+		ThreeVector eField, bField;
+
+		m_field->GetField(part.GetTime(), part.GetPosition(), eField, bField);
 		posK1 = PushPosition(part.GetMass(), part.GetMomentum());
-		momK1 = PushMomentum(part.GetMass(), part.GetCharge(), posK1,
-							 m_field->GetEfield(part.GetPosition(), part.GetTime()),
-							 m_field->GetBfield(part.GetPosition(), part.GetTime()));
+		momK1 = PushMomentum(part.GetMass(), part.GetCharge(),
+							 part.GetMomentum(),
+							 eField, bField);
+		
+		m_field->GetField(part.GetTime() + m_dt / 2.0,
+						  part.GetPosition() + posK1 * m_dt / 2.0,
+						  eField, bField);
 		posK2 = PushPosition(part.GetMass(), part.GetMomentum() + momK1 * m_dt / 2.0);
-		momK2 = PushMomentum(part.GetMass(), part.GetCharge(), posK2,
-							 m_field->GetEfield(part.GetPosition() + posK1 * m_dt / 2.0,
-							 					part.GetTime()),
-							 m_field->GetBfield(part.GetPosition() + posK1 * m_dt / 2.0,
-							 					part.GetTime()));
+		momK2 = PushMomentum(part.GetMass(), part.GetCharge(), 
+							 part.GetMomentum() + momK1 * m_dt / 2.0,
+							 eField, bField);
+
+		m_field->GetField(part.GetTime() + m_dt / 2.0,
+						  part.GetPosition() + posK2 * m_dt / 2.0,
+						  eField, bField);
 		posK3 = PushPosition(part.GetMass(), part.GetMomentum() + momK2 * m_dt / 2.0);
-		momK3 = PushMomentum(part.GetMass(), part.GetCharge(), posK3,
-							 m_field->GetEfield(part.GetPosition() + posK2 * m_dt / 2.0,
-							 					part.GetTime()),
-							 m_field->GetBfield(part.GetPosition() + posK2 * m_dt / 2.0,
-							 					part.GetTime()));
+		momK3 = PushMomentum(part.GetMass(), part.GetCharge(),
+							 part.GetMomentum() + momK2 * m_dt / 2.0,
+							 eField, bField);
+
+		m_field->GetField(part.GetTime() + m_dt,
+						  part.GetPosition() + posK2 * m_dt,
+						  eField, bField);
 		posK4 = PushPosition(part.GetMass(), part.GetMomentum() + momK3 * m_dt);
-		momK4 = PushMomentum(part.GetMass(), part.GetCharge(), posK4,
-							 m_field->GetEfield(part.GetPosition() + posK3 * m_dt,
-							 					part.GetTime()),
-							 m_field->GetBfield(part.GetPosition() + posK3 * m_dt,
-							 					part.GetTime()));
+		momK4 = PushMomentum(part.GetMass(), part.GetCharge(),
+							 part.GetMomentum() + momK3 * m_dt,
+							 eField, bField);
+
 		ThreeVector positionNew = part.GetPosition() + (m_dt / 6.0) 
 								  * (posK1 + 2.0 * posK2 + 2.0 * posK3 + posK4);
 		ThreeVector momentumNew = part.GetMomentum() + (m_dt / 6.0) 

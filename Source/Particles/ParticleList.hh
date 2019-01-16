@@ -27,7 +27,7 @@ public:
 					   double deltaPos, const ThreeVector &position,
 					   const ThreeVector &direction);
 
-	void SaveTracks(HDF5Output *file, std::string partName) const;
+//	void SaveTracks(HDF5Output *file, std::string partName) const;
 
 private:
 	unsigned int m_maxParticles;	// The maximum number of particles the list can take

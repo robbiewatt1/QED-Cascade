@@ -1,5 +1,6 @@
 #include <cmath>
 
+#include "Field.hh"
 #include "LaserField.hh"
 #include "UnitsSystem.hh"
 
@@ -23,13 +24,14 @@ LaserField::~LaserField()
 {
 }
 
-ThreeVector LaserField::GetEfield(const ThreeVector &position, double time) const
+void LaserField::GetField(double time, const ThreeVector &position,
+						  ThreeVector &eField, ThreeVector &bField) const
 {
 	ThreeVector position_p = m_rotaion * position;
 	double r2 		 = position_p[0] * position_p[0] + position_p[1] * position_p[1];
 	double rayleigh  = m_waveNum * m_waist * m_waist / 2.0;
 	double curvature = (position_p[2] + rayleigh * rayleigh
-										/ (position_p[2] + 1e-10));
+										/ (position_p[2] + 1e-20));
 	// Adding small number to stop divergence at zero
 	double beamWaist = m_waist * std::sqrt(1.0 + position_p[2] * position_p[2] 
 										   / (rayleigh * rayleigh));
@@ -37,40 +39,22 @@ ThreeVector LaserField::GetEfield(const ThreeVector &position, double time) cons
 				* (m_waist / beamWaist) 
 				* std::exp(-1.0 * r2 / (beamWaist * beamWaist))
 				* std::cos(position_p[2] * m_waveNum + r2 * m_waveNum / (2.0 * curvature)) 
-				* std::exp(-1.0 * (time + m_start - position_p[2]) * (time + m_start - position_p[2]) / (m_tau * m_tau));
+				* std::exp(-1.0 * (time + m_start - position_p[2]) 
+							* (time + m_start - position_p[2]) / (m_tau * m_tau));
 	
-	ThreeVector Efield;
-	Efield[0] = E0 * std::cos(m_polAngle);
-	Efield[1] = E0 * std::sin(m_polAngle);
-	Efield[2] = 0;
-	return m_rotationInv * Efield;
+	eField[0] = E0 * std::cos(m_polAngle);
+	eField[1] = E0 * std::sin(m_polAngle);
+	eField[2] = 0;
+	eField = m_rotationInv * eField;
+
+	bField[0] = E0 * std::sin(m_polAngle);
+	bField[1] = E0 * std::cos(m_polAngle);
+	bField[2] = 0;
+	bField = m_rotationInv * bField;
 }
 
-ThreeVector LaserField::GetBfield(const ThreeVector &position, double time) const
-{
-	// This method is double as slow and does not need to be done. 
-	// Can just calculate E and B at the same time
-	ThreeVector position_p = m_rotaion * position;
 
-	double r2 		 = position_p[0] * position_p[0] + position_p[1] * position_p[1];
-	double rayleigh  = m_waveNum * m_waist * m_waist / 2.0;
-	double curvature = (position_p[2] + rayleigh * rayleigh
-										/ (position_p[2] + 1e-10));
-	double beamWaist = m_waist * std::sqrt(1.0 + position_p[2] * position_p[2] 
-										   / (rayleigh * rayleigh));
-	double B0 = 0.5 * std::sqrt(m_maxI) 
-				* (m_waist / beamWaist) 
-				* std::exp(-1.0 * r2 / (beamWaist * beamWaist))
-				* std::cos(position_p[2] * m_waveNum + r2 * m_waveNum / (2.0 * curvature)) 
-				* std::exp(-1.0 * (time - m_start - position_p[2]) * (time - m_start - position_p[2]) / (m_tau * m_tau));
-
-	ThreeVector Bfield;
-	Bfield[0] = B0 * std::sin(m_polAngle);
-	Bfield[1] = B0 * std::cos(m_polAngle);
-	Bfield[2] = 0;
-	return m_rotationInv * Bfield;
-}
-
+/*
 void LaserField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 						   const std::vector<double> &xAxis, const std::vector<double> &yAxis,
 						   const std::vector<double> &zAxis)
@@ -102,3 +86,4 @@ void LaserField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 		}
 	}
 }
+*/

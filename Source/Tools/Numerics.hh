@@ -13,8 +13,7 @@ double SimpsonsRule(const std::vector<double> &axis, const std::vector<double> &
 // a linear extrapolation method will be used
 //double Interpolate1D(const Vector<double> &samplePoints, const Vector<double> &sampleData,
 //                             const Vector<double> &queryPoints);
-double Interpolate1D(const std::vector<double> &samplePoints, 
-					 const std::vector<double> &sampleData,
+double Interpolate1D(double* samplePoints, double* sampleData, unsigned int sampleSize, 
 					 double queryPoint);
 }
 #endif

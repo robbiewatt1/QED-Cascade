@@ -4,11 +4,9 @@ get NonLinearCompton class working
 get NonLinearBW class working
 
 create abstract base class for particle pusher allowing different implimentations
-create abstract base class for fields allowing different types of field
-
-remove Particle module dependancy on IO allowing the library to be built without it
 
 Sort the setup of the laserfield. decide how foccusing is implimented
-
-
 Make an imput script parser that outputs a struct to fill in all clases required
+
+Proper test of ParticlePusher
+proper test of LaserField
