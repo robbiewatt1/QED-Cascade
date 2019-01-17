@@ -82,6 +82,11 @@ double Particle::GetBeta() const
 	}
 }
 
+double Particle::GetEnergy() const
+{
+	return m_mass * GetGamma();
+}
+
 void Particle::InitOpticalDepth()
 {
 	m_opticalDepth = -1.0 * std::log(1.0 - MCTools::RandDouble(0.0, 1.0));

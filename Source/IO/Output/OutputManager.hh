@@ -7,6 +7,7 @@
 #include "Particle.hh"
 #include "ParticleList.hh"
 #include "Field.hh"
+#include "NonLinearCompton.hh"
 #include "UnitsSystem.hh"
 
 class OutputManager
@@ -32,6 +33,8 @@ public:
 							   const std::vector<double> &xAxis,
 							   const std::vector<double> &yAxis,
 							   const std::vector<double> &zAxis);
+
+	void Compton(NonLinearCompton* compton);
 
 private:
 	HDF5Output* m_outputFile;

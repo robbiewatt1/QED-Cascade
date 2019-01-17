@@ -10,3 +10,5 @@ Make an imput script parser that outputs a struct to fill in all clases required
 
 Proper test of ParticlePusher
 proper test of LaserField
+
+Method for finding chi is very bad leading to bad aliasing. needs improved

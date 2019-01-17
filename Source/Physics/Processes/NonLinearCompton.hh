@@ -13,18 +13,18 @@ public:
 	
 	~NonLinearCompton();
 
-	// Main function carrying out the process. The particle is the iunterafting particle
-	// and the particle list is where the new particle will be added.
+	// Main function carrying out the process. The particle is the iunterafting 
+	// particle and the particle list is where the new particle will be added.
 	void Interact(Particle &part, ParticleList *partList);
 
-public:
+public: // Should be private
 	
 	// Calculates the value of eta at the particles current location
 	double CalculateEta(const Particle &part);
 
 	double CalculateH(double eta);
 
-	double SampleChi(double eta);
+	double CalculateChi(double eta);	// Very bad method at the moment
 
 	void LoadTables();
 

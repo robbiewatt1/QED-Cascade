@@ -168,3 +168,7 @@ void OutputManager::EMField(Field* field, const std::vector<double> &tAxis,
 {
 
 }
+void OutputManager::Compton(NonLinearCompton* compton)
+{
+	
+}

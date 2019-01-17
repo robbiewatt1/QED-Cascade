@@ -43,6 +43,8 @@ public:
 
 	double GetBeta() const;
 
+	double GetEnergy() const;
+
 	bool GetTracking() const {return m_tracking;}
 
 	std::vector<ThreeVector> GetPosHist() const {return m_posHistory;}

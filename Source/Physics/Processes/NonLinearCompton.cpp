@@ -3,11 +3,13 @@
 
 #include "NonLinearCompton.hh"
 #include "Numerics.hh"
+#include "MCTools.hh"
 
 
 NonLinearCompton::NonLinearCompton(Field* field, UnitsSystem* units, double dt):
 m_filed(field), m_units(units), m_dt(dt)
 {
+	MCTools::SetSeed(10);
 	LoadTables();
 }
 
@@ -18,28 +20,28 @@ NonLinearCompton::~NonLinearCompton()
 
 void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 {
-
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
 	double h = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable, m_h_length, eta);
-	double deltaOD = m_dt * std::sqrt(3) * eta * h / part.GetGamma();
+	double deltaOD = m_dt * std::sqrt(3) * eta * h / part.GetGamma(); // might need a 2pi in here
 	part.UpdateOpticalDepth(deltaOD);
-/*
+
 	// Now check if process hass occured. If so then emmit and react
 	if (part.GetOpticalDepth() < 0.0)
 	{
-		// Calculate the momentum of the emmitted photns of
-		ThreeVector gammaMom = part.GetMomentum() * 0.1; // Dummy method
-		// Update the partles 
-		part.UpdateTrack(part.GetPosition(), part.GetMomentum() - gammaMom);
+		double chi = CalculateChi(eta);
+		double gammaE = chi * part.GetGamma() / eta;
+		ThreeVector gammaP = gammaE * part.GetDirection();
+		
+		part.UpdateTrack(part.GetPosition(), part.GetMomentum() - gammaP);
 		// Add new partles to the simulation 
-		Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaMom, part.GetTime(), true);
+		Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
 		partList->AddParticle(gamma);
 		part.InitOpticalDepth();
 	}
-	*/
 }
+
 double NonLinearCompton::CalculateEta(const Particle &part)
 {
 	ThreeVector partDir = part.GetDirection();
@@ -53,6 +55,18 @@ double NonLinearCompton::CalculateEta(const Particle &part)
 						   + std::pow(partDir.Dot(eField), 2.0) / (part.GetGamma() 
 						   	* part.GetGamma())) * part.GetGamma();
 	return eta;
+}
+
+double NonLinearCompton::CalculateChi(double eta)
+{
+	double rand = MCTools::RandDouble(0,1);
+
+	// Need to first find closest index for given eta;
+	int etaIndex = Numerics::ArrayIndex(m_phEn_etaAxis, m_phEn_etaLength, eta);
+	// Now need to find closest index for random value
+	int chiIndex = Numerics::ArrayIndex(m_phEn_dataTable[etaIndex], m_phEn_etaLength, rand);
+	// Now find the chi value from the table
+	return m_phEn_chiAxis[etaIndex][chiIndex];
 }
 
 void NonLinearCompton::LoadTables()
@@ -116,12 +130,13 @@ void NonLinearCompton::LoadTables()
 	double deltaEta = (logMaxEta - logMinEta) / (m_phEn_etaLength - 1.0);
 	for (unsigned int i = 0; i < m_phEn_etaLength; i++)
 	{
-		m_phEn_etaAxis[i] = logMinEta + i * deltaEta;
+		m_phEn_etaAxis[i] = std::pow(10.0, logMinEta + i * deltaEta);
 		double minChi = std::log10(m_phEn_chiMinAxis[i]);
-		double deltaChi = m_phEn_etaAxis[i] - std::log10(2.0);
+		double deltaChi = (std::log10(m_phEn_etaAxis[i]) - std::log10(2.0) - minChi) 
+						  / (m_phEn_etaLength - 1.0);
 		for (unsigned int j = 0; j < m_phEn_chiLength; j++)
 		{
-			m_phEn_chiAxis[i][j] = minChi + j * deltaChi;
+			m_phEn_chiAxis[i][j] = std::pow(10.0, minChi + j * deltaChi);
 		}
 	}
 

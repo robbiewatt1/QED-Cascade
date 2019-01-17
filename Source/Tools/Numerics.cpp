@@ -57,3 +57,31 @@ double Numerics::Interpolate1D(double* samplePoints, double* sampleData, unsigne
 	}
 	return queryData;
 }
+
+int Numerics::ArrayIndex(double* samplePoints, unsigned int sampleSize, double queryPoint)
+{
+	unsigned int lowIndex = 0;
+	for (unsigned int i = 0; i < sampleSize; i++)
+	{
+		if (samplePoints[i] < queryPoint)
+		{
+			lowIndex = i;
+		} else
+		{
+			break;
+		}
+	}
+	if (lowIndex < sampleSize - 1)
+	{
+		if ( queryPoint - samplePoints[lowIndex] < samplePoints[lowIndex+1] - queryPoint)
+		{
+			return lowIndex;
+		} else
+		{
+			return lowIndex+1;
+		}
+	} else
+	{
+		return sampleSize - 1;
+	}
+}

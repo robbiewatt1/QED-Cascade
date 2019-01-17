@@ -15,5 +15,7 @@ double SimpsonsRule(const std::vector<double> &axis, const std::vector<double> &
 //                             const Vector<double> &queryPoints);
 double Interpolate1D(double* samplePoints, double* sampleData, unsigned int sampleSize, 
 					 double queryPoint);
+
+int ArrayIndex(double* samplePoints, unsigned int sampleSize, double queryPoint);
 }
 #endif
