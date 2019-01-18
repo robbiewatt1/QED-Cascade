@@ -2,6 +2,7 @@
 #define HISTOGRAM_HH
 
 #include <string>
+#include "ParticleList.hh"
 
 class Histogram
 {
@@ -12,7 +13,12 @@ public:
 
 	void Initialise(std::string name, double minBin, double maxBin, unsigned int nBins);
 
+	void Fill(ParticleList* partList, string dataType);
+
 	void Merge(Histogram* hist);
+
+private:
+	void Normalise();
 
 private:
 	unsigned int m_nBins;
