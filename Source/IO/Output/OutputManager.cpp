@@ -4,11 +4,13 @@
 OutputManager::OutputManager(HDF5Output* file):
 m_outputFile(file), m_units(NULL)
 {
+	SetFields(true,true,true);
 }
 
 OutputManager::OutputManager(HDF5Output* file, UnitsSystem* units):
 m_outputFile(file), m_units(units)
 {
+	SetFields(true,true,true);
 }
 
 OutputManager::~OutputManager()
@@ -27,7 +29,7 @@ void OutputManager::SetFields(bool partOn, bool fieldOn, bool qedOn)
 	}
 	if (qedOn == true)
 	{
-		m_outputFile->AddGroup("QED");
+		m_outputFile->AddGroup("Histograms");
 	}
 }
 
@@ -168,7 +170,12 @@ void OutputManager::EMField(Field* field, const std::vector<double> &tAxis,
 {
 
 }
-void OutputManager::Compton(NonLinearCompton* compton)
+
+void OutputManager::OutputHist(Histogram* hist)
 {
-	
+	std::string groupName = "Histograms/"+ hist->GetName();
+	m_outputFile->AddGroup(groupName);
+	m_outputFile->AddArray1D(hist->GetBinCentres(), hist->GetNBins(), groupName + "/BinCentres");
+	m_outputFile->AddArray1D(hist->GetBinValues(), hist->GetNBins(), groupName + "/BinValues");
+
 }

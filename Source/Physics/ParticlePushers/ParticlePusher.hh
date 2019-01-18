@@ -2,6 +2,7 @@
 #define PARTICLEPUSHER_HH
 
 #include "Particle.hh"
+#include "ParticleList.hh"
 #include "Field.hh"
 
 class ParticlePusher
@@ -13,6 +14,8 @@ public:
 	~ParticlePusher();
 	
 	void PushParticle(Particle &part);
+
+	void PushParticleList(ParticleList* partList);
 
 	double GetTime() const {return m_time;}
 

@@ -6,6 +6,7 @@ find_package(HDF5 REQUIRED COMPONENTS C CXX)
 set(io_source_files
     Output/HDF5Output.cpp
     Output/OutputManager.cpp
+    Output/Histogram.cpp
     Input/ini.cpp
     Input/INIReader.cpp)
 add_library(IO SHARED ${io_source_files})

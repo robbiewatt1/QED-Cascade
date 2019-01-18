@@ -36,18 +36,8 @@ void ParticleList::GenericSource(unsigned int nPart, double mass, double charge,
 		partPosition = m_rotaion * partPosition + position;
 		double momMag = std::sqrt(energy * energy - mass * mass);
 		
-		Particle part = Particle(mass, charge, partPosition, momMag * direction.Norm(), 0, true);
+		Particle part = Particle(mass, charge, partPosition, momMag * direction.Norm());
 		m_particleList[i] = part;		
 	}
 }
 
-/*
-void ParticleList::SaveTracks(HDF5Output *file, std::string partName) const
-{
-	file->AddGroup("Particles/" + partName);
-	for (unsigned int i = 0; i < m_particleNumber; i++)
-	{
-		m_particleList[i].SaveTrack(file, partName, i);
-	}
-}
-*/

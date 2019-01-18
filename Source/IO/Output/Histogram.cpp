@@ -2,11 +2,11 @@
 #include "Numerics.hh"
 
 Histogram::Histogram():
-m_binCentres(NULL), m_entries(NULL), m_nBins(0), m_entries(0)
+m_nBins(0), m_entries(0), m_binCentres(NULL), m_binValues(NULL)
 {
 }
 
-Histogram::Histogram(std::string name, double minBin, double maxBin, unsigned int nBins):
+Histogram::Histogram(std::string name, double minBin, double maxBin, unsigned int nBins)
 {
 	Initialise(name, minBin, maxBin, nBins);
 }
@@ -19,10 +19,10 @@ Histogram::~Histogram()
 
 void Histogram::Initialise(std::string name, double minBin, double maxBin, unsigned int nBins)
 {
-	m_nane = name;
+	m_name = name;
 	m_nBins = nBins;
 	m_binCentres = new double [nBins];
-	m_binValues  = new double [m_nBins]
+	m_binValues  = new double [m_nBins];
 	double detla = (maxBin - minBin) / (m_nBins - 1.0);
 	for (unsigned int i = 0; i < m_nBins; i++)
 	{
@@ -31,7 +31,7 @@ void Histogram::Initialise(std::string name, double minBin, double maxBin, unsig
 	}
 }
 
-void Histogram::Fill(ParticleList* partList, string dataType)
+void Histogram::Fill(ParticleList* partList, std::string dataType)
 {
 	if (m_nBins == 0)
 	{
@@ -44,7 +44,8 @@ void Histogram::Fill(ParticleList* partList, string dataType)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double energy =  partList->GetParticle(i)->GetEnergy();
+				double energy =  partList->GetParticle(i).GetEnergy();
+				std::cout << energy << std::endl;;
 				if (energy > m_binCentres[0] && energy < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, energy);
@@ -57,7 +58,7 @@ void Histogram::Fill(ParticleList* partList, string dataType)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double xPos =  partList->GetParticle(i)->GetPosition()[0];
+				double xPos =  partList->GetParticle(i).GetPosition()[0];
 				if (xPos > m_binCentres[0] && xPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, xPos);
@@ -69,7 +70,7 @@ void Histogram::Fill(ParticleList* partList, string dataType)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double yPos =  partList->GetParticle(i)->GetPosition()[1];
+				double yPos =  partList->GetParticle(i).GetPosition()[1];
 				if (yPos > m_binCentres[0] && yPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, yPos);
@@ -81,7 +82,7 @@ void Histogram::Fill(ParticleList* partList, string dataType)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double zPos =  partList->GetParticle(i)->GetPosition()[2];
+				double zPos =  partList->GetParticle(i).GetPosition()[2];
 				if (zPos > m_binCentres[0] && zPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);
@@ -98,26 +99,26 @@ void Histogram::Fill(ParticleList* partList, string dataType)
 }
 
 void Histogram::Merge(Histogram* hist)
-{
+{ 
 	// Check that hisograms are compitble
-	if (m_nBins == hist.m_nBins && m_binCentres[0] == hist.m_binCentres[0] &&
-		m_binCentres[m_nBins-1] == hist.m_binCentres[m_nBins-1])
+	if (m_nBins == hist->m_nBins && m_binCentres[0] == hist->m_binCentres[0] &&
+		m_binCentres[m_nBins-1] == hist->m_binCentres[m_nBins-1])
 	{
-		m_entries += hist.m_entries;
+		m_entries += hist->m_entries;
 		for (unsigned int i = 0; i < m_nBins; i++)
 		{
-			m_binValues[i] += hist.m_binValues[i];
+			m_binValues[i] += hist->m_binValues[i];
 		}
 	} else
 	{
 		std::cerr << "Error: Trying to merge histograms \"" << m_name << "\" and \""
-				  << hist.m_name << "\".\n";
+				  << hist->m_name << "\".\n";
 		std::cerr << "These histograms are incompatible.\n";
 	}
 	delete hist;
 }
 
-Void Histogram::Normalise()
+void Histogram::Normalise()
 {
 	for (unsigned int i = 0; i < m_nBins; i++)
 	{

@@ -84,7 +84,13 @@ double Particle::GetBeta() const
 
 double Particle::GetEnergy() const
 {
-	return m_mass * GetGamma();
+	if (m_mass > 0)
+	{
+		return m_mass * GetGamma();
+	} else
+	{
+		return m_momentum.Mag();
+	}
 }
 
 void Particle::InitOpticalDepth()

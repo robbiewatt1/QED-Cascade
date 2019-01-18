@@ -64,6 +64,15 @@ void ParticlePusher::PushParticle(Particle &part)
 	}
 }
 
+void ParticlePusher::PushParticleList(ParticleList* partList)
+{
+	for (unsigned int i = 0; i < partList->GetNPart(); i++)
+	{
+		PushParticle(partList->GetParticle(i));
+	}
+}
+
+
 ThreeVector ParticlePusher::PushPosition(double mass, const ThreeVector &momentum)
 {
 	double gamma  = std::sqrt(1.0 + momentum.Mag2() / (mass * mass));

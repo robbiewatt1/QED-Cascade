@@ -9,6 +9,7 @@
 #include "Field.hh"
 #include "NonLinearCompton.hh"
 #include "UnitsSystem.hh"
+#include "Histogram.hh"
 
 class OutputManager
 {
@@ -34,7 +35,8 @@ public:
 							   const std::vector<double> &yAxis,
 							   const std::vector<double> &zAxis);
 
-	void Compton(NonLinearCompton* compton);
+	void OutputHist(Histogram* hist);
+
 
 private:
 	HDF5Output* m_outputFile;
