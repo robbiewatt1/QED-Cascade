@@ -81,8 +81,19 @@ public:
 		return Dot(*this);
 	}
 
+	// Returns the unit vector pointing from frim this to point
+	ThreeVector Direction(const ThreeVector& point) const
+	{
+		ThreeVector dir;
+		dir[0] = point[0] - m_data[0];
+		dir[1] = point[1] - m_data[1];
+		dir[2] = point[2] - m_data[2];
+		dir.Norm();
+		return dir;
+	}
+
 	// Returns the matrix required to rotate the vecotor onto the second
-	ThreeMatrix RotateToAxis(const ThreeVector &axis) const
+	ThreeMatrix RotateToAxis(const ThreeVector& axis) const
 	{
 		ThreeMatrix rotation;
 		// Fist we need to check if the vectors are ainti parallel as this method fails

@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 	// Gammas
 	// Output
 
-
+/*
 	// Set up the simulation
 	UnitsSystem* units = new UnitsSystem();
 	units->SetReferenceFrequencySI(1);
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 	ParticleList* positrons = new ParticleList();
 	ParticleList* gammas	= new ParticleList();
 	electrons->GenericSource(e_number, 1, -1, e_energy, e_deltaR, e_location, e_direction);
-/*
+
 
 	// Enter the main simulation loop
 	int n = 0;
@@ -143,14 +143,14 @@ int main(int argc, char* argv[])
 
 	gammas->SaveTracks(file, "Gamma");
 	electrons->SaveTracks(file, "Electron");
-*/
+
 	delete field;
 	delete electrons;
 	delete positrons;
 	delete gammas;
 	delete compton;
 	delete file;
-
+*/
 	// define time using laser frequency with 
 /*
 	Particle electron = Particle(1, -1, true);

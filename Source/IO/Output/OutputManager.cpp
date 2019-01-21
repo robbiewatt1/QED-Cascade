@@ -168,7 +168,33 @@ void OutputManager::EMField(Field* field, const std::vector<double> &tAxis,
 								 	      const std::vector<double> &yAxis,
 									      const std::vector<double> &zAxis)
 {
-
+	for (unsigned int t = 0; t < tAxis.size(); t++)
+	{
+		std::string groupName = "Fields/" + std::to_string(tAxis[t]);
+		groupName.erase(groupName.find_last_not_of('0') + 1, std::string::npos);
+		m_outputFile->AddGroup(groupName);
+		for (int dir = 0; dir < 3; dir++)
+		{
+			double* dataBuff = new double[xAxis.size()*yAxis.size()*zAxis.size()];
+			for (unsigned int i = 0; i < xAxis.size(); i++)
+			{
+				for (unsigned int j = 0; j < yAxis.size(); j++)
+				{
+					for (unsigned int k = 0; k < zAxis.size(); k++)
+					{
+						unsigned int index = (i*yAxis.size()*zAxis.size()) + (j*zAxis.size()) + k;
+						ThreeVector efield, bfield;
+						field->GetField(tAxis[t], ThreeVector(xAxis[i], yAxis[j], zAxis[k]),
+									   efield, bfield);
+						dataBuff[index] = efield[dir];
+					}
+				}
+			}
+			std::string dataName = groupName + "/E" + std::to_string(dir);
+			m_outputFile->AddArray3D(dataBuff, xAxis.size(), yAxis.size(), zAxis.size(), dataName);
+			delete dataBuff;
+		}
+	}
 }
 
 void OutputManager::OutputHist(Histogram* hist)

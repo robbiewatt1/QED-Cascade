@@ -30,6 +30,7 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 	// Now check if process hass occured. If so then emmit and react
 	if (part.GetOpticalDepth() < 0.0)
 	{
+		std::cout << "here" << std::endl;
 		double chi = CalculateChi(eta);
 		double gammaE = chi * part.GetGamma() / eta;
 		ThreeVector gammaP = gammaE * part.GetDirection();

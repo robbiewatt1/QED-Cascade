@@ -21,14 +21,23 @@ int main(int argc, char* argv[])
 	// main script used in development and testing of NonLinearCompton class
 	UnitsSystem* units = new UnitsSystem();
         units->SetReferenceFrequencySI(1);
-        StaticField* field = new StaticField(ThreeVector(1e-3,0,0),ThreeVector(0,-1e-3,0));
-	NonLinearCompton* compton = new NonLinearCompton(field, units, 1.0);
+
+	ThreeVector start = ThreeVector(0, 0, 5);
+	ThreeVector focus = ThreeVector(0, 0, 0);
+	LaserField* field = new LaserField(0.4,           // Max Efield
+                                           1.0,         // Wavelength
+                                           5,           // duration
+                                           2,           // waist
+                                           0,           // pol angle
+                                           start,       // start location
+                                           focus);      // focus point	);
+	NonLinearCompton* compton = new NonLinearCompton(field, units, 0.01);
 	ParticleList* gammas = new ParticleList();
 	ParticlePusher* pusher = new ParticlePusher(field, 0.01);
 
 
 	ThreeVector x = ThreeVector(0,0,0);
- 	ThreeVector p = ThreeVector(0,0,10);
+ 	ThreeVector p = ThreeVector(0,0,2000);
         Particle part = Particle(1.0, 1.0, 0, false);
 	part.UpdateTrack(x,p);
         
@@ -52,7 +61,7 @@ int main(int argc, char* argv[])
 	// Output
 	HDF5Output* file = new HDF5Output("Copton.h5");
 	OutputManager* outMan = new OutputManager(file);
-	Histogram* hist = new Histogram("PhotonEnergy",0,1,100);
+	Histogram* hist = new Histogram("PhotonEnergy",0,100,30);
 	hist->Fill(gammas, "energy");
 	
 	outMan->OutputHist(hist);

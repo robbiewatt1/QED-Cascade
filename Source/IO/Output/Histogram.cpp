@@ -45,7 +45,6 @@ void Histogram::Fill(ParticleList* partList, std::string dataType)
 			{
 				m_entries++;
 				double energy =  partList->GetParticle(i).GetEnergy();
-				std::cout << energy << std::endl;;
 				if (energy > m_binCentres[0] && energy < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, energy);
@@ -120,8 +119,16 @@ void Histogram::Merge(Histogram* hist)
 
 void Histogram::Normalise()
 {
-	for (unsigned int i = 0; i < m_nBins; i++)
+	if (m_entries > 0)
 	{
-		m_binValues[i] /= m_entries;
+		double sum(0);
+		for (unsigned int i = 0; i < m_nBins; i++)
+		{
+			sum += m_binValues[i];
+		}
+		for (unsigned int i = 0; i < m_nBins; i++)
+		{
+			m_binValues[i] /= sum;
+		}
 	}
 }

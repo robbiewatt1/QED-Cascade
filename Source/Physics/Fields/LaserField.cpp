@@ -8,13 +8,14 @@ LaserField::LaserField()
 {
 }
 
-LaserField::LaserField(double maxI, double tau, double waveLength, double waist, 
-					   double start, double polAngle, const ThreeVector &focus,
-					   const ThreeVector &waveVec):
-m_maxI(maxI), m_tau(tau), m_waveLength(waveLength), m_waist(waist), m_start(start),
-m_polAngle(polAngle), m_focus(focus)
+LaserField::LaserField(double maxE,  double waveLength, double tau, double waist,
+					   double polAngle, const ThreeVector& startPos,
+					   const ThreeVector& focusPos):
+m_maxE(maxE), m_waveLength(waveLength), m_tau(tau), m_waist(waist), m_polAngle(polAngle)
 {
-	m_waveVec = waveVec.Norm();
+	m_startPos = startPos;
+	m_focusPos = focusPos;
+	m_waveVec = startPos.Direction(focusPos);
 	m_rotaion = m_waveVec.RotateToAxis(ThreeVector(0,0,1));
 	m_rotationInv = m_rotaion.Inverse();
 	m_waveNum = 2.0 * UnitsSystem::pi / m_waveLength;
@@ -28,6 +29,7 @@ void LaserField::GetField(double time, const ThreeVector &position,
 						  ThreeVector &eField, ThreeVector &bField) const
 {
 	ThreeVector position_p = m_rotaion * position;
+	double t0 		 = (m_startPos - m_focusPos).Mag();
 	double r2 		 = position_p[0] * position_p[0] + position_p[1] * position_p[1];
 	double rayleigh  = m_waveNum * m_waist * m_waist / 2.0;
 	double curvature = (position_p[2] + rayleigh * rayleigh
@@ -35,12 +37,11 @@ void LaserField::GetField(double time, const ThreeVector &position,
 	// Adding small number to stop divergence at zero
 	double beamWaist = m_waist * std::sqrt(1.0 + position_p[2] * position_p[2] 
 										   / (rayleigh * rayleigh));
-	double E0 = 0.5 * std::sqrt(m_maxI) 
-				* (m_waist / beamWaist) 
+	double E0 = m_maxE * (m_waist / beamWaist) 
 				* std::exp(-1.0 * r2 / (beamWaist * beamWaist))
 				* std::cos(position_p[2] * m_waveNum + r2 * m_waveNum / (2.0 * curvature)) 
-				* std::exp(-1.0 * (time + m_start - position_p[2]) 
-							* (time + m_start - position_p[2]) / (m_tau * m_tau));
+				* std::exp(-1.0 * (time - t0 - position_p[2]) 
+							* (time - t0 - position_p[2]) / (m_tau * m_tau));
 	
 	eField[0] = E0 * std::cos(m_polAngle);
 	eField[1] = E0 * std::sin(m_polAngle);
