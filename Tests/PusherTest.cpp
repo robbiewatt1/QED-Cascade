@@ -19,22 +19,21 @@ int main(int argc, char* argv[])
 	HDF5Output* file = new HDF5Output("./test.h5");
 	OutputManager* outManager = new OutputManager(file);
 	
-	StaticField* field = new StaticField(ThreeVector(1,0,0), ThreeVector(0,0,0));
+	StaticField* field = new StaticField(ThreeVector(0.005,0,0), ThreeVector(0,1,0));
 	
 	ParticlePusher* pusher = new ParticlePusher(field, 0.01);
 	
 	ThreeVector x = ThreeVector(0,0,0);
-	ThreeVector p = ThreeVector(0,0,0);
+	ThreeVector p = ThreeVector(0.1,0.1,0.1);
 
-	Particle part = Particle(1.0, 1.0, 0, false);
+	Particle part = Particle(1.0, 1.0, 0, true);
 	part.UpdateTrack(x,p);
 
-	for(int i = 0; i < 100000; i++)
+	for(int i = 0; i < 10000; i++)
 	{
 		pusher->PushParticle(part);
 	}
 	
-	outManager->SetFields(true,true,true);
 	outManager->SingleParticle(part, "Electron");
 
 		

@@ -4,6 +4,7 @@ project(Physics C CXX)
 set(physics_source_files
 	Fields/LaserField.cpp
 	Fields/StaticField.cpp
+	Fields/PlaneField.cpp
 	Processes/NonLinearCompton.cpp
 	ParticlePushers/ParticlePusher.cpp)
 add_library(Physics SHARED ${physics_source_files})

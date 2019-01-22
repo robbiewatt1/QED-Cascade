@@ -66,17 +66,14 @@ void OutputManager::SingleParticle(const Particle& part, std::string name)
 		double gammaBuff[part.GetGammaHist().size()];		
 		for (unsigned int i = 0; i < part.GetPosHist().size(); i++)
 		{
-			for (unsigned int j = 0; j < 3; j++)
-			{
-				posBuff[3*i+j] = part.GetPosHist()[i][j] * length;
-			}
-		}
-		for (unsigned int i = 0; i < part.GetMomHist().size(); i++)
-		{
-			for (unsigned int j = 0; j < 3; j++)
-			{
-				momBuff[3*i+j] = part.GetMomHist()[i][j] * momentum;
-			}
+			ThreeVector pos = part.GetPosHist()[i];
+			ThreeVector mom = part.GetMomHist()[i];
+			posBuff[3*i]   = pos[0] * length;
+			posBuff[3*i+1] = pos[1] * length;
+			posBuff[3*i+2] = pos[2] * length;
+			momBuff[3*i]   = mom[0] * momentum;
+			momBuff[3*i+1] = mom[1] * momentum;
+			momBuff[3*i+2] = mom[2] * momentum;
 		}
 		for (unsigned int i = 0; i < part.GetTimeHist().size(); i++)
 		{

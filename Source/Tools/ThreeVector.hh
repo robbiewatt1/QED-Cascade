@@ -97,10 +97,10 @@ public:
 	{
 		ThreeMatrix rotation;
 		// Fist we need to check if the vectors are ainti parallel as this method fails
-		if ((this->Norm() + axis.Norm()).Mag2() <= 1e-8)
+		if ((this->Norm() + axis.Norm()).Mag2() <= 1e-10)
 		{
 			rotation[0][0] = -1.0;
-			rotation[1][1] = -1.0;
+			rotation[1][1] =  1.0;
 			rotation[2][2] = -1.0;
 		} else
 		{

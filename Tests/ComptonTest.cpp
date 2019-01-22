@@ -1,5 +1,6 @@
 #include "LaserField.hh"
 #include "Particle.hh"
+#include "PlaneField.hh"
 #include "ThreeVector.hh"
 #include "ParticlePusher.hh"
 #include "HDF5Output.hh"
@@ -24,21 +25,25 @@ int main(int argc, char* argv[])
 
 	ThreeVector start = ThreeVector(0, 0, 5);
 	ThreeVector focus = ThreeVector(0, 0, 0);
-	LaserField* field = new LaserField(0.4,           // Max Efield
+	LaserField* field2 = new LaserField(0.01,           // Max Efield
                                            1.0,         // Wavelength
                                            5,           // duration
                                            2,           // waist
                                            0,           // pol angle
                                            start,       // start location
                                            focus);      // focus point	);
-	NonLinearCompton* compton = new NonLinearCompton(field, units, 0.01);
+        PlaneField* field = new PlaneField(3e-5,
+                                           2.6e5,
+                                           0.0,
+                                           ThreeVector(0,0,-1));
+	NonLinearCompton* compton = new NonLinearCompton(field, units, 1e3);
 	ParticleList* gammas = new ParticleList();
-	ParticlePusher* pusher = new ParticlePusher(field, 0.01);
+	ParticlePusher* pusher = new ParticlePusher(field, 1e3);
 
 
 	ThreeVector x = ThreeVector(0,0,0);
- 	ThreeVector p = ThreeVector(0,0,2000);
-        Particle part = Particle(1.0, 1.0, 0, false);
+ 	ThreeVector p = ThreeVector(0,0,4000);
+        Particle part = Particle(1.0, 1.0, 0, true);
 	part.UpdateTrack(x,p);
         
 	/*
@@ -49,7 +54,7 @@ int main(int argc, char* argv[])
 	}
 	*/
 
-	for(int i=0; i < 1000; i++)
+	for(int i=0; i < 20000; i++)
 	{
 		// Push particle
 		pusher->PushParticle(part);
@@ -65,7 +70,7 @@ int main(int argc, char* argv[])
 	hist->Fill(gammas, "energy");
 	
 	outMan->OutputHist(hist);
-//	outMan->SingleParticle(part,"Electron");
+	outMan->SingleParticle(part,"Electron");
 
 
 	return 0;

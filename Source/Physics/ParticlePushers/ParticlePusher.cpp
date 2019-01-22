@@ -48,7 +48,7 @@ void ParticlePusher::PushParticle(Particle &part)
 							 eField, bField);
 
 		m_field->GetField(part.GetTime() + m_dt,
-						  part.GetPosition() + posK2 * m_dt,
+						  part.GetPosition() + posK3 * m_dt,
 						  eField, bField);
 		posK4 = PushPosition(part.GetMass(), part.GetMomentum() + momK3 * m_dt);
 		momK4 = PushMomentum(part.GetMass(), part.GetCharge(),

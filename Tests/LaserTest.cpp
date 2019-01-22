@@ -1,4 +1,5 @@
 #include "LaserField.hh"
+#include "PlaneField.hh"
 #include "ThreeVector.hh"
 #include "HDF5Output.hh"
 #include "OutputManager.hh"
@@ -17,6 +18,10 @@ int main(int argc, char* argv[])
 					   start,	// start location
 					   focus);	// focus point
 
+	PlaneField* field2 = new PlaneField(1,
+					    3,
+					    0.0,
+					    ThreeVector(0,0,1));
 
         HDF5Output* file = new HDF5Output("Field.h5");
         OutputManager* outMan = new OutputManager(file);
@@ -37,7 +42,7 @@ int main(int argc, char* argv[])
                 time[i] = (double) i;
         }
 
-	outMan->EMField(field, time, xax, zax, zax);
+	outMan->EMField(field2, time, xax, zax, zax);
 
 
 

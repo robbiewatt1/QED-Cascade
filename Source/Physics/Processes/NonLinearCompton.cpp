@@ -4,12 +4,13 @@
 #include "NonLinearCompton.hh"
 #include "Numerics.hh"
 #include "MCTools.hh"
+#include "UnitsSystem.hh"
 
 
 NonLinearCompton::NonLinearCompton(Field* field, UnitsSystem* units, double dt):
 m_filed(field), m_units(units), m_dt(dt)
 {
-	MCTools::SetSeed(10);
+	MCTools::SetSeed(1);
 	LoadTables();
 }
 
@@ -24,13 +25,12 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
 	double h = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable, m_h_length, eta);
-	double deltaOD = m_dt * std::sqrt(3) * eta * h / part.GetGamma(); // might need a 2pi in here
+	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta * h / part.GetGamma();
 	part.UpdateOpticalDepth(deltaOD);
 
 	// Now check if process hass occured. If so then emmit and react
 	if (part.GetOpticalDepth() < 0.0)
 	{
-		std::cout << "here" << std::endl;
 		double chi = CalculateChi(eta);
 		double gammaE = chi * part.GetGamma() / eta;
 		ThreeVector gammaP = gammaE * part.GetDirection();
@@ -46,9 +46,8 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 double NonLinearCompton::CalculateEta(const Particle &part)
 {
 	ThreeVector partDir = part.GetDirection();
-	ThreeVector eField, bField; 
+	ThreeVector eField, bField;
 	m_filed->GetField(part.GetTime(), part.GetPosition(), eField, bField);
-	
 	// Get the components of E perp and para to direction of motion
 	ThreeVector ePara = eField.Dot(partDir) * partDir;
 	ThreeVector ePerp = eField - ePara;
