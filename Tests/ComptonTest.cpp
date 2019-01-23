@@ -25,26 +25,37 @@ int main(int argc, char* argv[])
 
 	ThreeVector start = ThreeVector(0, 0, 5);
 	ThreeVector focus = ThreeVector(0, 0, 0);
-	LaserField* field2 = new LaserField(0.01,           // Max Efield
+	LaserField* field2 = new LaserField(0.01,       // Max Efield
                                            1.0,         // Wavelength
                                            5,           // duration
                                            2,           // waist
                                            0,           // pol angle
                                            start,       // start location
                                            focus);      // focus point	);
-        PlaneField* field = new PlaneField(3e-5,
-                                           2.6e5,
-                                           0.0,
-                                           ThreeVector(0,0,-1));
-	NonLinearCompton* compton = new NonLinearCompton(field, units, 1e3);
+        PlaneField* field = new PlaneField(6e-5,	// Max Field
+                                           2.3e6,	// Wave Length
+                                           0.0,		// pol angle
+                                           ThreeVector(0,0,-1));	// Direction
+
+	NonLinearCompton* compton = new NonLinearCompton(field, units, 5e2);
+
 	ParticleList* gammas = new ParticleList();
-	ParticlePusher* pusher = new ParticlePusher(field, 1e3);
+	ParticleList* electrons = new ParticleList();
+	electrons->GenericSource(200, 		// n particles
+				 1,		//  mass
+				 -1,		// charge
+				 4000,		// energy
+				 2.3e6, 	// spot size
+				 ThreeVector(0,0,0),	// pos
+				 ThreeVector(0,0,1));	// direction
 
+	ParticlePusher* pusher = new ParticlePusher(field, 5e2);
 
-	ThreeVector x = ThreeVector(0,0,0);
- 	ThreeVector p = ThreeVector(0,0,4000);
-        Particle part = Particle(1.0, 1.0, 0, true);
-	part.UpdateTrack(x,p);
+        HDF5Output* file = new HDF5Output("Compton.h5");
+        OutputManager* outMan = new OutputManager(file);
+
+        Histogram* hist1 = new Histogram("ElectronEnergyB",500,5000,50);
+        hist1->Fill(electrons, "energy");
         
 	/*
 	std::ofstream outf("chi-test.dat");
@@ -57,20 +68,22 @@ int main(int argc, char* argv[])
 	for(int i=0; i < 20000; i++)
 	{
 		// Push particle
-		pusher->PushParticle(part);
+		pusher->PushParticleList(electrons);
 		// Push Photons
-		pusher->PushParticleList(gammas);
-		compton->Interact(part, gammas);
+//		pusher->PushParticleList(gammas);
+		for(int j = 0; j < electrons->GetNPart(); j++)
+		{
+			compton->Interact(electrons->GetParticle(j), gammas);
+		}
 	}
 
 	// Output
-	HDF5Output* file = new HDF5Output("Copton.h5");
-	OutputManager* outMan = new OutputManager(file);
-	Histogram* hist = new Histogram("PhotonEnergy",0,100,30);
-	hist->Fill(gammas, "energy");
+	Histogram* hist2 = new Histogram("ElectronEnergyA",500,5000,50);
+	hist2->Fill(electrons, "energy");
 	
-	outMan->OutputHist(hist);
-	outMan->SingleParticle(part,"Electron");
+	outMan->OutputHist(hist1);
+	outMan->OutputHist(hist2);
+//	outMan->SingleParticle(part,"Electron");
 
 
 	return 0;

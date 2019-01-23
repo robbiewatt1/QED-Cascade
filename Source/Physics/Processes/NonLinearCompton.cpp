@@ -10,7 +10,7 @@
 NonLinearCompton::NonLinearCompton(Field* field, UnitsSystem* units, double dt):
 m_filed(field), m_units(units), m_dt(dt)
 {
-	MCTools::SetSeed(1);
+	MCTools::SetSeed(5);
 	LoadTables();
 }
 

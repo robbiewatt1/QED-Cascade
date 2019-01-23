@@ -83,6 +83,7 @@ ThreeVector ParticlePusher::PushPosition(double mass, const ThreeVector &momentu
 ThreeVector ParticlePusher::PushMomentum(double mass, double charge, const ThreeVector &momentum,
 										 const ThreeVector &Efield, const ThreeVector &Bfield)
 {
-	ThreeVector newMomentum = charge * (Efield + (momentum.Cross(Bfield) / mass));
+	double gamma  = std::sqrt(1.0 + momentum.Mag2() / (mass * mass));
+	ThreeVector newMomentum = charge * (Efield + (momentum.Cross(Bfield) / (mass * gamma)));
 	return newMomentum;
 }
