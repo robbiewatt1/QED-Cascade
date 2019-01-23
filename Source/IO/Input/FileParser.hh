@@ -7,47 +7,45 @@
 struct GeneralParameters
 {
 	// General
+	std::string units;
 	double timeStep;	// time step
 	double timeEnd;		// end of simulation
 };
 
 struct ParticleParameters
 {
-	long unsigned int maxParticle;	// max number of particles per list
-	unsigned int numbSources; 		// number of particle sources
-	std::string sourceNames;		// names of sources
-	std::string sourceType;			// particle types
-	ThreeVector sourcePosition;		// positions
-	ThreeVector sourceDirection;	// directions
-	double sourceEnergy;			// source energy
-	double sourceSize;				// source size
+	unsigned int Number; 	// number of particle sources
+	std::string Name;		// names of source
+	std::string Type;		// particle types
+	ThreeVector Position;	// positions
+	ThreeVector Direction;	// directions
+	double Energy;			// source energy
+	double Radius;			// source size
 };
 
 struct FieldParameters
 {
-	std::string fieldType;	// type of field
-	// for static
-	ThreeVector fieldE;	// electric field
-	ThreeVector fieldB;	// magnetic field 
-	// for guassian or plane
-	double fieldMaxE;			// Max E field
-	double fieldWavelength;		// laser wavelength
-	double fieldDuration;		// laser duration
-	double fieldWaist;			// laser waist
-	double fieldPolerisation;	// laser polerisation
-	ThreeVector fieldStart;		// start point of laser pulse
-	ThreeVector fieldFocus;		// focus point of laser
+	std::string Type;		// type of field
+	ThreeVector E;			// electric field
+	ThreeVector B;			// magnetic field 
+	double MaxE;			// Max E field
+	double Wavelength;		// laser wavelength
+	double Duration;		// laser duration
+	double Waist;			// laser waist
+	double Polerisation;	// laser polerisation
+	ThreeVector Start;		// start point of laser pulse
+	ThreeVector Focus;		// focus point of laser
 };
 
 struct HistogramParameters
 {
-	unsigned int numbHist;	// number of histograms
-	std::string histName;	// names of the histograms
-	std::string particle;	// particles being histed
-	double histTime;		// Time at which hists are made
-	unsigned int bins;		// number of bins in histograms
-	double minBin;			// First value of bins 
-	double maxBin;			// last value of bins
+	std::string Name;		// names of the histograms
+	std::string Particle;	// particles being histed
+	std::string Type;		// the output paramter
+	double Time;			// Time at which hists are made
+	unsigned int Bins;		// number of bins in histograms
+	double MinBin;			// First value of bins 
+	double MaxBin;			// last value of bins
 };
 
 class FileParser
@@ -57,13 +55,13 @@ public:
 
 	~FileParser();
 
-	GeneralParameters GetGeneral() const;
+	GeneralParameters GetGeneral() const {return m_general;}
 
-	FieldParameters GetField() const;
+	FieldParameters GetField() const {return m_field;}
 
-	std::vector<ParticleParameters> GetParticle() const;
+	std::vector<ParticleParameters> GetParticle() const {return m_particles;}
 
-	std::vector<HistogramParameters> GetHistograms() const;
+	std::vector<HistogramParameters> GetHistograms() const {return m_histograms;}
 
 private:
 
@@ -71,14 +69,23 @@ private:
 	// has been set
 	void CheckVitals();
 
+	void ReadGeneral();
+
+	void ReadField();
+
+	void ReadParticles();
+
+	void ReadHistograms();
+
 private:
 	std::vector<std::string> m_sections;
 	GeneralParameters m_general;
-	FieldParameters m_fields;
+	FieldParameters m_field;
 	std::vector<ParticleParameters> m_particles;
 	std::vector<HistogramParameters> m_histograms;
 
 	INIReader* m_reader;
+	UnitsSystem* m_units;
 };
 
 #endif

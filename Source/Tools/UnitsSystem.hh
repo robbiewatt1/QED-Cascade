@@ -15,14 +15,10 @@ public:
 	SI. This class is also used to convert all units back at the end.
 	*/
 
-	UnitsSystem();
-
-//	UnitsSystem(double refFrequency, std::string units);
+	UnitsSystem(std::string system);
 
 	~UnitsSystem();
 	
-	void SetReferenceFrequencySI(double frequency);
-
 	// Method to get refrence values and physical constants
 	double RefFrequency() const {return ref_freq;} 
 
@@ -38,6 +34,7 @@ public:
 
 	double RefEnergy() const {return ref_energy;}
 
+/*
 	// Method for getting physical constants in terms of reference values
 	double HBar() const {return hBar;}
 
@@ -66,6 +63,11 @@ public:
 	double EField2SI(double eField) const;
 
 	double BField2SI(double bField) const;
+*/
+
+private:
+
+	void SetUnitsSI();
 
 private:
 
@@ -97,5 +99,6 @@ public:
 	static constexpr double SI_hBar	 = 1.05457180e-34;
 	static constexpr double SI_lComp = 2.4263102367e-12;
 	static constexpr double SI_eps0	 = 8.854187817e-12;
+	static constexpr double SI_eSchw = 1.3232855e18;
 };
 #endif

@@ -20,8 +20,6 @@
 int main(int argc, char* argv[])
 {
 	// main script used in development and testing of NonLinearCompton class
-	UnitsSystem* units = new UnitsSystem();
-        units->SetReferenceFrequencySI(1);
 
 	ThreeVector start = ThreeVector(0, 0, 5);
 	ThreeVector focus = ThreeVector(0, 0, 0);
@@ -37,7 +35,7 @@ int main(int argc, char* argv[])
                                            0.0,		// pol angle
                                            ThreeVector(0,0,-1));	// Direction
 
-	NonLinearCompton* compton = new NonLinearCompton(field, units, 5e2);
+	NonLinearCompton* compton = new NonLinearCompton(field, 5e2);
 
 	ParticleList* gammas = new ParticleList();
 	ParticleList* electrons = new ParticleList();

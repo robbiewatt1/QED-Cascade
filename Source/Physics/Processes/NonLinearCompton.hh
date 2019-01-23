@@ -9,7 +9,7 @@
 class NonLinearCompton
 {
 public:
-	NonLinearCompton(Field* field, UnitsSystem* units, double dt);
+	NonLinearCompton(Field* field, double dt);
 	
 	~NonLinearCompton();
 
@@ -32,7 +32,6 @@ public: // Should be private
 
 private:
 	Field* m_filed;	// LaserField interacting with particle
-	UnitsSystem* m_units;
 	double m_dt;	// simulation time step	
 
 	// Data tables for h factor

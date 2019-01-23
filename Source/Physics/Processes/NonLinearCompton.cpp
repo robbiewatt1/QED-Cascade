@@ -7,8 +7,8 @@
 #include "UnitsSystem.hh"
 
 
-NonLinearCompton::NonLinearCompton(Field* field, UnitsSystem* units, double dt):
-m_filed(field), m_units(units), m_dt(dt)
+NonLinearCompton::NonLinearCompton(Field* field, double dt):
+m_filed(field), m_dt(dt)
 {
 	MCTools::SetSeed(5);
 	LoadTables();
