@@ -34,8 +34,8 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 		double chi = CalculateChi(eta);
 		double gammaE = chi * part.GetGamma() / eta;
 		ThreeVector gammaP = gammaE * part.GetDirection();
-		
 		part.UpdateTrack(part.GetPosition(), part.GetMomentum() - gammaP);
+		
 		// Add new partles to the simulation 
 		Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
 		partList->AddParticle(gamma);
@@ -48,7 +48,6 @@ double NonLinearCompton::CalculateEta(const Particle &part)
 	ThreeVector partDir = part.GetDirection();
 	ThreeVector eField, bField;
 	m_filed->GetField(part.GetTime(), part.GetPosition(), eField, bField);
-	// Get the components of E perp and para to direction of motion
 	ThreeVector ePara = eField.Dot(partDir) * partDir;
 	ThreeVector ePerp = eField - ePara;
 	double eta = std::sqrt((ePerp + part.GetBeta() * partDir.Cross(bField)).Mag2()

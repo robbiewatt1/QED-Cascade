@@ -10,6 +10,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include "ThreeVector.hh"
 
 // Read an INI file into easy-to-access name/value pairs. (Note that I've gone
@@ -57,9 +58,12 @@ public:
     // Return true if a value exists with the given section and field names.
     bool HasValue(const std::string& section, const std::string& name) const;
 
+    std::vector<std::string> GetSections() const;
+
 private:
     int _error;
     std::map<std::string, std::string> _values;
+    std::vector<std::string> _sections;
     static std::string MakeKey(const std::string& section, const std::string& name);
     static int ValueHandler(void* user, const char* section, const char* name,
                             const char* value);

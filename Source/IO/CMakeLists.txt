@@ -8,7 +8,8 @@ set(io_source_files
     Output/OutputManager.cpp
     Output/Histogram.cpp
     Input/ini.cpp
-    Input/INIReader.cpp)
+    Input/INIReader.cpp
+    Input/FileParser.cpp)
 add_library(IO SHARED ${io_source_files})
 target_link_libraries(IO ${HDF5_LIBRARIES} Tools Particles Physics)
 target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Output
