@@ -8,6 +8,7 @@
 
 int main(int argc, char* argv[])
 {
+        /*
 	ThreeVector start = ThreeVector(0,0,6);
 	ThreeVector focus = ThreeVector(0,-1,-1);
 	LaserField* field = new LaserField(1, 		// Max intensity
@@ -45,7 +46,7 @@ int main(int argc, char* argv[])
 	outMan->EMField(field2, time, xax, zax, zax);
 
 
-
+*/
 
 	return 0;
 }

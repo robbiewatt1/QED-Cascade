@@ -1,4 +1,6 @@
 #include "LaserField.hh"
+#include "StaticField.hh"
+#include "PlaneField.hh"
 #include "Particle.hh"
 #include "ThreeVector.hh"
 #include "ParticlePusher.hh"
@@ -12,10 +14,12 @@
 #include <cstring>
 #include "INIReader.hh"
 #include "UnitsSystem.hh"
+#include "FileParser.hh"
+#include "Field.hh"
+#include "Histogram.hh"
 
 int main(int argc, char* argv[])
 {
-	INIReader inputFile;
 	if (argc == 1)
 	{
 		std::cerr << "Error: Input file was not provided\n";
@@ -39,12 +43,7 @@ int main(int argc, char* argv[])
 			return 1;
 		} else if (argument.substr(argument.size() - 4) == ".ini")
 		{
-			inputFile = INIReader(argument);
-			if (inputFile.ParseError() < 0)
-			{
-        		std::cerr << "Error: File \"" << argument << "\" does not exist!\n";
-        		return 1;
-        	}
+
 		} else
 		{
 			std::cerr << "Error: unrecognised command line argument \"" << argv[1] << "\" provided.\n";
@@ -54,17 +53,91 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// First check that all fields that need to be set are
-	if (!(inputFile.HasValue("General", "time_step")))
+	// Parse the file
+	FileParser* input = new FileParser(argv[1]);
+
+	// Get the input paramter strucs
+	GeneralParameters inGeneral = input->GetGeneral();
+	FieldParameters inField = input->GetField();
+	std::vector<ParticleParameters> inParticles = input->GetParticle();
+	std::vector<HistogramParameters> inHistogram = input->GetHistograms();
+
+	// Set up the fields
+	Field* field;
+	if (inField.Type == "static")
 	{
-		std::cerr << "Error: Simulation time step not found.\n";
-		return 1;
-	} else if (!(inputFile.HasValue("General", "time_end")))
+		field = new StaticField(inField.E, inField.B);
+	} else if (inField.Type == "plane")
 	{
-		std::cerr << "Error: Simulation time end not found.\n";
-		return 1;
+		field = new PlaneField(inField.MaxE, inField.Wavelength, inField.Polerisation,
+							   inField.Direction);
+	} else
+	{
+		field = new LaserField(inField.MaxE, inField.Wavelength, inField.Duration,
+							   inField.Waist, inField.Polerisation, inField.Start,
+							   inField.Focus);
 	}
 
+	// Set up the particle lists
+	std::vector<ParticleList*> sources(inParticles.size());
+	for (unsigned int i = 0; i < inParticles.size(); i++)
+	{
+
+		double mass, charge;
+		if (inParticles[i].Type == "electron")
+		{
+			mass = 1.0;
+			charge = -1.0;
+		} else if (inParticles[i].Type == "positron")
+		{
+			mass = 1.0;
+			charge = 1.0;
+		} else
+		{
+			mass = 0;
+			charge = 0;
+		}
+		sources[i] = new ParticleList();
+	
+		sources[i]->GenericSource(inParticles[i].Number, mass, charge, inParticles[i].Energy,
+								  inParticles[i].Radius, inParticles[i].Position,
+								  inParticles[i].Direction);
+	}
+	ParticleList* secondaries = new ParticleList();
+
+	// Set up the physics processes / pusher
+	ParticlePusher* pusher = new ParticlePusher(field, inGeneral.timeStep);
+	NonLinearCompton* compton = new NonLinearCompton(field, inGeneral.timeStep);
+
+	std::cout << "here" << std::endl;
+	// Set up the histograms
+	std::vector<Histogram*> histograms(inHistogram.size());
+	for (unsigned int i = 0; i < inHistogram.size(); i++)
+	{
+		histograms[i] = new Histogram(inHistogram[i].Name, inHistogram[i].Type,
+									  inHistogram[i].Time, inHistogram[i].MinBin,
+									  inHistogram[i].MaxBin, inHistogram[i].Bins);
+	}
+
+	// main loop
+	double time(0);
+	while(time < inGeneral.timeEnd)
+	{
+		std::cout << time << std::endl;
+		for (unsigned int i = 0; i < sources.size(); i++)
+		{
+			pusher->PushParticleList(sources[i]);
+			for (unsigned int j = 0; j < sources[i]->GetNPart(); ++j)
+			{
+				//compton->Interact
+			}
+			
+		}
+	}
+
+
+
+/*
 	// General
 	double timeStep 	= inputFile.GetReal("General", "time_step", 0);
 	double timeEnd 		= inputFile.GetReal("General", "time_end", 0);

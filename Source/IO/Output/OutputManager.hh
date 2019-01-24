@@ -15,10 +15,10 @@ class OutputManager
 {
 public:
 	// Output using normilised units. Fails for QED processes
-	OutputManager(HDF5Output* file);
+	OutputManager(std::string fileName);
 
 	// Output using units defined by units class
-	OutputManager(HDF5Output* file, UnitsSystem* units);
+	OutputManager(std::string fileName, UnitsSystem* units);
 
 	~OutputManager();
 

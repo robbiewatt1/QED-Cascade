@@ -16,6 +16,7 @@
 
 int main(int argc, char* argv[])
 {
+	/*
 	HDF5Output* file = new HDF5Output("./test.h5");
 	OutputManager* outManager = new OutputManager(file);
 	
@@ -36,6 +37,6 @@ int main(int argc, char* argv[])
 	
 	outManager->SingleParticle(part, "Electron");
 
-		
+	*/	
 	return 0;
 }

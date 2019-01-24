@@ -6,9 +6,10 @@ m_nBins(0), m_entries(0), m_binCentres(NULL), m_binValues(NULL)
 {
 }
 
-Histogram::Histogram(std::string name, double minBin, double maxBin, unsigned int nBins)
+Histogram::Histogram(std::string name, std::string particle, std::string type, 
+					 double time, double minBin, double maxBin, unsigned int nBins)
 {
-	Initialise(name, minBin, maxBin, nBins);
+	Initialise(name, particle, type, time, minBin, maxBin, nBins);
 }
 
 Histogram::~Histogram()
@@ -17,9 +18,13 @@ Histogram::~Histogram()
 	delete [] m_binValues;
 }
 
-void Histogram::Initialise(std::string name, double minBin, double maxBin, unsigned int nBins)
+void Histogram::Initialise(std::string name, std::string particle , std::string type, 
+						   double time, double minBin, double maxBin, unsigned int nBins)
 {
 	m_name = name;
+	m_particle = particle;
+	m_type = type;
+	m_time = time;
 	m_nBins = nBins;
 	m_binCentres = new double [nBins];
 	m_binValues  = new double [m_nBins];
@@ -31,7 +36,7 @@ void Histogram::Initialise(std::string name, double minBin, double maxBin, unsig
 	}
 }
 
-void Histogram::Fill(ParticleList* partList, std::string dataType)
+void Histogram::Fill(ParticleList* partList)
 {
 	if (m_nBins == 0)
 	{
@@ -39,7 +44,7 @@ void Histogram::Fill(ParticleList* partList, std::string dataType)
 		exit(1);
 	} else
 	{
-		if (dataType == "Energy" || "energy")
+		if (m_type == "Energy" || "energy")
 		{
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
@@ -52,7 +57,7 @@ void Histogram::Fill(ParticleList* partList, std::string dataType)
 				}
 			}
 			
-		} else if (dataType == "X" || "x")
+		} else if (m_type == "X" || "x")
 		{
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
@@ -64,7 +69,7 @@ void Histogram::Fill(ParticleList* partList, std::string dataType)
 					m_binValues[index]++;
 				}
 			}
-		} else if (dataType == "Y" || "y")
+		} else if (m_type == "Y" || "y")
 		{
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
@@ -76,7 +81,7 @@ void Histogram::Fill(ParticleList* partList, std::string dataType)
 					m_binValues[index]++;
 				}
 			}
-		} else if (dataType == "Z" || "z")
+		} else if (m_type == "Z" || "z")
 		{
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
@@ -90,7 +95,7 @@ void Histogram::Fill(ParticleList* partList, std::string dataType)
 			}
 		} else
 		{
-			std::cerr << "Error: Particle property \"" << dataType << "\" not found\n";
+			std::cerr << "Error: Particle property \"" << m_type << "\" not found\n";
 			exit(1);
 		}
 	}

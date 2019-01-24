@@ -10,6 +10,22 @@ struct GeneralParameters
 	std::string units;
 	double timeStep;	// time step
 	double timeEnd;		// end of simulation
+	std::string fileName;
+};
+
+struct FieldParameters
+{
+	std::string Type;		// type of field
+	ThreeVector E;			// electric field
+	ThreeVector B;			// magnetic field 
+	double MaxE;			// Max E field
+	double Wavelength;		// laser wavelength
+	double Duration;		// laser duration
+	double Waist;			// laser waist
+	double Polerisation;	// laser polerisation
+	ThreeVector Direction;	// plane field direction
+	ThreeVector Start;		// start point of laser pulse
+	ThreeVector Focus;		// focus point of laser
 };
 
 struct ParticleParameters
@@ -23,19 +39,6 @@ struct ParticleParameters
 	double Radius;			// source size
 };
 
-struct FieldParameters
-{
-	std::string Type;		// type of field
-	ThreeVector E;			// electric field
-	ThreeVector B;			// magnetic field 
-	double MaxE;			// Max E field
-	double Wavelength;		// laser wavelength
-	double Duration;		// laser duration
-	double Waist;			// laser waist
-	double Polerisation;	// laser polerisation
-	ThreeVector Start;		// start point of laser pulse
-	ThreeVector Focus;		// focus point of laser
-};
 
 struct HistogramParameters
 {

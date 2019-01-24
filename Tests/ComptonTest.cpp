@@ -20,7 +20,7 @@
 int main(int argc, char* argv[])
 {
 	// main script used in development and testing of NonLinearCompton class
-
+/*
 	ThreeVector start = ThreeVector(0, 0, 5);
 	ThreeVector focus = ThreeVector(0, 0, 0);
 	LaserField* field2 = new LaserField(0.01,       // Max Efield
@@ -55,13 +55,12 @@ int main(int argc, char* argv[])
         Histogram* hist1 = new Histogram("ElectronEnergyB",500,5000,50);
         hist1->Fill(electrons, "energy");
         
-	/*
+
 	std::ofstream outf("chi-test.dat");
 	for(int i =0; i < 1e6; i++)
 	{
 		outf << compton->CalculateChi(0.1) << "\n";
 	}
-	*/
 
 	for(int i=0; i < 20000; i++)
 	{
@@ -83,6 +82,6 @@ int main(int argc, char* argv[])
 	outMan->OutputHist(hist2);
 //	outMan->SingleParticle(part,"Electron");
 
-
+*/
 	return 0;
 }

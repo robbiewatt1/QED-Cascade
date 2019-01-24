@@ -1,15 +1,17 @@
 #include<string>
 #include "OutputManager.hh"
 
-OutputManager::OutputManager(HDF5Output* file):
-m_outputFile(file), m_units(NULL)
+OutputManager::OutputManager(std::string fileName):
+m_units(NULL)
 {
+	m_outputFile = new HDF5Output(fileName);
 	SetFields(true,true,true);
 }
 
-OutputManager::OutputManager(HDF5Output* file, UnitsSystem* units):
-m_outputFile(file), m_units(units)
+OutputManager::OutputManager(std::string fileName, UnitsSystem* units):
+m_units(units)
 {
+	m_outputFile = new HDF5Output(fileName);
 	SetFields(true,true,true);
 }
 

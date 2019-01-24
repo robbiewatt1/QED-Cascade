@@ -3,8 +3,8 @@
 #include "UnitsSystem.hh"
 #include <fstream>
 
-ParticleList::ParticleList(unsigned int maxParticles):
-m_maxParticles(maxParticles), m_particleNumber(0)
+ParticleList::ParticleList(std::string name, unsigned int maxParticles):
+m_name(name), m_maxParticles(maxParticles), m_particleNumber(0)
 {
 	m_particleList = std::vector<Particle>(m_maxParticles);
 }

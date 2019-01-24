@@ -51,6 +51,8 @@ void FileParser::ReadGeneral()
 	m_units = new UnitsSystem(m_general.units);
 	m_general.timeStep = m_reader->GetReal("General", "time_step", 0) / m_units->RefTime();
 	m_general.timeEnd = m_reader->GetReal("General", "time_end", 0) / m_units->RefTime();
+	m_general.fileName = m_reader->GetString("General", "file_name", "out.h5");
+
 }
 
 void FileParser::ReadField()
@@ -58,8 +60,8 @@ void FileParser::ReadField()
 	if (std::find(m_sections.begin(), m_sections.end(), "Field") != m_sections.end())
 	{
 		m_field.Type = m_reader->GetString("Field", "field_type", "");
-		if (m_field.Type != "guassian" || m_field.Type != "plane"
-			|| m_field.Type != "static")
+		if (m_field.Type != "guassian" && m_field.Type != "plane"
+			&& m_field.Type != "static")
 		 {
 		 	std::cerr << "Input error: Field type \"" << m_field.Type << "\" is not recognise.\n";
 			std::cerr << "Exiting!\n";
@@ -75,6 +77,7 @@ void FileParser::ReadField()
 		 {
 		 	m_field.MaxE = m_reader->GetReal("Field", "e_max", 0) / m_units->RefEField();
 		 	m_field.Wavelength = m_reader->GetReal("Field", "wavelength", 1) / m_units->RefLength();
+		 	m_field.Direction = m_reader->GetThreeVector("Field", "direction", ThreeVector(0,0,1));
 		 	m_field.Polerisation = m_reader->GetReal("Field", "polerisation", 0);
 		 } else if (m_field.Type == "guassian")
 		 {
@@ -106,7 +109,7 @@ void FileParser::ReadParticles()
 			source.Type = m_reader->GetString(partField, "particle_type", "electron");
 			source.Position = m_reader->GetThreeVector(partField, "position", ThreeVector(0, 0, 0))
 																			 / m_units->RefLength();
-			source.Direction = m_reader->GetThreeVector(partField, "position", ThreeVector(0, 0, 0));
+			source.Direction = m_reader->GetThreeVector(partField, "direction", ThreeVector(0, 0, 0));
 			source.Energy = m_reader->GetReal(partField, "energy", 0) / m_units->RefEnergy();
 			source.Radius = m_reader->GetReal(partField, "radius", 0) / m_units->RefLength();
 			m_particles.push_back(source);
@@ -138,8 +141,8 @@ void FileParser::ReadHistograms()
 			histogram.Type = m_reader->GetString(histField, "type", "");
 			histogram.Time = m_reader->GetReal(histField, "time", 0) / m_units->RefTime();
 			histogram.Bins = m_reader->GetInteger(histField, "bins", 1);
-			histogram.MinBin = m_reader->GetReal(histField, "min_bin", 1);
-			histogram.MaxBin = m_reader->GetReal(histField, "max_bins", 0);
+			histogram.MinBin = m_reader->GetReal(histField, "min_bin", 0);
+			histogram.MaxBin = m_reader->GetReal(histField, "max_bin", 1);
 			m_histograms.push_back(histogram);
 			i++;
 		} else

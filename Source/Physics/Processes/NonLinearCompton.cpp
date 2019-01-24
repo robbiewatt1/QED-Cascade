@@ -37,8 +37,8 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 		part.UpdateTrack(part.GetPosition(), part.GetMomentum() - gammaP);
 		
 		// Add new partles to the simulation 
-		Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
-		partList->AddParticle(gamma);
+	//	Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
+	//	partList->AddParticle(gamma);
 		part.InitOpticalDepth();
 	}
 }
