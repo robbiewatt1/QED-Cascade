@@ -19,7 +19,7 @@ NonLinearCompton::~NonLinearCompton()
 	UnloadTables();
 }
 
-void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
+void NonLinearCompton::Interact(Particle &part)
 {
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
@@ -35,11 +35,13 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 		double gammaE = chi * part.GetGamma() / eta;
 		ThreeVector gammaP = gammaE * part.GetDirection();
 		part.UpdateTrack(part.GetPosition(), part.GetMomentum() - gammaP);
-		
-		// Add new partles to the simulation 
-		Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
-		partList->AddParticle(gamma);
 		part.InitOpticalDepth();
+
+		if (m_genSecondary == true)
+		{
+			Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
+			m_secondaries->AddParticle(gamma);
+		}
 	}
 }
 

@@ -1,12 +1,13 @@
 #ifndef NONLINEARCOMPTON_HH
 #define NONLINEARCOMPTON_HH
 
+#include "Process.hh"
 #include "EMField.hh"
 #include "Particle.hh"
 #include "ParticleList.hh"
 #include "UnitsSystem.hh"
 
-class NonLinearCompton
+class NonLinearCompton: public Process
 {
 public:
 	NonLinearCompton(EMField* field, double dt);
@@ -15,9 +16,9 @@ public:
 
 	// Main function carrying out the process. The particle is the iunterafting 
 	// particle and the particle list is where the new particle will be added.
-	void Interact(Particle &part, ParticleList *partList);
+	void Interact(Particle &part);
 
-public: // Should be private
+private: // Should be private
 	
 	// Calculates the value of eta at the particles current location
 	double CalculateEta(const Particle &part);

@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
 			pusher->PushParticleList(sources[i]);
 			for (unsigned int j = 0; j < sources[i]->GetNPart(); ++j)
 			{
-				compton->Interact(sources[i]->GetParticle(j), secondaries);
+				compton->Interact(sources[i]->GetParticle(j));
 			}
 		}
 		std::cout << "\n\n";

@@ -6,6 +6,7 @@ set(physics_source_files
 	Fields/EMField/StaticEMField.cpp
 	Fields/EMField/PlaneEMField.cpp
 	Processes/NonLinearCompton.cpp
+	Processes/Process.cpp
 	ParticlePushers/ParticlePusher.cpp)
 add_library(Physics SHARED ${physics_source_files})
 target_link_libraries(Physics Tools Particles)
