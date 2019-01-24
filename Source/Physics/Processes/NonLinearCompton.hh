@@ -1,7 +1,7 @@
 #ifndef NONLINEARCOMPTON_HH
 #define NONLINEARCOMPTON_HH
 
-#include "Field.hh"
+#include "EMField.hh"
 #include "Particle.hh"
 #include "ParticleList.hh"
 #include "UnitsSystem.hh"
@@ -9,7 +9,7 @@
 class NonLinearCompton
 {
 public:
-	NonLinearCompton(Field* field, double dt);
+	NonLinearCompton(EMField* field, double dt);
 	
 	~NonLinearCompton();
 
@@ -31,7 +31,7 @@ public: // Should be private
 	void UnloadTables();
 
 private:
-	Field* m_filed;	// LaserField interacting with particle
+	EMField* m_filed;	// LaserField interacting with particle
 	double m_dt;	// simulation time step	
 
 	// Data tables for h factor

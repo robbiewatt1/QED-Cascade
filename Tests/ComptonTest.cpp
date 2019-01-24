@@ -1,6 +1,6 @@
-#include "LaserField.hh"
+#include "GaussianEMField.hh"
 #include "Particle.hh"
-#include "PlaneField.hh"
+#include "PlaneEMField.hh"
 #include "ThreeVector.hh"
 #include "ParticlePusher.hh"
 #include "HDF5Output.hh"
@@ -14,7 +14,7 @@
 #include <cstring>
 #include "INIReader.hh"
 #include "UnitsSystem.hh"
-#include "StaticField.hh"
+#include "StaticEMField.hh"
 #include "OutputManager.hh"
 
 int main(int argc, char* argv[])

@@ -12,7 +12,7 @@
 #include "HDF5Output.hh"
 #include "OutputManager.hh"
 
-#include "StaticField.hh"
+#include "StaticEMField.hh"
 
 int main(int argc, char* argv[])
 {

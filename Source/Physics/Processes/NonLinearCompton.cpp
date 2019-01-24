@@ -7,7 +7,7 @@
 #include "UnitsSystem.hh"
 
 
-NonLinearCompton::NonLinearCompton(Field* field, double dt):
+NonLinearCompton::NonLinearCompton(EMField* field, double dt):
 m_filed(field), m_dt(dt)
 {
 	MCTools::SetSeed(5);
@@ -37,8 +37,8 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 		part.UpdateTrack(part.GetPosition(), part.GetMomentum() - gammaP);
 		
 		// Add new partles to the simulation 
-	//	Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
-	//	partList->AddParticle(gamma);
+		Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
+		partList->AddParticle(gamma);
 		part.InitOpticalDepth();
 	}
 }

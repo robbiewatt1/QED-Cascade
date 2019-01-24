@@ -1,20 +1,20 @@
-#ifndef PLANEFIELD_HH
-#define PLANEFIELD_HH
+#ifndef PlaneEMField_HH
+#define PlaneEMField_HH
 
-#include "Field.hh"
+#include "EMField.hh"
 #include "ThreeVector.hh"
 #include "ThreeMatrix.hh"
 
-class PlaneField: public Field
+class PlaneEMField: public EMField
 {
 public:
 
-	PlaneField();
+	PlaneEMField();
 
-	PlaneField(double maxE, double waveLength, double polAngle,
+	PlaneEMField(double maxE, double waveLength, double polAngle,
 			   const ThreeVector& direction);
 	
-	virtual ~PlaneField();
+	virtual ~PlaneEMField();
 
 //	void SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 //				   const std::vector<double> &xAxis, const std::vector<double> &yAxis,

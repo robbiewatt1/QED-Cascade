@@ -6,7 +6,7 @@
 #include "HDF5Output.hh"
 #include "Particle.hh"
 #include "ParticleList.hh"
-#include "Field.hh"
+#include "EMField.hh"
 #include "NonLinearCompton.hh"
 #include "UnitsSystem.hh"
 #include "Histogram.hh"
@@ -30,10 +30,10 @@ public:
 	void ListParticle(ParticleList* partList, std::string name);
 
 	// Physics package output methods
-	void EMField(Field* field, const std::vector<double> &tAxis,
-							   const std::vector<double> &xAxis,
-							   const std::vector<double> &yAxis,
-							   const std::vector<double> &zAxis);
+	void OutEMField(EMField* field, const std::vector<double> &tAxis,
+							    	const std::vector<double> &xAxis,
+							    	const std::vector<double> &yAxis,
+							    	const std::vector<double> &zAxis);
 
 	void OutputHist(Histogram* hist);
 

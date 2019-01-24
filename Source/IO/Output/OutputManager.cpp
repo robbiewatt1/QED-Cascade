@@ -162,7 +162,7 @@ void OutputManager::ListParticle(ParticleList* partList, std::string name)
 	}
 }
 
-void OutputManager::EMField(Field* field, const std::vector<double> &tAxis,
+void OutputManager::OutEMField(EMField* field, const std::vector<double> &tAxis,
 						   				  const std::vector<double> &xAxis,
 								 	      const std::vector<double> &yAxis,
 									      const std::vector<double> &zAxis)

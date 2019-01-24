@@ -1,6 +1,6 @@
 #include "ParticlePusher.hh"
 
-ParticlePusher::ParticlePusher(Field* field, double dt):
+ParticlePusher::ParticlePusher(EMField* field, double dt):
 m_field(field), m_dt(dt), m_time(0)
 {
 }

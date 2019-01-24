@@ -1,13 +1,13 @@
-#include "PlaneField.hh"
+#include "PlaneEMField.hh"
 #include "ThreeVector.hh"
 #include "UnitsSystem.hh"
 
 
-PlaneField::PlaneField()
+PlaneEMField::PlaneEMField()
 {
 }
 
-PlaneField::PlaneField(double maxE, double waveLength, double polAngle,
+PlaneEMField::PlaneEMField(double maxE, double waveLength, double polAngle,
 					   const ThreeVector& direction):
 m_maxE(maxE), m_waveLength(waveLength), m_polAngle(polAngle)
 {
@@ -16,11 +16,11 @@ m_maxE(maxE), m_waveLength(waveLength), m_polAngle(polAngle)
 	m_waveNum = 2.0 * UnitsSystem::pi / m_waveLength;
 }
 
-PlaneField::~PlaneField()
+PlaneEMField::~PlaneEMField()
 {
 }
 
-void PlaneField::GetField(double time, const ThreeVector &position,
+void PlaneEMField::GetField(double time, const ThreeVector &position,
 						  ThreeVector &eField, ThreeVector &bField) const
 {
 	ThreeVector position_p = m_rotaion * position;

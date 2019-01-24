@@ -1,14 +1,14 @@
-#ifndef FIELD_HH
-#define FIELD_HH
+#ifndef EMFIELD_HH
+#define EMFIELD_HH
 
 #include "ThreeVector.hh"
 
-class Field
+class EMField
 {
 public:
-	Field(){};
+	EMField(){};
 
-	virtual ~Field(){};
+	virtual ~EMField(){};
 
 	virtual void GetField(double time, const ThreeVector &position,
 						  ThreeVector &eField, ThreeVector &bField) const = 0;

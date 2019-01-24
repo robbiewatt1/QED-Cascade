@@ -3,13 +3,13 @@
 
 #include "Particle.hh"
 #include "ParticleList.hh"
-#include "Field.hh"
+#include "EMField.hh"
 
 class ParticlePusher
 {
 public:
 	
-	ParticlePusher(Field* field, double dt);
+	ParticlePusher(EMField* field, double dt);
 
 	~ParticlePusher();
 	
@@ -27,7 +27,7 @@ private:
 	ThreeVector PushMomentum(double mass, double charge, const ThreeVector &momentum,
 						const ThreeVector &Efield, const ThreeVector &Bfield);	
 
-	Field* m_field;	// Field which particles are pushed through
+	EMField* m_field;	// Field which particles are pushed through
 	double m_dt;	// Time of each step
 	double m_time;	// global time of simulation
 };

@@ -1,14 +1,13 @@
 #include <cmath>
 
-#include "Field.hh"
-#include "LaserField.hh"
+#include "GaussianEMField.hh"
 #include "UnitsSystem.hh"
 
-LaserField::LaserField()
+GaussianEMField::GaussianEMField()
 {
 }
 
-LaserField::LaserField(double maxE,  double waveLength, double tau, double waist,
+GaussianEMField::GaussianEMField(double maxE,  double waveLength, double tau, double waist,
 					   double polAngle, const ThreeVector& startPos,
 					   const ThreeVector& focusPos):
 m_maxE(maxE), m_waveLength(waveLength), m_tau(tau), m_waist(waist), m_polAngle(polAngle)
@@ -21,11 +20,11 @@ m_maxE(maxE), m_waveLength(waveLength), m_tau(tau), m_waist(waist), m_polAngle(p
 	m_waveNum = 2.0 * UnitsSystem::pi / m_waveLength;
 }
 
-LaserField::~LaserField()
+GaussianEMField::~GaussianEMField()
 {
 }
 
-void LaserField::GetField(double time, const ThreeVector &position,
+void GaussianEMField::GetField(double time, const ThreeVector &position,
 						  ThreeVector &eField, ThreeVector &bField) const
 {
 	ThreeVector position_p = m_rotaion * position;
@@ -56,7 +55,7 @@ void LaserField::GetField(double time, const ThreeVector &position,
 
 
 /*
-void LaserField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
+void GaussianEMField::SaveField(HDF5Output &file, const std::vector<double> &tAxis,
 						   const std::vector<double> &xAxis, const std::vector<double> &yAxis,
 						   const std::vector<double> &zAxis)
 {

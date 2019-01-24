@@ -1,18 +1,19 @@
 #include <string>
 
-#include "LaserField.hh"
-#include "StaticField.hh"
-#include "PlaneField.hh"
+#include "GaussianEMField.hh"
+#include "StaticEMField.hh"
+#include "PlaneEMField.hh"
 #include "ParticlePusher.hh"
 #include "ParticleList.hh"
 #include "NonLinearCompton.hh"
 #include "FileParser.hh"
-#include "Field.hh"
+#include "EMField.hh"
 #include "Histogram.hh"
 #include "OutputManager.hh"
 
 int main(int argc, char* argv[])
 {
+	/*
 	if (argc == 1)
 	{
 		std::cerr << "Error: Input file was not provided\n";
@@ -156,7 +157,6 @@ int main(int argc, char* argv[])
 	{
 		out->OutputHist(histograms[i]);
 	}
-
+*/
 	return 0;
 }
-
