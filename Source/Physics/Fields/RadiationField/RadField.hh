@@ -6,7 +6,7 @@
 class RadField
 {
 public:
-	RadField();
+	RadField(){};
 
 	virtual ~RadField(){};
 

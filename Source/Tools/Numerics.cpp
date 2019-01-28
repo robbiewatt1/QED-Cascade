@@ -3,21 +3,21 @@
 
 #include "Numerics.hh"
 
-double Numerics::SimpsonsRule(const std::vector<double> &axis, const std::vector<double> &integrand)
+double Numerics::SimpsonsRule(double* xAxis, double* integrand, unsigned int sampleSize)
 {
 
-	double deltaX = (axis.back() - axis[0]) / (axis.size() - 1.0);
+	double deltaX = (xAxis[sampleSize-1] - xAxis[0]) / (sampleSize - 1.0);
 	double integral = integrand[0];
 
-	for (unsigned int i = 1; i < integrand.size() - 1; i += 2)
+	for (unsigned int i = 1; i < sampleSize - 1; i += 2)
 	{
 		integral += 4.0 * integrand[i];
 	}
-	for (unsigned int i = 2; i < integrand.size() - 2; i += 2)
+	for (unsigned int i = 2; i < sampleSize - 2; i += 2)
 	{
 		integral += 2.0 * integrand[i];
 	}
-	integral += integrand.back();
+	integral += integrand[sampleSize-1];
 
 	return (integral * deltaX / 3.0);
 }
