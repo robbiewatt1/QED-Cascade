@@ -1,16 +1,18 @@
-#include "LinearBW.hh"
-
-LinearBW::LinearBW(RadField* field, double dt, std::string table, bool saveTable):
-m_field(field), m_dt(dt), m_saveTable(saveTable)
+#include "ThermalBW.hh"
+#include "Numerics.hh
+"
+ThermalBW::ThermalBW(RadField* field, double dt, double maxEnergy, std::string table,
+					 bool saveTable):
+m_field(field), m_dt(dt), m_maxEnergy(maxEnergy), m_saveTable(saveTable)
 {
 	LoadTables(table)
 }
 
-LinearBW::~LinearBW()
+ThermalBW::~ThermalBW()
 {
 }
 
-void LinearBW::Interact(Particle &part)
+void ThermalBW::Interact(Particle &part)
 {
 	// Calculate the 
 
@@ -29,7 +31,7 @@ void LinearBW::Interact(Particle &part)
 	}
 }
 
-double LinearBW::CrossSection(double s)
+double ThermalBW::CrossSection(double s)
 {
 	// should just have this fuunction in terms of s!
 	double beta = std::sqrt(1.0 - 1.0 / s);
@@ -38,7 +40,7 @@ double LinearBW::CrossSection(double s)
 		   + (3.0 - beta * beta * beta * beta) * std::log((1.0 + beta) / (1.0 - beta)));
 }
 
-double LinearBW::DiffCrossSection(double s, double theta)
+double ThermalBW::DiffCrossSection(double s, double theta)
 {
 
 	double beta = std::sqrt(1.0 - 1.0 / s);
@@ -50,7 +52,7 @@ double LinearBW::DiffCrossSection(double s, double theta)
 							   + 1.0 / ((1.0 + beta * cost) * (1.0 + beta * cost))));
 }
 
-void LinearBW::LoadTables(std::string table)
+void ThermalBW::LoadTables(std::string table)
 {
 	std::ifstream bwFile(table);
 	if (!hFile)
@@ -63,22 +65,53 @@ void LinearBW::LoadTables(std::string table)
 	}
 }
 
-void LinearBW::GenerateTables()
+void ThermalBW::GenerateTables()
 {
-	// first generate optical depth table
-	m_od_length = 500;
-	double energyMax = 2e3; // max energy ~ 1GeV
 
-	double deltaEnergy = energyMax / (m_od_length - 1);
-	m_od_energyAxis = new double [m_od_length];
-	for (unsigned int i = 0; i < m_od_length; i++)
+	m_energySize = 200;
+	m_tempSize = 200;
+
+	double deltaEnergy = m_maxEnergy / (m_energySize - 1);
+	m_energyAxis = new double [m_energySize];
+	for (unsigned int i = 0; i < m_energySize; i++)
 	{
-		m_od_energyAxis[i] = i * deltaEnergy;
+		m_energyAxis[i] = i * deltaEnergy;
 	}
 
-	for (int i = 0; i < count; ++i)
+	double tempLimits[2];
+	field->GetTempLimits(tempLimits);
+	double deltaTemp = (tempLimits[1] - tempLimits[0]) / (m_tempSize - 1);
+	m_tempAxis = new double [m_tempSize];
+	for (unsigned int i = 0; i < m_tempSize; i++)
 	{
-		// solve inner integral
-		double sAxis = 
+		m_tempAxis[i] = tempLimits[0] + i * deltaTemp;
+	}
+
+	m_ODdataTable = new double* [m_energySize];
+	for (unsigned int i = 0; i < m_energySize; i++)
+	{
+		m_ODdataTable[i] = new double [m_tempSize];
+		for (int j = 0; j < m_tempSize; j++)
+		{
+			double nu = 1.0 / (m_energyAxis[i] * m_tempAxis[j]);
+
+			// need to first calculate f, required two integrals. Inner one over s
+			// and the outter one of com energy xray energy
+
+			// generate the epsilon integrand
+			for (int i = 0; i < count; ++i)
+			{
+				/* code */
+			}
+
+			// calculate s integral
+
+
+
+			
+
+
+			m_ODdataTable[i][j] = 0;
+		}
 	}
 }

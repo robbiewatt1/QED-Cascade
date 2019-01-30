@@ -10,7 +10,7 @@ public:
 
 	virtual ~RadField(){};
 
-	virtual void GetField(double time, const ThreeVector &position,
-						  double* energy, double* density) const = 0;
+	virtual void GetField(double time, const ThreeVector &position, double* energy,
+				 		  double* density, unsigned int resolusion) const = 0;
 };
 #endif

@@ -13,6 +13,8 @@ public:
 	void GetField(double time, const ThreeVector &position, double* energy,
 				  double* density, unsigned int resolusion) const;
 
+	void GetTempLimits(double limits[2]);
+
 private:
 
 	double m_temp;
