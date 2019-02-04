@@ -2,6 +2,8 @@ Data/*
 Tables/*
 Build/*
 build/*
+Install/*
+Tests/python/*
 
 bin/
 lib/

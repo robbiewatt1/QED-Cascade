@@ -26,9 +26,13 @@ public:
 	void AddParticle(const Particle &part);
 
 	// Generates a generic particle source
-	void GenericSource(unsigned int nPart, double mass, double charge, double energy,
-					   double deltaPos, const ThreeVector &position,
-					   const ThreeVector &direction);
+	void MonoSource(unsigned int nPart, double mass, double charge, double energy,
+				    double deltaPos, const ThreeVector &position,
+				    const ThreeVector &direction);
+
+	void LinearSource(unsigned int nPart, double mass, double charge, double energyMin,
+					  double energyMax, double deltaPos, const ThreeVector &position,
+				      const ThreeVector &direction);
 
 //	void SaveTracks(HDF5Output *file, std::string partName) const;
 

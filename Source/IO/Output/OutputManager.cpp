@@ -94,7 +94,29 @@ void OutputManager::SingleParticle(const Particle& part, std::string name)
 	}
 }
 
-void OutputManager::ListParticle(ParticleList* partList, std::string name)
+void OutputManager::ListProperties(ParticleList* partList, std::string setName)
+{
+	if (m_partListBool == false)
+	{
+		m_outputFile->AddGroup("Particles/ParticleList");
+		m_partListBool = true;
+	}
+	std::string groupName = "Particles/ParticleList/" + partList->GetName();
+	m_outputFile->AddGroup(groupName);
+	
+	double* dataBuff = new double[partList->GetNPart()*5];
+	for (unsigned int i = 0; i < partList->GetNPart(); i++)
+	{
+		dataBuff[i*5] = i;
+		dataBuff[i*5+1] = partList->GetParticle(i).GetEnergy();
+		dataBuff[i*5+2] = partList->GetParticle(i).GetPosition()[0];
+		dataBuff[i*5+3] = partList->GetParticle(i).GetPosition()[1];
+		dataBuff[i*5+4] = partList->GetParticle(i).GetPosition()[2];
+	}
+	m_outputFile->AddArray2D(dataBuff, partList->GetNPart(), 5, groupName + "/" + setName);
+}
+
+void OutputManager::ListTracks(ParticleList* partList, std::string name)
 {
 	if (m_partListBool == false)
 	{
@@ -109,7 +131,7 @@ void OutputManager::ListParticle(ParticleList* partList, std::string name)
 		{
 			std::cerr << "Error: Failed to output data for particle \"" << name 
 					  << " " << i << "\".\n"; 
-			std::cerr << "		 Tracking set to false for this particle.\n";
+			std::cerr << "Tracking set to false for this particle.\n";
 			exit(1);
 		} else
 		{

@@ -1,5 +1,4 @@
 #include <string>
-
 #include "GaussianEMField.hh"
 #include "StaticEMField.hh"
 #include "PlaneEMField.hh"
@@ -10,6 +9,7 @@
 #include "EMField.hh"
 #include "Histogram.hh"
 #include "OutputManager.hh"
+#include <ctime>
 
 int main(int argc, char* argv[])
 {
@@ -75,7 +75,6 @@ int main(int argc, char* argv[])
 	std::vector<ParticleList*> sources(inParticles.size());
 	for (unsigned int i = 0; i < inParticles.size(); i++)
 	{
-
 		double mass, charge;
 		if (inParticles[i].Type == "electron")
 		{
@@ -91,10 +90,18 @@ int main(int argc, char* argv[])
 			charge = 0;
 		}
 		sources[i] = new ParticleList(inParticles[i].Name);
-	
-		sources[i]->GenericSource(inParticles[i].Number, mass, charge, inParticles[i].Energy,
-								  inParticles[i].Radius, inParticles[i].Position,
-								  inParticles[i].Direction);
+		if (inParticles[i].Distro == "mono")
+		{
+			sources[i]->MonoSource(inParticles[i].Number, mass, charge, inParticles[i].Energy,
+								   inParticles[i].Radius, inParticles[i].Position,
+								   inParticles[i].Direction);
+		} else if (inParticles[i].Distro == "linear")
+		{
+			sources[i]->LinearSource(inParticles[i].Number, mass, charge,
+									 inParticles[i].EnergyMin, inParticles[i].EnergyMax,
+									 inParticles[i].Radius, inParticles[i].Position,
+									 inParticles[i].Direction);
+		}
 	}
 	ParticleList* secondaries = new ParticleList("Secondaries");
 
@@ -112,15 +119,21 @@ int main(int argc, char* argv[])
 									  inHistogram[i].Bins);
 	}
 
+	// Add particle list to file
+	OutputManager* out = new OutputManager(inGeneral.fileName);
+	out->ListProperties(sources[0], "t0");
+
 	// main loop
 	unsigned int histCount(0);
 	unsigned int stepCount(0);
 	double time(0);
+	double start = std::clock();
 	while(time < inGeneral.timeEnd)
 	{
 		std::cout << "At step: " << stepCount << ":" << std::endl;
 		std::cout << "Current time: " << time << " / " << inGeneral.timeEnd << std::endl;
 		std::cout << "Number of particles: " << secondaries->GetNPart() << std::endl;
+		std::cout << "\n";
 		// Check if time for histogram
 		if (histCount < histograms.size() && time >= histograms[histCount]->GetTime())
 		{
@@ -143,14 +156,16 @@ int main(int argc, char* argv[])
 				compton->Interact(sources[i]->GetParticle(j), secondaries);
 			}
 		}
-		std::cout << "\n\n";
 		stepCount++;
 		time += inGeneral.timeStep;
 	}
 
+    double duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	std::cout << "Time taken: "<< duration <<"s\n";
+	out->ListProperties(sources[0], "t1");
+
 
 	// Output to file
-	OutputManager* out = new OutputManager(inGeneral.fileName);
 	for (unsigned int i = 0; i < histograms.size(); i++)
 	{
 		out->OutputHist(histograms[i]);

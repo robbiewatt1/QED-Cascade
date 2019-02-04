@@ -60,7 +60,7 @@ void FileParser::ReadField()
 	if (std::find(m_sections.begin(), m_sections.end(), "Field") != m_sections.end())
 	{
 		m_field.Type = m_reader->GetString("Field", "field_type", "");
-		if (m_field.Type != "guassian" && m_field.Type != "plane"
+		if (m_field.Type != "gaussian" && m_field.Type != "plane"
 			&& m_field.Type != "static")
 		 {
 		 	std::cerr << "Input error: Field type \"" << m_field.Type << "\" is not recognise.\n";
@@ -79,7 +79,7 @@ void FileParser::ReadField()
 		 	m_field.Wavelength = m_reader->GetReal("Field", "wavelength", 1) / m_units->RefLength();
 		 	m_field.Direction = m_reader->GetThreeVector("Field", "direction", ThreeVector(0,0,1));
 		 	m_field.Polerisation = m_reader->GetReal("Field", "polerisation", 0);
-		 } else if (m_field.Type == "guassian")
+		 } else if (m_field.Type == "gaussian")
 		 {
 		 	m_field.MaxE = m_reader->GetReal("Field", "e_max", 0) / m_units->RefEField();
 		 	m_field.Wavelength = m_reader->GetReal("Field", "wavelength", 1) / m_units->RefLength();
@@ -107,10 +107,14 @@ void FileParser::ReadParticles()
 			source.Number = m_reader->GetInteger(partField, "number_particles", 1);
 			source.Name = m_reader->GetString(partField, "name", partField);
 			source.Type = m_reader->GetString(partField, "particle_type", "electron");
+			source.Distro = m_reader->GetString(partField, "energy_distrobution", "mono");
 			source.Position = m_reader->GetThreeVector(partField, "position", ThreeVector(0, 0, 0))
 																			 / m_units->RefLength();
-			source.Direction = m_reader->GetThreeVector(partField, "direction", ThreeVector(0, 0, 0));
+			source.Direction = m_reader->GetThreeVector(partField, "direction", ThreeVector(0, 0, 1));
 			source.Energy = m_reader->GetReal(partField, "energy", 0) / m_units->RefEnergy();
+			source.EnergyMin = m_reader->GetReal(partField, "min_energy", 0) / m_units->RefEnergy();
+			source.EnergyMax = m_reader->GetReal(partField, "max_energy", 0) / m_units->RefEnergy();
+
 			source.Radius = m_reader->GetReal(partField, "radius", 0) / m_units->RefLength();
 			m_particles.push_back(source);
 			i++;

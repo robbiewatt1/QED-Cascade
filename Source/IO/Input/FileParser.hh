@@ -33,9 +33,12 @@ struct ParticleParameters
 	unsigned int Number; 	// number of particle sources
 	std::string Name;		// names of source
 	std::string Type;		// particle types
+	std::string Distro;		// Energy distrobution
 	ThreeVector Position;	// positions
 	ThreeVector Direction;	// directions
 	double Energy;			// source energy
+	double EnergyMin;		// source min energy
+	double EnergyMax;		// source max energy
 	double Radius;			// source size
 };
 

@@ -71,7 +71,7 @@ double NonLinearCompton::CalculateChi(double eta)
 void NonLinearCompton::LoadTables()
 {
 	// Load the table for h
-	std::ifstream hFile("../../Tables/hsokolov.table");
+	std::ifstream hFile("Tables/hsokolov.table");
 	if (!hFile)
 	{
 		std::cerr << "ERROR: Data table for h not found!" << std::endl;
@@ -79,14 +79,14 @@ void NonLinearCompton::LoadTables()
 		exit(1);
 	}
 
-	std::ifstream phEnFile("../../Tables/ksi_sokolov.table");
+	std::ifstream phEnFile("Tables/ksi_sokolov.table");
 	if (!phEnFile)
 	{
 		std::cerr << "ERROR: Data table for photon energy sampling not found!" << std::endl;
 		std::cerr << "Please download required data tables." << std::endl;
 		exit(1); 
 	}
-	std::ifstream chiMinFile("../../Tables/chimin.table");
+	std::ifstream chiMinFile("Tables/chimin.table");
 	if (!chiMinFile)
 	{
 		std::cerr << "ERROR: Data table for chimin energy sampling not found!" << std::endl;

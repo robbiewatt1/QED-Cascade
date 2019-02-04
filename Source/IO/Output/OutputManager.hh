@@ -27,7 +27,12 @@ public:
 	// Particle Output methods
 	void SingleParticle(const Particle& part, std::string name);
 
-	void ListParticle(ParticleList* partList, std::string name);
+	// Saves the data from a tracked particle
+	void ListTracks(ParticleList* partList, std::string name);
+
+	// Saves data for a non tracked particle list
+	// format: id, energy, theta1, theta2, pos1, pos2, pos3,  
+	void ListProperties(ParticleList* partList, std::string setName);
 
 	// Physics package output methods
 	void OutEMField(EMField* field, const std::vector<double> &tAxis,
