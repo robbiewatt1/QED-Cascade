@@ -34,40 +34,18 @@ public:
 
 	double RefEnergy() const {return ref_energy;}
 
-/*
-	// Method for getting physical constants in terms of reference values
-	double HBar() const {return hBar;}
+	// Methods to geth g4 units
+	double G4Time() const {return g4_time;}
 
-	double ECrit() const {return eCrit;}
+	double G4Length() const {return g4_length;}
 
-	double LComp() const {return lComp;}
-
-	// Methods to convert SI units to refrence values
-	double Freq2Ref(double freq) const {return freq / ref_freq;}
-
-	double Time2Ref(double time) const {return time / ref_time;}
-
-	double Length2Ref(double length) const {return length / ref_length;}
-
-	double EField2Ref(double eField) const {return eField / ref_eField;}
-
-	double BField2Ref(double bField) const {return bField / ref_bField;}
-
-	// Methods to convert values back to SI
-	double Freq2SI(double freq) const;
-
-	double Time2SI(double time) const;
-
-	double Length2SI(double length) const;
-
-	double EField2SI(double eField) const;
-
-	double BField2SI(double bField) const;
-*/
+	double G4Energy() const {return g4_energy;}
 
 private:
 
 	void SetUnitsSI();
+
+	void SetG4Units();
 
 private:
 
@@ -86,6 +64,12 @@ private:
 	double lComp;	// Compton wavelength
 	double eps0;	// electric constant
 
+	// Constants for transforming to Geant units
+	double g4_time;
+	double g4_length;
+	double g4_energy;
+
+
 public:
 	// dimensionless constants
 	static constexpr double pi 	  = 3.14159265359;
@@ -100,5 +84,6 @@ public:
 	static constexpr double SI_lComp = 2.4263102367e-12;
 	static constexpr double SI_eps0	 = 8.854187817e-12;
 	static constexpr double SI_eSchw = 1.3232855e18;
+
 };
 #endif

@@ -70,27 +70,37 @@ double NonLinearCompton::CalculateChi(double eta)
 
 void NonLinearCompton::LoadTables()
 {
+	char* tablePath(getenv("QED_TABLES_PATH"));
+	std::cout << tablePath << std::endl;
+	if (tablePath == NULL)
+	{
+		std::cout << "Error: Enviromental variable \"QED_TABLES_PATH\" "; 
+		std::cout << "is not set!" << std::endl;
+		std::cout <<  "Please set QED_TABLES_PATH to point to tables directory." << std::endl;
+	}
+
+	std::string path(tablePath);
 	// Load the table for h
-	std::ifstream hFile("Tables/hsokolov.table");
+	std::ifstream hFile(path + "/hsokolov.table");
 	if (!hFile)
 	{
 		std::cerr << "ERROR: Data table for h not found!" << std::endl;
-		std::cerr << "Please download required data tables." << std::endl;
+		std::cerr << "No file at: " << path + "/hsokolov.table" << std::endl;
 		exit(1);
 	}
 
-	std::ifstream phEnFile("Tables/ksi_sokolov.table");
+	std::ifstream phEnFile(path + "/ksi_sokolov.table");
 	if (!phEnFile)
 	{
 		std::cerr << "ERROR: Data table for photon energy sampling not found!" << std::endl;
-		std::cerr << "Please download required data tables." << std::endl;
+		std::cerr << "No file at: " << path + "/ksi_sokolov.table" << std::endl;
 		exit(1); 
 	}
-	std::ifstream chiMinFile("Tables/chimin.table");
+	std::ifstream chiMinFile(path + "/chimin.table");
 	if (!chiMinFile)
 	{
 		std::cerr << "ERROR: Data table for chimin energy sampling not found!" << std::endl;
-		std::cerr << "Please download required data tables." << std::endl;
+		std::cerr << "No file at: " << path + "/chimin.table" << std::endl;
 		exit(1); 
 	}
 

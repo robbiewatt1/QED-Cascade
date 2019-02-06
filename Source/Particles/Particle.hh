@@ -14,6 +14,9 @@ public:
 
 	Particle(double mass, double charge, const ThreeVector &position, 
 			 const ThreeVector &momentum, double time = 0, bool tracking = false);
+
+	Particle(double mass, double charge, double energy, const ThreeVector &position, 
+			 const ThreeVector &direction, double time = 0, bool tracking = false);	
 	
 	~Particle();
 	

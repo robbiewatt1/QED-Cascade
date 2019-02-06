@@ -22,6 +22,15 @@ m_mass(mass), m_charge(charge), m_time(time), m_tracking(tracking)
 	m_position = position;
 }
 
+Particle::Particle(double mass, double charge, double energy, const ThreeVector &position,
+			 	   const ThreeVector &direction, double time, bool tracking)
+{
+	InitOpticalDepth();
+	m_position = position;
+	double momMag = std::sqrt(energy * energy - mass * mass);
+	m_momentum = momMag * direction.Norm();
+}
+
 Particle::~Particle()
 {
 }

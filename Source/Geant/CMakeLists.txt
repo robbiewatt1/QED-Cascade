@@ -8,6 +8,8 @@ set(geant_header_files
     G4NonLinearCompton.hh)
 
 add_library(GeantQED SHARED ${geant_source_files})
+include(${Geant4_USE_FILE})
+message(${Geant4_USE_FILE})
 target_link_libraries(GeantQED ${Geant4_LIBRARIES} Tools Particles Physics)
 target_include_directories(GeantQED PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
        				           ${Geant4_INCLUDE_DIRS})

@@ -12,6 +12,7 @@ UnitsSystem::UnitsSystem(std::string units)
 		std::cerr << "Exiting!\n";
 		exit(1);
 	}
+	SetG4Units();
 }
 
 UnitsSystem::~UnitsSystem()
@@ -34,4 +35,11 @@ void UnitsSystem::SetUnitsSI()
 //	hBar  = SI_hBar / (SI_me * SI_c * SI_c * ref_time);
 //	eCrit = SI_me * SI_me * SI_c * SI_c * SI_c / (SI_qe * SI_hBar) / ref_eField;
 //	eps0  = SI_eps0  * (SI_me * SI_c * SI_c) * ref_length / (SI_qe * SI_qe);
+}
+
+void UnitsSystem::SetG4Units()
+{
+	g4_time = 1e-9 / ref_time;
+	g4_length = 1e-3 / ref_length;
+	g4_energy = 1e6 * SI_qe / ref_energy;
 }
