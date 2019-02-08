@@ -10,10 +10,13 @@ set(geant_header_files
 add_library(GeantQED SHARED ${geant_source_files})
 include(${Geant4_USE_FILE})
 message(${Geant4_USE_FILE})
-target_link_libraries(GeantQED ${Geant4_LIBRARIES} Tools Particles Physics)
+target_link_libraries(GeantQED ${Geant4_LIBRARIES} Tools Particles PhysicsQED)
 target_include_directories(GeantQED PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
        				           ${Geant4_INCLUDE_DIRS})
 install(TARGETS GeantQED
 	LIBRARY DESTINATION lib)
 install(FILES ${geant_header_files}
         DESTINATION include)
+
+
+message(${geant_source_files})

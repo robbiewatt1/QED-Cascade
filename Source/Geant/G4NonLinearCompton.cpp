@@ -43,7 +43,6 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
 	m_photonList = new ParticleList("Photons");
 
 	double time(0);
-
 	while(time < m_tEnd)
 	{
 		m_pusher->PushParticle(*m_part);
@@ -55,7 +54,7 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
 	aParticleChange.SetNumberOfSecondaries(m_photonList->GetNPart());
 	for (unsigned int i = 0; i < m_photonList->GetNPart(); i++)
 	{
-		std::cout << "Photon made!" << std::endl;
+		std::cerr << "Photon made!" << std::endl;
 		Particle gamma = m_photonList->GetParticle(i);
 		G4double gammaEnergy = gamma.GetEnergy() / m_units->G4Energy();
 		G4ThreeVector gammaDirection = G4ThreeVector(gamma.GetDirection()[0],
@@ -92,7 +91,7 @@ G4double G4NonLinearCompton::GetMeanFreePath(const G4Track&, G4double,
 void G4NonLinearCompton::SetStaticField(double* EField, double* BField)
 {
 	m_field = new StaticEMField(ThreeVector(EField[0], EField[1], EField[2]),
-							  ThreeVector(BField[0], BField[1], BField[2]));
+							    ThreeVector(BField[0], BField[1], BField[2]));
 	m_process = new NonLinearCompton(m_field, m_dt);
 	m_pusher  = new ParticlePusher(m_field, m_dt);
 }
@@ -100,9 +99,10 @@ void G4NonLinearCompton::SetStaticField(double* EField, double* BField)
 void G4NonLinearCompton::SetPlaneField(double maxE, double wavelength, double polerisation,
 									   double* direction)
 {
-	m_field = new PlaneEMField(maxE, wavelength, polerisation,ThreeVector(direction[0],
-																		  direction[1],
-																		  direction[2]));
+	m_field = new PlaneEMField(maxE / m_units->RefEField(), 
+							   wavelength / m_units->RefLength(),
+							   polerisation,
+							   ThreeVector(direction[0], direction[1], direction[2]));	
 	m_process = new NonLinearCompton(m_field, m_dt);
 	m_pusher  = new ParticlePusher(m_field, m_dt);
 }

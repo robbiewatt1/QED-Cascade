@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(Physics C CXX)
+project(PhysicsQED C CXX)
 
 set(physics_source_files
 	Fields/EMField/GaussianEMField.cpp
@@ -15,12 +15,12 @@ set(physics_header_files
 	Processes/NonLinearCompton.hh
         ParticlePushers/ParticlePusher.hh)
 
-add_library(Physics SHARED ${physics_source_files})
-target_link_libraries(Physics Tools Particles)
-target_include_directories(Physics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Fields/EMField 
+add_library(PhysicsQED SHARED ${physics_source_files})
+target_link_libraries(PhysicsQED Tools Particles)
+target_include_directories(PhysicsQED PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Fields/EMField 
 					  ${CMAKE_CURRENT_SOURCE_DIR}/Processes
 					  ${CMAKE_CURRENT_SOURCE_DIR}/ParticlePushers)
-install(TARGETS Physics
+install(TARGETS PhysicsQED
     	LIBRARY DESTINATION lib)
 install(FILES ${physics_header_files}
         DESTINATION include)

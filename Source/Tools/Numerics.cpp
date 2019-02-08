@@ -41,7 +41,7 @@ double Numerics::Interpolate1D(double* samplePoints, double* sampleData, unsigne
 		               				  / (samplePoints[end] - samplePoints[end-1]));
 	} else
 	{
-		int lIndex, hIndex;
+		int lIndex(0), hIndex(1);
 		for (unsigned int i = 0; i < sampleSize; i++)
 		{
 			if (queryPoint < samplePoints[i])

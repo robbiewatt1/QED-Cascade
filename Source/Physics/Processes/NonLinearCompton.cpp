@@ -59,7 +59,6 @@ double NonLinearCompton::CalculateEta(const Particle &part)
 double NonLinearCompton::CalculateChi(double eta)
 {
 	double rand = MCTools::RandDouble(0,1);
-
 	// Need to first find closest index for given eta;
 	int etaIndex = Numerics::ArrayIndex(m_phEn_etaAxis, m_phEn_etaLength, eta);
 	// Now need to find closest index for random value

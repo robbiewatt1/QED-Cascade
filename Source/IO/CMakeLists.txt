@@ -19,7 +19,7 @@ set(io_header_files
     Input/FileParser.hh)
 
 add_library(IO SHARED ${io_source_files})
-target_link_libraries(IO ${HDF5_LIBRARIES} Tools Particles Physics)
+target_link_libraries(IO ${HDF5_LIBRARIES} Tools Particles PhysicsQED)
 target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Output
 				     ${CMAKE_CURRENT_SOURCE_DIR}/Input
        				     ${HDF5_INCLUDE_DIRS})
