@@ -1,5 +1,7 @@
 #include "G4NonLinearCompton.hh"
 #include "G4Gamma.hh"
+#include "G4Material.hh"
+#include "GaussianEMField.hh"
 
 #include "PlaneEMField.hh"
 #include "StaticEMField.hh"
@@ -27,7 +29,7 @@ G4NonLinearCompton::~G4NonLinearCompton()
 G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
 {
     const G4DynamicParticle *g4Part = aTrack.GetDynamicParticle();
-    double mass = g4Part->GetMass();
+    double mass = g4Part->GetMass() * m_units->G4Energy();
     double charge = g4Part->GetCharge();
     double energy = aTrack.GetKineticEnergy() * m_units->G4Energy();
     G4ThreeVector g4_position = aTrack.GetPosition() * m_units->G4Length();
@@ -54,7 +56,6 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
 	aParticleChange.SetNumberOfSecondaries(m_photonList->GetNPart());
 	for (unsigned int i = 0; i < m_photonList->GetNPart(); i++)
 	{
-		std::cerr << "Photon made!" << std::endl;
 		Particle gamma = m_photonList->GetParticle(i);
 		G4double gammaEnergy = gamma.GetEnergy() / m_units->G4Energy();
 		G4ThreeVector gammaDirection = G4ThreeVector(gamma.GetDirection()[0],
@@ -72,17 +73,22 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
 	return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 }
 
-G4double G4NonLinearCompton::GetMeanFreePath(const G4Track&, G4double,
-                             		 		 G4ForceCondition*)
+G4double G4NonLinearCompton::GetMeanFreePath(const G4Track& track, G4double,
+											 G4ForceCondition*)
 {
+	// check if inside laser field
+	G4Material* material = track.GetMaterial();
+	double inField = material->GetMaterialPropertiesTable()->GetConstProperty("Laser Field");
+	if (inField < 1.0)
+	{
+		return 1e99;
+	}
 	if (m_pSwitch == false)
 	{
-		// process yet to occur
 		m_pSwitch = true;
-		return m_tEnd / m_units->G4Length();
+		return 1e-99;
 	} else
 	{
-		// process has occured
 		m_pSwitch = false;
 		return 1e99;
 	}
@@ -103,6 +109,21 @@ void G4NonLinearCompton::SetPlaneField(double maxE, double wavelength, double po
 							   wavelength / m_units->RefLength(),
 							   polerisation,
 							   ThreeVector(direction[0], direction[1], direction[2]));	
+	m_process = new NonLinearCompton(m_field, m_dt);
+	m_pusher  = new ParticlePusher(m_field, m_dt);
+}
+
+void G4NonLinearCompton::SetGaussianField(double maxE, double wavelength, double tau,
+										  double waist, double polerisation, double* start,
+										  double* focus)
+{
+	m_field = new GaussianEMField(maxE / m_units->RefEField(), 
+							      wavelength / m_units->RefLength(),
+							      tau / m_units->RefTime(),
+								  waist / m_units->RefLength(),
+								  polerisation,
+							  	  ThreeVector(start[0], start[1], start[2]),
+							  	  ThreeVector(focus[0], focus[1], focus[2]));	
 	m_process = new NonLinearCompton(m_field, m_dt);
 	m_pusher  = new ParticlePusher(m_field, m_dt);
 }

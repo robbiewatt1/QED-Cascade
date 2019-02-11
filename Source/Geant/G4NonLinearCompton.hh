@@ -6,7 +6,6 @@
 #include "G4Step.hh"
 #include "G4VParticleChange.hh"
 
-
 #include "Particle.hh"
 #include "ParticleList.hh"
 #include "ParticlePusher.hh"
@@ -23,16 +22,18 @@ public:
 
 	G4VParticleChange* PostStepDoIt(const G4Track& aTrack, const G4Step& aStep) override;
 
-	G4double GetMeanFreePath(const G4Track&, G4double,
+	G4double GetMeanFreePath(const G4Track& track, G4double,
                              		 G4ForceCondition*) override;
 
 	// Set a constant with E = field[0-2] B = field [3-5]
 	void SetStaticField(double* EField, double* BField);
 
-	// Sets a plane field 
+	// Sets a plane laser field
 	void SetPlaneField(double maxE, double wavelength, double polerisation, double* direction);
 
-	void SetGaussianField();
+	// sets a gaussian laser pulse
+	void SetGaussianField(double maxE, double wavelength, double tau, double waist,
+						  double polerisation, double* start, double* focus);
 
 private:
 	double m_dt;					// Time step of process

@@ -23,7 +23,8 @@ m_mass(mass), m_charge(charge), m_time(time), m_tracking(tracking)
 }
 
 Particle::Particle(double mass, double charge, double energy, const ThreeVector &position,
-			 	   const ThreeVector &direction, double time, bool tracking)
+			 	   const ThreeVector &direction, double time, bool tracking):
+m_mass(mass), m_charge(charge), m_time(time), m_tracking(tracking)
 {
 	InitOpticalDepth();
 	m_position = position;
