@@ -16,10 +16,6 @@ public:
 	
 	virtual ~PlaneEMField();
 
-//	void SaveField(HDF5Output &file, const std::vector<double> &tAxis,
-//				   const std::vector<double> &xAxis, const std::vector<double> &yAxis,
-//				   const std::vector<double> &zAxis);
-
 	virtual void GetField(double time, const ThreeVector &position,
 						  ThreeVector &eField, ThreeVector &bField) const;
 

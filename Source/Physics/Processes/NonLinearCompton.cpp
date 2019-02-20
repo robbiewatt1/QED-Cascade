@@ -8,7 +8,7 @@
 
 
 NonLinearCompton::NonLinearCompton(EMField* field, double dt):
-m_filed(field), m_dt(dt)
+Process(field, dt)
 {
 	MCTools::SetSeed(5);
 	LoadTables();
@@ -19,7 +19,7 @@ NonLinearCompton::~NonLinearCompton()
 	UnloadTables();
 }
 
-void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
+void NonLinearCompton::Interact(Particle &part, ParticleList *partList) const
 {
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
@@ -43,11 +43,11 @@ void NonLinearCompton::Interact(Particle &part, ParticleList *partList)
 	}
 }
 
-double NonLinearCompton::CalculateEta(const Particle &part)
+double NonLinearCompton::CalculateEta(const Particle &part) const
 {
 	ThreeVector partDir = part.GetDirection();
 	ThreeVector eField, bField;
-	m_filed->GetField(part.GetTime(), part.GetPosition(), eField, bField);
+	m_field->GetField(part.GetTime(), part.GetPosition(), eField, bField);
 	ThreeVector ePara = eField.Dot(partDir) * partDir;
 	ThreeVector ePerp = eField - ePara;
 	double eta = std::sqrt((ePerp + part.GetBeta() * partDir.Cross(bField)).Mag2()
@@ -56,7 +56,7 @@ double NonLinearCompton::CalculateEta(const Particle &part)
 	return eta;
 }
 
-double NonLinearCompton::CalculateChi(double eta)
+double NonLinearCompton::CalculateChi(double eta) const
 {
 	double rand = MCTools::RandDouble(0,1);
 	// Need to first find closest index for given eta;
@@ -70,7 +70,6 @@ double NonLinearCompton::CalculateChi(double eta)
 void NonLinearCompton::LoadTables()
 {
 	char* tablePath(getenv("QED_TABLES_PATH"));
-	std::cout << tablePath << std::endl;
 	if (tablePath == NULL)
 	{
 		std::cout << "Error: Enviromental variable \"QED_TABLES_PATH\" "; 

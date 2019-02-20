@@ -26,6 +26,8 @@ public:
 
 	void UpdateOpticalDepth(double dtau);
 
+	void Kill() {m_isAlive = false;}
+
 	ThreeVector GetPosition() const {return m_position;}
 
 	ThreeVector GetMomentum() const {return m_momentum;}
@@ -66,6 +68,7 @@ private:
 	double m_time;	// global time of particle
 	double m_opticalDepth;	// optical depth of particle
 	bool m_tracking;	// If set to true, particle tracking turned on
+	bool m_isAlive;		// If set to false the particle will no longer react or move 
 
 	ThreeVector m_position;	// current position of particle
 	ThreeVector m_momentum;	// current velcoity of particle

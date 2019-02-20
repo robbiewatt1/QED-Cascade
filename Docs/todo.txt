@@ -12,3 +12,7 @@ Proper test of ParticlePusher
 proper test of LaserField
 
 Method for finding chi is very bad leading to bad aliasing. needs improved
+
+The method for energy split may be using wrong table
+
+sort out how particle lists work and how particles are killed. Maybe add new particle for photons are positrons and electrons
