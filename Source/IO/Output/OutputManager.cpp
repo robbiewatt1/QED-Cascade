@@ -35,14 +35,14 @@ void OutputManager::SetFields(bool partOn, bool fieldOn, bool qedOn)
 	}
 }
 
-void OutputManager::SingleParticle(const Particle& part, std::string name)
+void OutputManager::SingleParticle(Particle* part, std::string name)
 {
 	if (m_singlePartBool == false)
 	{
 		m_outputFile->AddGroup("Particles/Single");
 		m_singlePartBool = true;
 	}
-	if (part.GetTracking() == false)
+	if (part->GetTracking() == false)
 	{
 		std::cerr << "Error: Failed to output data for particle \"" + name + "\".\n"; 
 		std::cerr << "		 Tracking set to false for this particle.\n";
@@ -62,14 +62,14 @@ void OutputManager::SingleParticle(const Particle& part, std::string name)
 			time = m_units->RefTime();
 		}
 
-		double posBuff[3*part.GetPosHist().size()];
-		double momBuff[3*part.GetMomHist().size()];
-		double timeBuff[part.GetTimeHist().size()];
-		double gammaBuff[part.GetGammaHist().size()];		
-		for (unsigned int i = 0; i < part.GetPosHist().size(); i++)
+		double posBuff[3*part->GetPosHist().size()];
+		double momBuff[3*part->GetMomHist().size()];
+		double timeBuff[part->GetTimeHist().size()];
+		double gammaBuff[part->GetGammaHist().size()];		
+		for (unsigned int i = 0; i < part->GetPosHist().size(); i++)
 		{
-			ThreeVector pos = part.GetPosHist()[i];
-			ThreeVector mom = part.GetMomHist()[i];
+			ThreeVector pos = part->GetPosHist()[i];
+			ThreeVector mom = part->GetMomHist()[i];
 			posBuff[3*i]   = pos[0] * length;
 			posBuff[3*i+1] = pos[1] * length;
 			posBuff[3*i+2] = pos[2] * length;
@@ -77,20 +77,20 @@ void OutputManager::SingleParticle(const Particle& part, std::string name)
 			momBuff[3*i+1] = mom[1] * momentum;
 			momBuff[3*i+2] = mom[2] * momentum;
 		}
-		for (unsigned int i = 0; i < part.GetTimeHist().size(); i++)
+		for (unsigned int i = 0; i < part->GetTimeHist().size(); i++)
 		{
-			timeBuff[i] = part.GetTimeHist()[i] * time;
+			timeBuff[i] = part->GetTimeHist()[i] * time;
 		}
-		for (unsigned int i = 0; i < part.GetGammaHist().size(); i++)
+		for (unsigned int i = 0; i < part->GetGammaHist().size(); i++)
 		{
-			gammaBuff[i] = part.GetGammaHist()[i];
+			gammaBuff[i] = part->GetGammaHist()[i];
 		}
 		std::string groupName = "Particles/Single/" + name;
 		m_outputFile->AddGroup(groupName);
-		m_outputFile->AddArray2D(posBuff, part.GetPosHist().size(), 3, groupName + "/Position");
-		m_outputFile->AddArray2D(momBuff, part.GetMomHist().size(), 3, groupName + "/Momentum");
-		m_outputFile->AddArray1D(timeBuff, part.GetTimeHist().size(), groupName + "/Time");
-		m_outputFile->AddArray1D(gammaBuff, part.GetGammaHist().size(), groupName + "/Gamma");
+		m_outputFile->AddArray2D(posBuff, part->GetPosHist().size(), 3, groupName + "/Position");
+		m_outputFile->AddArray2D(momBuff, part->GetMomHist().size(), 3, groupName + "/Momentum");
+		m_outputFile->AddArray1D(timeBuff, part->GetTimeHist().size(), groupName + "/Time");
+		m_outputFile->AddArray1D(gammaBuff, part->GetGammaHist().size(), groupName + "/Gamma");
 	}
 }
 
@@ -108,10 +108,10 @@ void OutputManager::ListProperties(ParticleList* partList, std::string setName)
 	for (unsigned int i = 0; i < partList->GetNPart(); i++)
 	{
 		dataBuff[i*5] = i;
-		dataBuff[i*5+1] = partList->GetParticle(i).GetEnergy();
-		dataBuff[i*5+2] = partList->GetParticle(i).GetPosition()[0];
-		dataBuff[i*5+3] = partList->GetParticle(i).GetPosition()[1];
-		dataBuff[i*5+4] = partList->GetParticle(i).GetPosition()[2];
+		dataBuff[i*5+1] = partList->GetParticle(i)->GetEnergy();
+		dataBuff[i*5+2] = partList->GetParticle(i)->GetPosition()[0];
+		dataBuff[i*5+3] = partList->GetParticle(i)->GetPosition()[1];
+		dataBuff[i*5+4] = partList->GetParticle(i)->GetPosition()[2];
 	}
 	m_outputFile->AddArray2D(dataBuff, partList->GetNPart(), 5, groupName + "/" + setName);
 }
@@ -126,8 +126,8 @@ void OutputManager::ListTracks(ParticleList* partList, std::string name)
 	m_outputFile->AddGroup("Particles/ParticleList/" + name);
 	for (unsigned int i = 0; i < partList->GetNPart(); i++)
 	{
-		Particle part = partList->GetParticle(i);
-		if (part.GetTracking() == false)
+		Particle* part = partList->GetParticle(i);
+		if (part->GetTracking() == false)
 		{
 			std::cerr << "Error: Failed to output data for particle \"" << name 
 					  << " " << i << "\".\n"; 
@@ -148,38 +148,38 @@ void OutputManager::ListTracks(ParticleList* partList, std::string name)
 				time = m_units->RefTime();
 			}
 
-			double posBuff[3*part.GetPosHist().size()];
-			double momBuff[3*part.GetMomHist().size()];
-			double timeBuff[part.GetTimeHist().size()];
-			double gammaBuff[part.GetGammaHist().size()];		
-			for (unsigned int i = 0; i < part.GetPosHist().size(); i++)
+			double posBuff[3*part->GetPosHist().size()];
+			double momBuff[3*part->GetMomHist().size()];
+			double timeBuff[part->GetTimeHist().size()];
+			double gammaBuff[part->GetGammaHist().size()];		
+			for (unsigned int i = 0; i < part->GetPosHist().size(); i++)
 			{
 				for (unsigned int j = 0; j < 3; j++)
 				{
-					posBuff[3*i+j] = part.GetPosHist()[i][j] * length;
+					posBuff[3*i+j] = part->GetPosHist()[i][j] * length;
 				}
 			}
-			for (unsigned int i = 0; i < part.GetMomHist().size(); i++)
+			for (unsigned int i = 0; i < part->GetMomHist().size(); i++)
 			{
 				for (unsigned int j = 0; j < 3; j++)
 				{
-					momBuff[3*i+j] = part.GetMomHist()[i][j] * momentum;
+					momBuff[3*i+j] = part->GetMomHist()[i][j] * momentum;
 				}
 			}
-			for (unsigned int i = 0; i < part.GetTimeHist().size(); i++)
+			for (unsigned int i = 0; i < part->GetTimeHist().size(); i++)
 			{
-				timeBuff[i] = part.GetTimeHist()[i] * time;
+				timeBuff[i] = part->GetTimeHist()[i] * time;
 			}
-			for (unsigned int i = 0; i < part.GetGammaHist().size(); i++)
+			for (unsigned int i = 0; i < part->GetGammaHist().size(); i++)
 			{
-				gammaBuff[i] = part.GetGammaHist()[i];
+				gammaBuff[i] = part->GetGammaHist()[i];
 			}
 			std::string groupName = "Particles/ParticleList/" + name + "/" + std::to_string(i);
 			m_outputFile->AddGroup(groupName);
-			m_outputFile->AddArray2D(posBuff, part.GetPosHist().size(), 3, groupName + "/Position");
-			m_outputFile->AddArray2D(momBuff, part.GetMomHist().size(), 3, groupName + "/Momentum");
-			m_outputFile->AddArray1D(timeBuff, part.GetTimeHist().size(), groupName + "/Time");
-			m_outputFile->AddArray1D(gammaBuff, part.GetGammaHist().size(), groupName + "/Gamma");
+			m_outputFile->AddArray2D(posBuff, part->GetPosHist().size(), 3, groupName + "/Position");
+			m_outputFile->AddArray2D(momBuff, part->GetMomHist().size(), 3, groupName + "/Momentum");
+			m_outputFile->AddArray1D(timeBuff, part->GetTimeHist().size(), groupName + "/Time");
+			m_outputFile->AddArray1D(gammaBuff, part->GetGammaHist().size(), groupName + "/Gamma");
 		}
 	}
 }

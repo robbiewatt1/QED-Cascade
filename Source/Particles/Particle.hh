@@ -14,11 +14,8 @@ public:
 
 	Particle(double mass, double charge, const ThreeVector &position, 
 			 const ThreeVector &momentum, double time = 0, bool tracking = false);
-
-	Particle(double mass, double charge, double energy, const ThreeVector &position, 
-			 const ThreeVector &direction, double time = 0, bool tracking = false);	
 	
-	~Particle();
+	virtual ~Particle();
 	
 	void UpdateTrack(const ThreeVector &position, const ThreeVector &momentum);
 	
@@ -34,7 +31,7 @@ public:
 
 	ThreeVector GetDirection() const;
 	
-	ThreeVector GetVelocity() const;
+//	ThreeVector GetVelocity() const;
 
 	double GetMass() const {return m_mass;}
 
@@ -44,13 +41,18 @@ public:
 
 	double GetOpticalDepth() const {return m_opticalDepth;}
 
-	double GetGamma() const;
-
-	double GetBeta() const;
-
-	double GetEnergy() const;
+	bool IsAlive() const {return m_isAlive;}
 
 	bool GetTracking() const {return m_tracking;}
+
+	virtual double GetGamma() const = 0;
+
+	virtual double GetBeta() const = 0;
+
+	virtual double GetEnergy() const = 0;
+
+	virtual std::string GetType() const = 0;
+
 
 	std::vector<ThreeVector> GetPosHist() const {return m_posHistory;}
 
@@ -62,7 +64,7 @@ public:
 
 	void InitOpticalDepth();
 
-private:
+protected:
 	double m_mass;	//mass normilised to electron mass
 	double m_charge;	//charge normilised to -electron charge
 	double m_time;	// global time of particle
@@ -76,7 +78,6 @@ private:
 	std::vector<ThreeVector> m_momHistory;	// only used if tracking is on
 	std::vector<double> m_timeHistory;
 	std::vector<double> m_gammaHistory;
-
 };
 
 #endif

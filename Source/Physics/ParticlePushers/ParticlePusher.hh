@@ -13,7 +13,7 @@ public:
 
 	~ParticlePusher();
 	
-	void PushParticle(Particle &part);
+	void PushParticle(Particle *part);
 
 	void PushParticleList(ParticleList* partList);
 

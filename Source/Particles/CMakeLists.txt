@@ -3,9 +3,13 @@ project(Particles C CXX)
 
 set(particles_source_files
     Particle.cpp
+    Photon.cpp
+    Lepton.cpp
     ParticleList.cpp)
 set(particles_header_files
     Particle.hh
+    Photon.hh
+    Lepton.hh
     ParticleList.hh)
 
 add_library(Particles SHARED  ${particles_source_files})

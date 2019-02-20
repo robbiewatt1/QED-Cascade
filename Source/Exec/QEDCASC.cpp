@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
 	std::vector<ParticleList*> sources(inParticles.size());
 	for (unsigned int i = 0; i < inParticles.size(); i++)
 	{
+		/*
 		double mass, charge;
 		if (inParticles[i].Type == "electron")
 		{
@@ -84,20 +85,21 @@ int main(int argc, char* argv[])
 		{
 			mass = 1.0;
 			charge = 1.0;
-		} else
+		} else if (inParticles[i].Type == "photon")
 		{
 			mass = 0;
 			charge = 0;
 		}
+		*/
 		sources[i] = new ParticleList(inParticles[i].Name);
 		if (inParticles[i].Distro == "mono")
 		{
-			sources[i]->MonoSource(inParticles[i].Number, mass, charge, inParticles[i].Energy,
-								   inParticles[i].Radius, inParticles[i].Position,
-								   inParticles[i].Direction);
+			sources[i]->MonoSource(inParticles[i].Type, inParticles[i].Number,
+								   inParticles[i].Energy, inParticles[i].Radius,
+								   inParticles[i].Position, inParticles[i].Direction);
 		} else if (inParticles[i].Distro == "linear")
 		{
-			sources[i]->LinearSource(inParticles[i].Number, mass, charge,
+			sources[i]->LinearSource(inParticles[i].Type, inParticles[i].Number,
 									 inParticles[i].EnergyMin, inParticles[i].EnergyMax,
 									 inParticles[i].Radius, inParticles[i].Position,
 									 inParticles[i].Direction);

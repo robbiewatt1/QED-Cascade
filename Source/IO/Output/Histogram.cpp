@@ -49,7 +49,7 @@ void Histogram::Fill(ParticleList* partList)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double energy =  partList->GetParticle(i).GetEnergy();
+				double energy =  partList->GetParticle(i)->GetEnergy();
 				if (energy > m_binCentres[0] && energy < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, energy);
@@ -62,7 +62,7 @@ void Histogram::Fill(ParticleList* partList)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double xPos =  partList->GetParticle(i).GetPosition()[0];
+				double xPos =  partList->GetParticle(i)->GetPosition()[0];
 				if (xPos > m_binCentres[0] && xPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, xPos);
@@ -74,7 +74,7 @@ void Histogram::Fill(ParticleList* partList)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double yPos =  partList->GetParticle(i).GetPosition()[1];
+				double yPos =  partList->GetParticle(i)->GetPosition()[1];
 				if (yPos > m_binCentres[0] && yPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, yPos);
@@ -86,7 +86,7 @@ void Histogram::Fill(ParticleList* partList)
 			for (unsigned int i = 0; i < partList->GetNPart(); i++)
 			{
 				m_entries++;
-				double zPos =  partList->GetParticle(i).GetPosition()[2];
+				double zPos =  partList->GetParticle(i)->GetPosition()[2];
 				if (zPos > m_binCentres[0] && zPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);

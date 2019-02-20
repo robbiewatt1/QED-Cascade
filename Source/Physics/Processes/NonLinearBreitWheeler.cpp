@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include "NonLinearBreitWheeler.hh"
+#include "Lepton.hh"
 #include "Numerics.hh"
 #include "UnitsSystem.hh"
 #include "MCTools.hh"
@@ -15,26 +16,28 @@ NonLinearBreitWheeler::~NonLinearBreitWheeler()
 {
 }
 
-void NonLinearBreitWheeler::Interact(Particle &part, ParticleList *partList) const
+void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) const
 {
 	double chi = CalculateChi(part);
 	double t = Numerics::Interpolate1D(m_t_chiAxis, m_t_dataTable, m_t_length, chi);
-	double deltaOD = m_dt * UnitsSystem::alpha * chi * t / part.GetEnergy();
-	part.UpdateOpticalDepth(deltaOD);
+	double deltaOD = m_dt * UnitsSystem::alpha * chi * t / part->GetEnergy();
+	part->UpdateOpticalDepth(deltaOD);
 
 	// Now check if process hass occured. If so then emmit and react
-	if (part.GetOpticalDepth() < 0.0)
+	if (part->GetOpticalDepth() < 0.0)
 	{
 		double split = CalculateSplit(chi);
-		double pEnergy = split * part.GetEnergy();
-		double eEnergy = (1.0 - split) * part.GetEnergy();
-		ThreeVector pMomentum =  std::sqrt(pEnergy * pEnergy - 1.0) * part.GetDirection();
-		ThreeVector eMomentum =  std::sqrt(eEnergy * eEnergy - 1.0) * part.GetDirection();
-		Particle positron = Particle(1.0, 1.0, part.GetPosition(), pMomentum, part.GetTime(), false);	
-		Particle electron = Particle(1.0, 1.0, part.GetPosition(), eMomentum, part.GetTime(), false);
+		double pEnergy = split * part->GetEnergy();
+		double eEnergy = (1.0 - split) * part->GetEnergy();
+		ThreeVector pMomentum =  std::sqrt(pEnergy * pEnergy - 1.0) * part->GetDirection();
+		ThreeVector eMomentum =  std::sqrt(eEnergy * eEnergy - 1.0) * part->GetDirection();
+		Lepton* positron = new Lepton(1.0, 1.0, part->GetPosition(), 
+									  pMomentum, part->GetTime(), false);	
+		Lepton* electron = new Lepton(1.0, 1.0, part->GetPosition(),
+									  eMomentum, part->GetTime(), false);
 		partList->AddParticle(positron);
 		partList->AddParticle(electron);
-		part.Kill();
+		part->Kill();
 	}
 }
 
@@ -46,14 +49,14 @@ double NonLinearBreitWheeler::CalculateSplit(double chi) const
 	return m_eFract_fractAxis[fracIndex];
 }
 
-double NonLinearBreitWheeler::CalculateChi(const Particle& part) const
+double NonLinearBreitWheeler::CalculateChi(Particle* part) const
 {
-	ThreeVector partDir = part.GetDirection();
+	ThreeVector partDir = part->GetDirection();
 	ThreeVector eField, bField;
-	m_field->GetField(part.GetTime(), part.GetPosition(), eField, bField);
+	m_field->GetField(part->GetTime(), part->GetPosition(), eField, bField);
 	ThreeVector ePara = eField.Dot(partDir) * partDir;
 	ThreeVector ePerp = eField - ePara;
-	return part.GetEnergy() * (ePerp + partDir.Cross(bField)).Mag();
+	return part->GetEnergy() * (ePerp + partDir.Cross(bField)).Mag();
 }
 
 void NonLinearBreitWheeler::LoadTables()

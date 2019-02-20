@@ -3,7 +3,7 @@
 
 #include "Process.hh"
 #include "EMField.hh"
-#include "Particle.hh"
+#include "Lepton.hh"
 #include "ParticleList.hh"
 #include "UnitsSystem.hh"
 
@@ -16,12 +16,12 @@ public:
 
     // Main function carrying out the process. The particle is the iunterafting 
     // particle and the particle list is where the new particle will be added.
-    void Interact(Particle &part, ParticleList *partList) const override;
+    void Interact(Particle* part, ParticleList *partList) const override;
 
 private:
     
     // Calculates the value of eta at the particles current location
-    double CalculateEta(const Particle &part) const;
+    double CalculateEta(Particle* part) const;
 
     double CalculateH(double eta) const;
 

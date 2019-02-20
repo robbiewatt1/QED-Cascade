@@ -25,7 +25,7 @@ public:
 	void SetFields(bool partOn = false, bool fieldOn = false, bool qedOn = false);
 
 	// Particle Output methods
-	void SingleParticle(const Particle& part, std::string name);
+	void SingleParticle(Particle* part, std::string name);
 
 	// Saves the data from a tracked particle
 	void ListTracks(ParticleList* partList, std::string name);

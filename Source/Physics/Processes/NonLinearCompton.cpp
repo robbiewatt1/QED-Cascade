@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "NonLinearCompton.hh"
+#include "Photon.hh"
 #include "Numerics.hh"
 #include "MCTools.hh"
 #include "UnitsSystem.hh"
@@ -19,40 +20,41 @@ NonLinearCompton::~NonLinearCompton()
 	UnloadTables();
 }
 
-void NonLinearCompton::Interact(Particle &part, ParticleList *partList) const
+void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 {
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
 	double h = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable, m_h_length, eta);
-	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta * h / part.GetGamma();
-	part.UpdateOpticalDepth(deltaOD);
+	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta * h / part->GetGamma();
+	part->UpdateOpticalDepth(deltaOD);
 
 	// Now check if process hass occured. If so then emmit and react
-	if (part.GetOpticalDepth() < 0.0)
+	if (part->GetOpticalDepth() < 0.0)
 	{
 		double chi = CalculateChi(eta);
-		double gammaE = chi * part.GetGamma() / eta;
-		ThreeVector gammaP = gammaE * part.GetDirection();
-		part.UpdateTrack(part.GetPosition(), part.GetMomentum() - gammaP);
+		double gammaE = chi * part->GetGamma() / eta;
+		ThreeVector gammaP = gammaE * part->GetDirection();
+		part->UpdateTrack(part->GetPosition(), part->GetMomentum() - gammaP);
 		
 		// Add new partles to the simulation 
-		Particle gamma = Particle(0.0, 0.0, part.GetPosition(), gammaP, part.GetTime(), false);
+		Photon* gamma = new Photon(gammaE, part->GetPosition(), part->GetDirection(), 
+							  	   part->GetTime(), false);
 		partList->AddParticle(gamma);
-		part.InitOpticalDepth();
+		part->InitOpticalDepth();
 	}
 }
 
-double NonLinearCompton::CalculateEta(const Particle &part) const
+double NonLinearCompton::CalculateEta(Particle* part) const
 {
-	ThreeVector partDir = part.GetDirection();
+	ThreeVector partDir = part->GetDirection();
 	ThreeVector eField, bField;
-	m_field->GetField(part.GetTime(), part.GetPosition(), eField, bField);
+	m_field->GetField(part->GetTime(), part->GetPosition(), eField, bField);
 	ThreeVector ePara = eField.Dot(partDir) * partDir;
 	ThreeVector ePerp = eField - ePara;
-	double eta = std::sqrt((ePerp + part.GetBeta() * partDir.Cross(bField)).Mag2()
-						   + std::pow(partDir.Dot(eField), 2.0) / (part.GetGamma() 
-						   	* part.GetGamma())) * part.GetGamma();
+	double eta = std::sqrt((ePerp + part->GetBeta() * partDir.Cross(bField)).Mag2()
+						   + std::pow(partDir.Dot(eField), 2.0) / (part->GetGamma() 
+						   	* part->GetGamma())) * part->GetGamma();
 	return eta;
 }
 

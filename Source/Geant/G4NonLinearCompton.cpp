@@ -41,14 +41,14 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
     								   g4_position[1],
     								   g4_position[2]);
 
-	m_part = new Particle(mass, charge, energy, position, direction);
+	m_part = new Lepton(mass, charge, energy, position, direction);
 	m_photonList = new ParticleList("Photons");
 
 	double time(0);
 	while(time < m_tEnd)
 	{
-		m_pusher->PushParticle(*m_part);
-		m_process->Interact(*m_part, m_photonList);
+		m_pusher->PushParticle(m_part);
+		m_process->Interact(m_part, m_photonList);
 		time += m_dt;
 	}
 
@@ -56,11 +56,11 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
 	aParticleChange.SetNumberOfSecondaries(m_photonList->GetNPart());
 	for (unsigned int i = 0; i < m_photonList->GetNPart(); i++)
 	{
-		Particle gamma = m_photonList->GetParticle(i);
-		G4double gammaEnergy = gamma.GetEnergy() / m_units->G4Energy();
-		G4ThreeVector gammaDirection = G4ThreeVector(gamma.GetDirection()[0],
-					 								 gamma.GetDirection()[1],
-					 								 gamma.GetDirection()[2]);
+		Particle* gamma = m_photonList->GetParticle(i);
+		G4double gammaEnergy = gamma->GetEnergy() / m_units->G4Energy();
+		G4ThreeVector gammaDirection = G4ThreeVector(gamma->GetDirection()[0],
+					 								 gamma->GetDirection()[1],
+					 								 gamma->GetDirection()[2]);
 		m_g4_part = new G4DynamicParticle(G4Gamma::Gamma(), gammaDirection, gammaEnergy);
 		aParticleChange.AddSecondary(m_g4_part);
 	}

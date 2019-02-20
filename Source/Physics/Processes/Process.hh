@@ -12,7 +12,7 @@ public:
 	
 	virtual ~Process(){ };
 
-	virtual void Interact(Particle &part, ParticleList *partList) const = 0;
+	virtual void Interact(Particle *part, ParticleList *partList) const = 0;
 
 protected:
 	EMField* m_field;

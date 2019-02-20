@@ -2,6 +2,7 @@
 #define NONLINEARBREITWHEELER_HH
 
 #include "Process.hh"
+#include "Photon.hh"
 
 class NonLinearBreitWheeler: public Process 
 {
@@ -10,11 +11,11 @@ public:
 
 	virtual ~NonLinearBreitWheeler();
 
-	void Interact(Particle &part, ParticleList *partList) const override;
+	void Interact(Particle* part, ParticleList *partList) const override;
 
 private:
 
-	double CalculateChi(const Particle& part) const;
+	double CalculateChi(Particle* part) const;
 
 	double CalculateSplit(double chi) const;
 
