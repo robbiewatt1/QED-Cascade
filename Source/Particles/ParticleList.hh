@@ -12,7 +12,7 @@ class ParticleList
 public:
 	/* Default constructor. The maximum number of particles is set 
 	   before to avoid appending to list */
-	ParticleList(std::string name, unsigned int maxParticles = 1e7);
+	ParticleList(std::string name, unsigned int maxParticles = 1e3);
 	
 	~ParticleList();
 
@@ -25,14 +25,6 @@ public:
 	// Adds a particle to the source. Not very fast for large arrays
 	void AddParticle(Particle *part);
 
-	// Generates a generic particle source
-	void MonoSource(std::string type, unsigned int nPart, double energy, double deltaPos,
-					const ThreeVector &position, const ThreeVector &direction);
-
-	void LinearSource(std::string type, unsigned int nPart, double energyMin,
-					  double energyMax, double deltaPos, 
-					  const ThreeVector &position, const ThreeVector &direction);
-
 //	void SaveTracks(HDF5Output *file, std::string partName) const;
 
 private:
@@ -41,5 +33,4 @@ private:
 	unsigned int m_particleNumber;	// The current number of particles in the list
 	std::vector<Particle*> m_particleList;	// the list containing all the particles
 };
-
 #endif

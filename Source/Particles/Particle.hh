@@ -31,8 +31,6 @@ public:
 
 	ThreeVector GetDirection() const;
 	
-//	ThreeVector GetVelocity() const;
-
 	double GetMass() const {return m_mass;}
 
 	double GetCharge() const {return m_charge;}
@@ -53,6 +51,7 @@ public:
 
 	virtual std::string GetType() const = 0;
 
+	virtual std::string GetName() const = 0;
 
 	std::vector<ThreeVector> GetPosHist() const {return m_posHistory;}
 

@@ -17,6 +17,8 @@ public:
 	void Initialise(std::string name, std::string particle, std::string type, double time,
 					double minBin, double maxBin, unsigned int nBins);
 
+	void AppParticle(Particle* part);
+
 	void Fill(ParticleList* partList);
 
 	void Merge(Histogram* hist);

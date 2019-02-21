@@ -10,18 +10,24 @@ NonLinearBreitWheeler::NonLinearBreitWheeler(EMField* field, double dt):
 Process(field, dt)
 {
 	LoadTables();
+	std::cerr << "tables loaded" << std::endl;
 }
 
 NonLinearBreitWheeler::~NonLinearBreitWheeler()
 {
+	UnloadTables();
 }
 
 void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) const
 {
+	if (part->GetType() != "Photon") return;
+
 	double chi = CalculateChi(part);
 	double t = Numerics::Interpolate1D(m_t_chiAxis, m_t_dataTable, m_t_length, chi);
 	double deltaOD = m_dt * UnitsSystem::alpha * chi * t / part->GetEnergy();
 	part->UpdateOpticalDepth(deltaOD);
+
+	std::cout << deltaOD << std::endl;
 
 	// Now check if process hass occured. If so then emmit and react
 	if (part->GetOpticalDepth() < 0.0)
@@ -62,7 +68,6 @@ double NonLinearBreitWheeler::CalculateChi(Particle* part) const
 void NonLinearBreitWheeler::LoadTables()
 {
 	char* tablePath(getenv("QED_TABLES_PATH"));
-	std::cout << tablePath << std::endl;
 	if (tablePath == NULL)
 	{
 		std::cout << "Error: Enviromental variable \"QED_TABLES_PATH\" "; 
@@ -87,7 +92,7 @@ void NonLinearBreitWheeler::LoadTables()
 		exit(1);
 	}
 
-	std::ifstream epsilonFile(path + "/ epsilon.table");
+	std::ifstream epsilonFile(path + "/epsilon.table");
 	if (!epsilonFile)
 	{
 		std::cerr << "ERROR: Data table for epsilon split not found!" << std::endl;
@@ -95,7 +100,7 @@ void NonLinearBreitWheeler::LoadTables()
 		exit(1);
 	}
 
-	std::ifstream chiFile(path + "/ log_chi.table");
+	std::ifstream chiFile(path + "/log_chi.table");
 	if (!chiFile)
 	{
 		std::cerr << "ERROR: Data table for log chi not found!" << std::endl;
@@ -120,7 +125,7 @@ void NonLinearBreitWheeler::LoadTables()
 	m_eFract_fractAxis = new double [m_efract_length];
 	m_eFract_dataTable = new double* [m_efract_length];
 	
-	for (unsigned int i = 0; i < m_t_length; i++)
+	for (unsigned int i = 0; i < m_efract_length; i++)
 	{
 		chiFile >> logChi;
 		m_eFract_chiAxis[i] = std::pow(logChi, 10.0);

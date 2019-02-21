@@ -22,13 +22,13 @@ NonLinearCompton::~NonLinearCompton()
 
 void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 {
+	if (part->GetType() != "Lepton") return;
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
 	double h = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable, m_h_length, eta);
 	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta * h / part->GetGamma();
 	part->UpdateOpticalDepth(deltaOD);
-
 	// Now check if process hass occured. If so then emmit and react
 	if (part->GetOpticalDepth() < 0.0)
 	{
@@ -36,10 +36,9 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 		double gammaE = chi * part->GetGamma() / eta;
 		ThreeVector gammaP = gammaE * part->GetDirection();
 		part->UpdateTrack(part->GetPosition(), part->GetMomentum() - gammaP);
-		
-		// Add new partles to the simulation 
+		// Add new partles to the simulation
 		Photon* gamma = new Photon(gammaE, part->GetPosition(), part->GetDirection(), 
-							  	   part->GetTime(), false);
+							  	   part->GetTime());
 		partList->AddParticle(gamma);
 		part->InitOpticalDepth();
 	}

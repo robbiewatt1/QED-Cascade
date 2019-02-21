@@ -22,5 +22,7 @@ public:
 	double GetEnergy() const override;
 
 	std::string GetType() const override {return "Phton";}
+
+	std::string GetName() const override {return "Phton";}
 };
 #endif

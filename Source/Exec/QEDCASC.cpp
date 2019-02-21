@@ -1,15 +1,21 @@
 #include <string>
+#include <omp.h>
+
+#include "EMField.hh"
 #include "GaussianEMField.hh"
 #include "StaticEMField.hh"
 #include "PlaneEMField.hh"
+
 #include "ParticlePusher.hh"
 #include "ParticleList.hh"
+#include "SourceGenerator.hh"
+
 #include "NonLinearCompton.hh"
+#include "NonLinearBreitWheeler.hh"
+
 #include "FileParser.hh"
-#include "EMField.hh"
 #include "Histogram.hh"
 #include "OutputManager.hh"
-#include <ctime>
 
 int main(int argc, char* argv[])
 {
@@ -72,45 +78,32 @@ int main(int argc, char* argv[])
 	}
 
 	// Set up the particle lists
-	std::vector<ParticleList*> sources(inParticles.size());
+	std::vector<ParticleList*> eventList;
 	for (unsigned int i = 0; i < inParticles.size(); i++)
 	{
-		/*
-		double mass, charge;
-		if (inParticles[i].Type == "electron")
-		{
-			mass = 1.0;
-			charge = -1.0;
-		} else if (inParticles[i].Type == "positron")
-		{
-			mass = 1.0;
-			charge = 1.0;
-		} else if (inParticles[i].Type == "photon")
-		{
-			mass = 0;
-			charge = 0;
-		}
-		*/
-		sources[i] = new ParticleList(inParticles[i].Name);
+	//	sources[i] = new ParticleList(inParticles[i].Name);
 		if (inParticles[i].Distro == "mono")
 		{
-			sources[i]->MonoSource(inParticles[i].Type, inParticles[i].Number,
-								   inParticles[i].Energy, inParticles[i].Radius,
-								   inParticles[i].Position, inParticles[i].Direction);
+			std::vector<ParticleList*> source = SourceGenerator::MonoSource(inParticles[i].Type, 
+														inParticles[i].Number, inParticles[i].Energy, 
+														inParticles[i].Radius, inParticles[i].Position, 
+														inParticles[i].Direction);
+			eventList.insert(eventList.end(), source.begin(), source.end());
 		} else if (inParticles[i].Distro == "linear")
 		{
-			sources[i]->LinearSource(inParticles[i].Type, inParticles[i].Number,
-									 inParticles[i].EnergyMin, inParticles[i].EnergyMax,
-									 inParticles[i].Radius, inParticles[i].Position,
-									 inParticles[i].Direction);
+			std::vector<ParticleList*> source = SourceGenerator::LinearSource(inParticles[i].Type,
+														inParticles[i].Number, inParticles[i].EnergyMin, 
+														inParticles[i].EnergyMax, inParticles[i].Radius, 
+														inParticles[i].Position, inParticles[i].Direction);
+			eventList.insert(eventList.end(), source.begin(), source.end());
 		}
 	}
-	ParticleList* secondaries = new ParticleList("Secondaries");
 
 	// Set up the physics processes / pusher
 	ParticlePusher* pusher = new ParticlePusher(field, inGeneral.timeStep);
 	NonLinearCompton* compton = new NonLinearCompton(field, inGeneral.timeStep);
-
+	NonLinearBreitWheeler* breitWheeler = new NonLinearBreitWheeler(field, 
+													  inGeneral.timeStep);
 	// Set up the histograms
 	std::vector<Histogram*> histograms(inHistogram.size());
 	for (unsigned int i = 0; i < inHistogram.size(); i++)
@@ -121,57 +114,73 @@ int main(int argc, char* argv[])
 									  inHistogram[i].Bins);
 	}
 
-	// Add particle list to file
-	OutputManager* out = new OutputManager(inGeneral.fileName);
-	out->ListProperties(sources[0], "t0");
-
 	// main loop
-	unsigned int histCount(0);
-	unsigned int stepCount(0);
-	double time(0);
-	double start = std::clock();
-	while(time < inGeneral.timeEnd)
+	std::cout << "Setup complete! " << eventList.size() << " events will be simulated.\n";
+	std::cout << "Entering main loop using " << omp_get_max_threads();
+	std::cout << " threads.\n";
+	double startTime = omp_get_wtime();
+
+	#pragma omp parallel for
+	for (unsigned int i = 0; i < eventList.size(); i++)
 	{
-		std::cout << "At step: " << stepCount << ":" << std::endl;
-		std::cout << "Current time: " << time << " / " << inGeneral.timeEnd << std::endl;
-		std::cout << "Number of particles: " << secondaries->GetNPart() << std::endl;
-		std::cout << "\n";
-		// Check if time for histogram
-		if (histCount < histograms.size() && time >= histograms[histCount]->GetTime())
+		unsigned int histCount(0);
+		double time(0);	
+		while(time < inGeneral.timeEnd)
 		{
-			for (unsigned int i = 0; i < sources.size(); i++)
+			// Check if time for histogram
+			if (histCount < histograms.size() && time >= histograms[histCount]->GetTime())
 			{
-				if (histograms[histCount]->GetParticle() == sources[i]->GetName())
+				for (unsigned int j = 0; j < eventList[i]->GetNPart(); j++)
 				{
-					std::cout << "Filling histogram!" << std::endl;
-					histograms[histCount]->Fill(sources[i]);
+					if (histograms[histCount]->GetParticle() == 
+						eventList[i]->GetParticle(j)->GetName())
+					{
+						histograms[histCount]->AppParticle(eventList[i]->GetParticle(j));
+					}
+				}
+				histCount++;
+			}
+
+			// Push particles and interact
+			for (unsigned int j = 0; j < eventList[i]->GetNPart(); j++)
+			{
+				pusher->PushParticle(eventList[i]->GetParticle(j));
+				compton->Interact(eventList[i]->GetParticle(j), eventList[i]);
+				breitWheeler->Interact(eventList[i]->GetParticle(j), eventList[i]);
+			}
+			time += inGeneral.timeStep;
+		}
+
+		// fill any non filled histograms
+		for (unsigned int j = histCount; j < histograms.size(); j++)
+		{
+			for (unsigned int k = 0; k < eventList[i]->GetNPart(); k++)
+			{
+				if (histograms[j]->GetParticle() == 
+					eventList[i]->GetParticle(k)->GetName())
+				{
+					histograms[j]->AppParticle(eventList[i]->GetParticle(k));
 				}
 			}
-			histCount++;
 		}
-
-		for (unsigned int i = 0; i < sources.size(); i++)
-		{
-			pusher->PushParticleList(sources[i]);
-			for (unsigned int j = 0; j < sources[i]->GetNPart(); ++j)
-			{
-				compton->Interact(sources[i]->GetParticle(j), secondaries);
-			}
-		}
-		stepCount++;
-		time += inGeneral.timeStep;
 	}
 
-    double duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-	std::cout << "Time taken: "<< duration <<"s\n";
-	out->ListProperties(sources[0], "t1");
-
-
-	// Output to file
-	for (unsigned int i = 0; i < histograms.size(); i++)
+	std::cout << "Simulation complete in time: "; 
+	std::cout << omp_get_wtime() - startTime << std::endl;
+	std::cout << "Saving data to file: " << inGeneral.fileName;
+	std::cout << " and cleaning up...\n";
+	
+	OutputManager* out = new OutputManager(inGeneral.fileName);
+	for (unsigned int i = 0; i < inHistogram.size(); i++)
 	{
 		out->OutputHist(histograms[i]);
+		delete histograms[i];
 	}
+	SourceGenerator::FreeSources(eventList);
+	delete field;
+	delete compton;
+	delete pusher;
+	delete input;
 
 	return 0;
 }

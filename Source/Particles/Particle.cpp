@@ -54,12 +54,6 @@ ThreeVector Particle::GetDirection() const
 	return m_momentum.Norm();
 }
 
-//ThreeVector Particle::GetVelocity() const
-//{
-//	ThreeVector velcoity = m_momentum / (m_mass * GetGamma());
-//	return velcoity;
-//}
-
 void Particle::InitOpticalDepth()
 {
 	m_opticalDepth = -1.0 * std::log(1.0 - MCTools::RandDouble(0.0, 1.0));

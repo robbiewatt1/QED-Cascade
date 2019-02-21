@@ -36,6 +36,58 @@ void Histogram::Initialise(std::string name, std::string particle , std::string 
 	}
 }
 
+void Histogram::AppParticle(Particle* part)
+{
+	if (m_nBins == 0)
+	{
+		std::cerr << "Error: Histogram has not been initialise!\n";
+		exit(1);
+	} else
+	{
+		if (m_type == "Energy" || "energy")
+		{
+			m_entries++;
+			double energy = part->GetEnergy();
+			if (energy > m_binCentres[0] && energy < m_binCentres[m_nBins-1])
+			{
+				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, energy);
+				m_binValues[index]++;
+			}
+		} else if (m_type == "X" || "x")
+		{
+			m_entries++;
+			double xPos = part->GetPosition()[0];
+			if (xPos > m_binCentres[0] && xPos < m_binCentres[m_nBins-1])
+			{
+				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, xPos);
+				m_binValues[index]++;
+			}
+		} else if (m_type == "Y" || "y")
+		{
+			m_entries++;
+			double yPos = part->GetPosition()[1];
+			if (yPos > m_binCentres[0] && yPos < m_binCentres[m_nBins-1])
+			{
+				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, yPos);
+				m_binValues[index]++;
+			}
+		} else if (m_type == "Z" || "z")
+		{
+			m_entries++;
+			double zPos =  part->GetPosition()[2];
+			if (zPos > m_binCentres[0] && zPos < m_binCentres[m_nBins-1])
+			{
+				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);
+				m_binValues[index]++;
+			}
+		} else
+		{
+			std::cerr << "Error: Particle property \"" << m_type << "\" not found\n";
+			exit(1);
+		}
+	}
+}
+
 void Histogram::Fill(ParticleList* partList)
 {
 	if (m_nBins == 0)

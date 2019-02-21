@@ -20,4 +20,9 @@ public:
 	double GetEnergy() const override;
 
 	std::string GetType() const override {return "Lepton";}
+
+	std::string GetName() const override {return m_name;}
+
+private:
+	std::string m_name;
 };

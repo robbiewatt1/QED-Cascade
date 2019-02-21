@@ -31,7 +31,10 @@ void HDF5Output::AddGroup(std::string groupName)
 	{
 		delete m_group;
 	}
-	bool status = H5Gget_objinfo(m_file->getId(), groupName.c_str(), 0, NULL);
+	bool status;
+	H5E_BEGIN_TRY {
+		status = H5Gget_objinfo(m_file->getId(), groupName.c_str(), 0, NULL);
+	} H5E_END_TRY
 	if (status != 0)
 	{
 		m_group = new H5::Group(m_file->createGroup(groupName));

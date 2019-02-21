@@ -5,12 +5,14 @@ set(particles_source_files
     Particle.cpp
     Photon.cpp
     Lepton.cpp
-    ParticleList.cpp)
+    ParticleList.cpp
+    SourceGenerator.cpp)
 set(particles_header_files
     Particle.hh
     Photon.hh
     Lepton.hh
-    ParticleList.hh)
+    ParticleList.hh
+    SourceGenerator.hh)
 
 add_library(Particles SHARED  ${particles_source_files})
 target_link_libraries(Particles Tools)
