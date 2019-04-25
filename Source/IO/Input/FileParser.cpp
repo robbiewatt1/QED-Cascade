@@ -94,6 +94,16 @@ void FileParser::ReadField()
 	}
 }
 
+void FileParser::ReadProcess()
+{
+	m_process.NonLinearCompton = m_reader->GetBoolean("Process", "NonLinearCompton", false);
+	m_process.NonLinearBreitWheeler = m_reader->GetBoolean("Process", "NonLinearBreitWheeler",
+														   false);
+	m_process.Trident = m_reader->GetBoolean("Process", "Trident", false);
+	m_process.LinearCompton = m_reader->GetBoolean("Process", "LinearCompton", false);
+	m_process.LinearBreitWheeler = m_reader->GetBoolean("Process", "LinearBreitWheeler", false);
+}
+
 void FileParser::ReadParticles()
 {
 	unsigned int i(1);

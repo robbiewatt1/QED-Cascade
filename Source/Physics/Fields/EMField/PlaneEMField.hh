@@ -9,23 +9,23 @@ class PlaneEMField: public EMField
 {
 public:
 
-	PlaneEMField();
+    PlaneEMField();
 
-	PlaneEMField(double maxE, double waveLength, double polAngle,
-			   const ThreeVector& direction);
-	
-	virtual ~PlaneEMField();
+    PlaneEMField(double maxE, double waveLength, double polAngle,
+               const ThreeVector& direction);
+    
+     ~PlaneEMField();
 
-	virtual void GetField(double time, const ThreeVector &position,
-						  ThreeVector &eField, ThreeVector &bField) const;
+    void GetField(double time, const ThreeVector &position,
+                  ThreeVector &eField, ThreeVector &bField) const override;
 
 private:
-	double m_maxE;	// Beam max intensity
-	double m_waveLength;	// wavelength
-	double m_polAngle; // Polerisation angle
-	double m_waveNum;	// Wavenumber of wave
+    double m_maxE;          // Beam max intensity
+    double m_waveLength;    // wavelength
+    double m_polAngle;      // Polerisation angle
+    double m_waveNum;       // Wavenumber of wave
 
-	ThreeMatrix m_rotaion;	// Matrix to rotate so beam goes inb z axis
-	ThreeMatrix m_rotationInv;	// Matrix to rotate back
+    ThreeMatrix m_rotaion;       // Matrix to rotate so beam goes in z
+    ThreeMatrix m_rotationInv;  // Matrix to rotate back
 };
 #endif

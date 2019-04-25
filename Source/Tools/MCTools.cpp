@@ -29,3 +29,13 @@ std::vector<double> MCTools::SampleNorm(double mean, double variance, unsigned i
 	}
 	return samples;
 }
+
+std::vector<double> MCTools::SampleUniform(double low, double high, unsigned int nSamples)
+{
+	std::vector<double> samples(nSamples);
+	for (unsigned int i = 0; i < nSamples; i++)
+	{
+		samples[i] = RandDouble(low, high);
+	}
+	return samples;
+}

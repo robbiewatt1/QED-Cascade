@@ -10,7 +10,6 @@ NonLinearBreitWheeler::NonLinearBreitWheeler(EMField* field, double dt):
 Process(field, dt)
 {
 	LoadTables();
-	std::cerr << "tables loaded" << std::endl;
 }
 
 NonLinearBreitWheeler::~NonLinearBreitWheeler()
@@ -27,11 +26,10 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
 	double deltaOD = m_dt * UnitsSystem::alpha * chi * t / part->GetEnergy();
 	part->UpdateOpticalDepth(deltaOD);
 
-	std::cout << deltaOD << std::endl;
-
 	// Now check if process hass occured. If so then emmit and react
 	if (part->GetOpticalDepth() < 0.0)
 	{
+	
 		double split = CalculateSplit(chi);
 		double pEnergy = split * part->GetEnergy();
 		double eEnergy = (1.0 - split) * part->GetEnergy();
@@ -39,8 +37,9 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
 		ThreeVector eMomentum =  std::sqrt(eEnergy * eEnergy - 1.0) * part->GetDirection();
 		Lepton* positron = new Lepton(1.0, 1.0, part->GetPosition(), 
 									  pMomentum, part->GetTime(), false);	
-		Lepton* electron = new Lepton(1.0, 1.0, part->GetPosition(),
+		Lepton* electron = new Lepton(1.0, -1.0, part->GetPosition(),
 									  eMomentum, part->GetTime(), false);
+	
 		partList->AddParticle(positron);
 		partList->AddParticle(electron);
 		part->Kill();
@@ -128,7 +127,7 @@ void NonLinearBreitWheeler::LoadTables()
 	for (unsigned int i = 0; i < m_efract_length; i++)
 	{
 		chiFile >> logChi;
-		m_eFract_chiAxis[i] = std::pow(logChi, 10.0);
+		m_eFract_chiAxis[i] = std::pow(10, logChi);
 		epsilonFile >> m_eFract_fractAxis[i];
 		m_eFract_dataTable[i] = new double [m_efract_length];
 		for (unsigned int j = 0; j < m_efract_length; j++)

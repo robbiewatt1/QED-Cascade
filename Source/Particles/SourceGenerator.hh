@@ -5,18 +5,32 @@
 #include "ThreeVector.hh"
 #include "ParticleList.hh"
 
-namespace SourceGenerator
-{
-	std::vector<ParticleList*> 	MonoSource(std::string type, unsigned int nPart, 
-										   double energy, double deltaPos,
-										   const ThreeVector &position,
-										   const ThreeVector &direction);
+class SourceGenerator
+ {
+ public:
+ 	SourceGenerator(std::string type, unsigned int nPart, 
+					double energyMin, double energyMax, 
+					double deltaPos, const ThreeVector &position,
+					const ThreeVector &direction);
+ 	
+ 	~SourceGenerator();
 
-	std::vector<ParticleList*> LinearSource(std::string type, unsigned int nPart, 
-											double energyMin, double energyMax,
-											double deltaPos, const ThreeVector &position, 
-					  						const ThreeVector &direction);
+ 	ParticleList* GenerateList();
 
-	void FreeSources(std::vector<ParticleList*> source);
+ 	void FreeSources(ParticleList* source);
+
+ 	unsigned int GetSourceNumber() const {return m_nPart;} 
+
+private:
+
+	std::string m_type;
+	unsigned int m_nPart;
+	ThreeVector m_position;
+	ThreeVector m_direction;
+	std::vector<double> m_radialPos;
+	std::vector<double> m_angle;
+	std::vector<double> m_energy;
+	unsigned int m_partCount;
+	ThreeMatrix m_rotaion;
 };
 #endif

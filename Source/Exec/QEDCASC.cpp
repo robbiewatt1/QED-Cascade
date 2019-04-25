@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
 	// Get the input paramter strucs
 	GeneralParameters inGeneral = input->GetGeneral();
 	FieldParameters inField = input->GetField();
+	ProcessParameters inProcess = input->GetProcess();
 	std::vector<ParticleParameters> inParticles = input->GetParticle();
 	std::vector<HistogramParameters> inHistogram = input->GetHistograms();
 
@@ -77,33 +78,49 @@ int main(int argc, char* argv[])
 							   inField.Focus);
 	}
 
-	// Set up the particle lists
-	std::vector<ParticleList*> eventList;
-	for (unsigned int i = 0; i < inParticles.size(); i++)
+	// set up the particle sources
+	std::vector<SourceGenerator*> generators(inParticles.size());
+	for (unsigned int i = 0; i < inParticles.size(); ++i)
 	{
-	//	sources[i] = new ParticleList(inParticles[i].Name);
+		SourceGenerator* source;
 		if (inParticles[i].Distro == "mono")
 		{
-			std::vector<ParticleList*> source = SourceGenerator::MonoSource(inParticles[i].Type, 
-														inParticles[i].Number, inParticles[i].Energy, 
-														inParticles[i].Radius, inParticles[i].Position, 
-														inParticles[i].Direction);
-			eventList.insert(eventList.end(), source.begin(), source.end());
-		} else if (inParticles[i].Distro == "linear")
+			source = new SourceGenerator(inParticles[i].Type,
+										 inParticles[i].Number,
+										 inParticles[i].Energy,
+										 inParticles[i].Energy,
+										 inParticles[i].Radius,
+										 inParticles[i].Position,
+										 inParticles[i].Direction);
+		} else
 		{
-			std::vector<ParticleList*> source = SourceGenerator::LinearSource(inParticles[i].Type,
-														inParticles[i].Number, inParticles[i].EnergyMin, 
-														inParticles[i].EnergyMax, inParticles[i].Radius, 
-														inParticles[i].Position, inParticles[i].Direction);
-			eventList.insert(eventList.end(), source.begin(), source.end());
+			source = new SourceGenerator(inParticles[i].Type,
+										 inParticles[i].Number,
+				 						 inParticles[i].EnergyMin,
+				 						 inParticles[i].EnergyMax,
+				 						 inParticles[i].Radius,
+				 						 inParticles[i].Position,
+				 						 inParticles[i].Direction);
 		}
+		generators[i] = source;
 	}
 
-	// Set up the physics processes / pusher
+	// Set up the physics pusher
 	ParticlePusher* pusher = new ParticlePusher(field, inGeneral.timeStep);
-	NonLinearCompton* compton = new NonLinearCompton(field, inGeneral.timeStep);
-	NonLinearBreitWheeler* breitWheeler = new NonLinearBreitWheeler(field, 
-													  inGeneral.timeStep);
+	
+	// Set up the Physics list
+	std::vector<Process*> processList;
+	if (inProcess.NonLinearCompton == true)
+	{
+		NonLinearCompton* comptonNL = new NonLinearCompton(field, inGeneral.timeStep);
+		processList.push_back(comptonNL);
+	} else if (inProcess.NonLinearBreitWheeler == true)
+	{
+		NonLinearBreitWheeler* breitWheelerNL = new NonLinearBreitWheeler(field, 
+													  		inGeneral.timeStep);
+		processList.push_back(breitWheelerNL);
+	}
+
 	// Set up the histograms
 	std::vector<Histogram*> histograms(inHistogram.size());
 	for (unsigned int i = 0; i < inHistogram.size(); i++)
@@ -114,54 +131,69 @@ int main(int argc, char* argv[])
 									  inHistogram[i].Bins);
 	}
 
-	// main loop
-	std::cout << "Setup complete! " << eventList.size() << " events will be simulated.\n";
+	unsigned int nEvents(0);
+	for (unsigned int i = 0; i < inParticles.size(); i++)
+	{
+		nEvents += inParticles[i].Number;
+	}
+	std::cout << "Setup complete! " << nEvents << " events will be simulated.\n";
 	std::cout << "Entering main loop using " << omp_get_max_threads();
 	std::cout << " threads.\n";
 	double startTime = omp_get_wtime();
 
-	#pragma omp parallel for
-	for (unsigned int i = 0; i < eventList.size(); i++)
+	// enter main loop
+	for (unsigned int i = 0; i < generators.size(); i++) // Loop sources
 	{
-		unsigned int histCount(0);
-		double time(0);	
-		while(time < inGeneral.timeEnd)
+		#pragma omp parallel for
+		for (unsigned int j = 0; j < generators[i]->GetSourceNumber(); j++) // loop events
 		{
-			// Check if time for histogram
-			if (histCount < histograms.size() && time >= histograms[histCount]->GetTime())
+			// Generate source
+			ParticleList* event = generators[i]->GenerateList();
+
+			unsigned int histCount(0);
+			double time(0);	
+			while(time < inGeneral.timeEnd) // loop time
 			{
-				for (unsigned int j = 0; j < eventList[i]->GetNPart(); j++)
+				// Check if time for histogram
+				if (histCount < histograms.size() && time >= histograms[histCount]->GetTime())
 				{
-					if (histograms[histCount]->GetParticle() == 
-						eventList[i]->GetParticle(j)->GetName())
+					for (unsigned int k = 0; k < event->GetNPart(); k++)
 					{
-						histograms[histCount]->AppParticle(eventList[i]->GetParticle(j));
+						if (histograms[histCount]->GetParticle() == 
+							event->GetParticle(k)->GetName())
+						{
+							histograms[histCount]->AppParticle(event->GetParticle(k));
+						}
+					}
+					histCount++;
+				}
+
+				// Push particles and interact
+				for (unsigned int k = 0; k < event->GetNPart(); k++) // Loop particles
+				{
+					pusher->PushParticle(event->GetParticle(k));
+					for (unsigned int proc = 0; proc < processList.size(); proc++) // loop processes
+					{
+						processList[proc]->Interact(event->GetParticle(k), event);
 					}
 				}
-				histCount++;
+				time += inGeneral.timeStep;
 			}
 
-			// Push particles and interact
-			for (unsigned int j = 0; j < eventList[i]->GetNPart(); j++)
+			// fill any non filled histograms
+			for (unsigned int k = histCount; k < histograms.size(); k++)
 			{
-				pusher->PushParticle(eventList[i]->GetParticle(j));
-				compton->Interact(eventList[i]->GetParticle(j), eventList[i]);
-				breitWheeler->Interact(eventList[i]->GetParticle(j), eventList[i]);
-			}
-			time += inGeneral.timeStep;
-		}
-
-		// fill any non filled histograms
-		for (unsigned int j = histCount; j < histograms.size(); j++)
-		{
-			for (unsigned int k = 0; k < eventList[i]->GetNPart(); k++)
-			{
-				if (histograms[j]->GetParticle() == 
-					eventList[i]->GetParticle(k)->GetName())
+				for (unsigned int l = 0; l < event->GetNPart(); l++)
 				{
-					histograms[j]->AppParticle(eventList[i]->GetParticle(k));
+					if (histograms[k]->GetParticle() == 
+						event->GetParticle(l)->GetName())
+					{
+						histograms[k]->AppParticle(event->GetParticle(l));
+					}
 				}
 			}
+			// Free up the sapce
+			generators[i]->FreeSources(event);
 		}
 	}
 
@@ -176,9 +208,7 @@ int main(int argc, char* argv[])
 		out->OutputHist(histograms[i]);
 		delete histograms[i];
 	}
-	SourceGenerator::FreeSources(eventList);
 	delete field;
-	delete compton;
 	delete pusher;
 	delete input;
 

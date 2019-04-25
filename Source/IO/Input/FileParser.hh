@@ -42,6 +42,14 @@ struct ParticleParameters
 	double Radius;			// source size
 };
 
+struct ProcessParameters
+{
+	bool NonLinearCompton;		// Turn on non-linear comnpton
+	bool NonLinearBreitWheeler;	// Turn on non-linear Breit-Wheeler
+	bool Trident;				// Turn on Trident process
+	bool LinearCompton;			// Turn on linear compton
+	bool LinearBreitWheeler;	// turn on linear Breit-Wheeler
+};
 
 struct HistogramParameters
 {
@@ -65,6 +73,8 @@ public:
 
 	FieldParameters GetField() const {return m_field;}
 
+	ProcessParameters GetProcess() const {return m_process;}
+
 	std::vector<ParticleParameters> GetParticle() const {return m_particles;}
 
 	std::vector<HistogramParameters> GetHistograms() const {return m_histograms;}
@@ -79,6 +89,8 @@ private:
 
 	void ReadField();
 
+	void ReadProcess();
+
 	void ReadParticles();
 
 	void ReadHistograms();
@@ -87,6 +99,7 @@ private:
 	std::vector<std::string> m_sections;
 	GeneralParameters m_general;
 	FieldParameters m_field;
+	ProcessParameters m_process;
 	std::vector<ParticleParameters> m_particles;
 	std::vector<HistogramParameters> m_histograms;
 

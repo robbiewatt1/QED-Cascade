@@ -11,5 +11,6 @@ namespace MCTools
 
 	std::vector<double> SampleNorm(double mean, double variance, unsigned int nSamples);
 
+	std::vector<double> SampleUniform(double low, double high, unsigned int nSamples);
 }
 #endif

@@ -12,7 +12,7 @@ class ParticleList
 public:
 	/* Default constructor. The maximum number of particles is set 
 	   before to avoid appending to list */
-	ParticleList(std::string name, unsigned int maxParticles = 1e3);
+	ParticleList(std::string name, unsigned int maxParticles = 1e6);
 	
 	~ParticleList();
 
@@ -24,8 +24,6 @@ public:
 
 	// Adds a particle to the source. Not very fast for large arrays
 	void AddParticle(Particle *part);
-
-//	void SaveTracks(HDF5Output *file, std::string partName) const;
 
 private:
 	std::string m_name;

@@ -8,27 +8,27 @@
 class ParticlePusher
 {
 public:
-	
-	ParticlePusher(EMField* field, double dt);
+    
+    ParticlePusher(EMField* field, double dt);
 
-	~ParticlePusher();
-	
-	void PushParticle(Particle *part);
+    ~ParticlePusher();
+    
+    void PushParticle(Particle *part);
 
-	void PushParticleList(ParticleList* partList);
+    void PushParticleList(ParticleList* partList);
 
-	double GetTime() const {return m_time;}
+    double GetTime() const {return m_time;}
 
 private:
-	// position update function for charged particle
-	ThreeVector PushPosition(double mass, const ThreeVector &momentum);
+    // position update function for charged particle
+    ThreeVector PushPosition(double mass, const ThreeVector &momentum);
 
-	// momentum update fuinction for charged particle
-	ThreeVector PushMomentum(double mass, double charge, const ThreeVector &momentum,
-						const ThreeVector &Efield, const ThreeVector &Bfield);	
+    // momentum update fuinction for charged particle
+    ThreeVector PushMomentum(double mass, double charge, const ThreeVector &momentum,
+                        const ThreeVector &Efield, const ThreeVector &Bfield);  
 
-	EMField* m_field;	// Field which particles are pushed through
-	double m_dt;	// Time of each step
-	double m_time;	// global time of simulation
+    EMField* m_field;   // Field which particles are pushed through
+    double m_dt;        // Time of each step
+    double m_time;      // global time of simulation
 };
 #endif

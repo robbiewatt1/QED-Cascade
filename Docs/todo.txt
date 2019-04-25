@@ -18,3 +18,5 @@ The method for energy split may be using wrong table
 sort out how particle lists work and how particles are killed. Maybe add new particle for photons are positrons and electrons
 
 Currently all events are generated at the star making it very memory intensive! change this by generating event within the event loop.
+
+Add in check at end of inputs to make sure e.g. fields are set for processes

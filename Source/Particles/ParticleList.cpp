@@ -21,6 +21,13 @@ ParticleList::~ParticleList()
 
 void ParticleList::AddParticle(Particle *part)
 {
-	m_particleList[m_particleNumber] = part;
-	m_particleNumber++;
+	if (m_particleNumber < m_maxParticles)
+	{
+		m_particleList[m_particleNumber] = part;
+		m_particleNumber++;
+	} else
+	{
+		std::cerr << "Error: Particle list too small!\n";
+		std::cerr << "New particles will be forgotten\n";
+	}
 }
