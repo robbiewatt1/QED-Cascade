@@ -40,6 +40,7 @@ struct ParticleParameters
 	double EnergyMin;		// source min energy
 	double EnergyMax;		// source max energy
 	double Radius;			// source size
+	bool Output;			// Output individual particle data
 };
 
 struct ProcessParameters

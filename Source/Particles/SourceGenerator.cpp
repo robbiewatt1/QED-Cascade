@@ -15,7 +15,7 @@ m_type(type), m_nPart(nPart), m_partCount(0)
 	m_radialPos = MCTools::SampleNorm(0, deltaPos, nPart);
 	m_angle = MCTools::SampleUniform(0, 2.0 * UnitsSystem::pi, nPart);
 	m_energy = MCTools::SampleUniform(energyMin, energyMax, nPart);
-	ThreeMatrix m_rotaion = m_direction.RotateToAxis(ThreeVector(0, 0, 1));
+	m_rotaion = m_direction.RotateToAxis(ThreeVector(0, 0, 1));
 }
  	
 SourceGenerator::~SourceGenerator()

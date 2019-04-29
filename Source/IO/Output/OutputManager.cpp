@@ -5,33 +5,30 @@ OutputManager::OutputManager(std::string fileName):
 m_units(NULL)
 {
 	m_outputFile = new HDF5Output(fileName);
-	SetFields(true,true,true);
+	m_outputFile->AddGroup("Particles");
+	m_outputFile->AddGroup("Fields");
+	m_outputFile->AddGroup("Histograms");
 }
 
 OutputManager::OutputManager(std::string fileName, UnitsSystem* units):
 m_units(units)
 {
 	m_outputFile = new HDF5Output(fileName);
-	SetFields(true,true,true);
+	m_outputFile->AddGroup("Particles");
+	m_outputFile->AddGroup("Fields");
+	m_outputFile->AddGroup("Histograms");
 }
 
 OutputManager::~OutputManager()
 {
-}
+	delete m_outputFile;
 
-void OutputManager::SetFields(bool partOn, bool fieldOn, bool qedOn)
-{
-	if (partOn == true)
+	for (unsigned int i = 0; i < m_primaryEvent.size(); i++)
 	{
-		m_outputFile->AddGroup("Particles");
-	}
-	if (fieldOn == true)
-	{
-		m_outputFile->AddGroup("Fields");
-	}
-	if (qedOn == true)
-	{
-		m_outputFile->AddGroup("Histograms");
+		delete [] m_primaryEvent[i];
+		delete [] m_electronEvent[i];
+		delete [] m_positronEvent[i];
+		delete [] m_photonEvent[i];
 	}
 }
 
@@ -92,28 +89,6 @@ void OutputManager::SingleParticle(Particle* part, std::string name)
 		m_outputFile->AddArray1D(timeBuff, part->GetTimeHist().size(), groupName + "/Time");
 		m_outputFile->AddArray1D(gammaBuff, part->GetGammaHist().size(), groupName + "/Gamma");
 	}
-}
-
-void OutputManager::ListProperties(ParticleList* partList, std::string setName)
-{
-	if (m_partListBool == false)
-	{
-		m_outputFile->AddGroup("Particles/ParticleList");
-		m_partListBool = true;
-	}
-	std::string groupName = "Particles/ParticleList/" + partList->GetName();
-	m_outputFile->AddGroup(groupName);
-	
-	double* dataBuff = new double[partList->GetNPart()*5];
-	for (unsigned int i = 0; i < partList->GetNPart(); i++)
-	{
-		dataBuff[i*5] = i;
-		dataBuff[i*5+1] = partList->GetParticle(i)->GetEnergy();
-		dataBuff[i*5+2] = partList->GetParticle(i)->GetPosition()[0];
-		dataBuff[i*5+3] = partList->GetParticle(i)->GetPosition()[1];
-		dataBuff[i*5+4] = partList->GetParticle(i)->GetPosition()[2];
-	}
-	m_outputFile->AddArray2D(dataBuff, partList->GetNPart(), 5, groupName + "/" + setName);
 }
 
 void OutputManager::ListTracks(ParticleList* partList, std::string name)
@@ -184,10 +159,239 @@ void OutputManager::ListTracks(ParticleList* partList, std::string name)
 	}
 }
 
+void OutputManager::ListProperties(ParticleList* partList, std::string setName)
+{
+	if (m_partListBool == false)
+	{
+		m_outputFile->AddGroup("Particles/ParticleList");
+		m_partListBool = true;
+	}
+	std::string groupName = "Particles/ParticleList/" + partList->GetName();
+	m_outputFile->AddGroup(groupName);
+	
+	double* dataBuff = new double[partList->GetNPart()*5];
+	for (unsigned int i = 0; i < partList->GetNPart(); i++)
+	{
+		dataBuff[i*5] = i;
+		dataBuff[i*5+1] = partList->GetParticle(i)->GetEnergy();
+		dataBuff[i*5+2] = partList->GetParticle(i)->GetPosition()[0];
+		dataBuff[i*5+3] = partList->GetParticle(i)->GetPosition()[1];
+		dataBuff[i*5+4] = partList->GetParticle(i)->GetPosition()[2];
+	}
+	m_outputFile->AddArray2D(dataBuff, partList->GetNPart(), 5, groupName + "/" + setName);
+}
+
+void OutputManager::InitSource(unsigned int nEvents)
+{
+	m_primaryEvent  = std::vector<double*>(nEvents);
+	m_electronEvent = std::vector<double*>(nEvents);
+	m_positronEvent = std::vector<double*>(nEvents);
+	m_photonEvent   = std::vector<double*>(nEvents);
+	m_electronCount = std::vector<unsigned int>(nEvents);
+	m_positronCount = std::vector<unsigned int>(nEvents);
+	m_photonCount   = std::vector<unsigned int>(nEvents);
+}
+
+void OutputManager::StoreSource(ParticleList* partList, unsigned int eventID, bool primary)
+{
+	if (primary == true)
+	{
+		double* dataBuff = new double[8];
+		dataBuff[0] = eventID;
+		dataBuff[1] = partList->GetParticle(0)->GetEnergy(),
+		dataBuff[2] = partList->GetParticle(0)->GetMomentum()[0],
+		dataBuff[3] = partList->GetParticle(0)->GetMomentum()[1],
+		dataBuff[4] = partList->GetParticle(0)->GetMomentum()[2],
+		dataBuff[5] = partList->GetParticle(0)->GetPosition()[0],
+		dataBuff[6] = partList->GetParticle(0)->GetPosition()[1],
+		dataBuff[7] = partList->GetParticle(0)->GetPosition()[2];
+		m_primaryEvent[eventID] = dataBuff;
+	} else
+	{
+		m_electronCount[eventID] = 0;
+		m_positronCount[eventID] = 0;
+		m_photonCount[eventID] = 0;
+		for (unsigned int i = 0; i < partList->GetNPart(); i++)
+		{
+			if (partList->GetParticle(i)->GetName() == "Electron") m_electronCount[eventID]++;
+			if (partList->GetParticle(i)->GetName() == "Positron") m_positronCount[eventID]++;
+			if (partList->GetParticle(i)->GetName() == "Photon") m_photonCount[eventID]++;
+		}
+		double* electronData = new double [m_electronCount[eventID]*8];
+		double* positronData = new double [m_positronCount[eventID]*8];
+		double* photonData   = new double [m_photonCount[eventID]*8];
+		m_electronCount[eventID] = 0;
+		m_positronCount[eventID] = 0;
+		m_photonCount[eventID] = 0;
+		for (unsigned int i = 0; i < partList->GetNPart(); i++)
+		{
+			if (partList->GetParticle(i)->GetName() == "Electron")
+			{
+				electronData[m_electronCount[eventID]*8]   = eventID;
+				electronData[m_electronCount[eventID]*8+1] = partList->GetParticle(i)
+						->GetEnergy();
+				electronData[m_electronCount[eventID]*8+2] = partList->GetParticle(i)
+						->GetMomentum()[0];
+				electronData[m_electronCount[eventID]*8+3] = partList->GetParticle(i)
+						->GetMomentum()[1];
+				electronData[m_electronCount[eventID]*8+4] = partList->GetParticle(i)
+						->GetMomentum()[2];
+				electronData[m_electronCount[eventID]*8+5] = partList->GetParticle(i)
+						->GetPosition()[0];
+				electronData[m_electronCount[eventID]*8+6] = partList->GetParticle(i)
+						->GetPosition()[1];
+				electronData[m_electronCount[eventID]*8+7] = partList->GetParticle(i)
+						->GetPosition()[2];
+				m_electronCount[eventID]++;
+			} else if (partList->GetParticle(i)->GetName() == "Positron")
+			{
+				positronData[m_positronCount[eventID]*8]   = eventID;
+				positronData[m_positronCount[eventID]*8+1] = partList->GetParticle(i)
+						->GetEnergy();
+				positronData[m_positronCount[eventID]*8+2] = partList->GetParticle(i)
+						->GetMomentum()[0];
+				positronData[m_positronCount[eventID]*8+3] = partList->GetParticle(i)
+						->GetMomentum()[1];
+				positronData[m_positronCount[eventID]*8+4] = partList->GetParticle(i)
+						->GetMomentum()[2];
+				positronData[m_positronCount[eventID]*8+5] = partList->GetParticle(i)
+						->GetPosition()[0];
+				positronData[m_positronCount[eventID]*8+6] = partList->GetParticle(i)
+						->GetPosition()[1];
+				positronData[m_positronCount[eventID]*8+7] = partList->GetParticle(i)
+						->GetPosition()[2];
+				m_positronCount[eventID]++;
+			}  else if (partList->GetParticle(i)->GetName() == "Photon")
+			{
+				photonData[m_photonCount[eventID]*8]   = eventID;
+				photonData[m_photonCount[eventID]*8+1] = partList->GetParticle(i)
+						->GetEnergy();
+				photonData[m_photonCount[eventID]*8+2] = partList->GetParticle(i)
+						->GetMomentum()[0];
+				photonData[m_photonCount[eventID]*8+3] = partList->GetParticle(i)
+						->GetMomentum()[1];
+				photonData[m_photonCount[eventID]*8+4] = partList->GetParticle(i)
+						->GetMomentum()[2];
+				photonData[m_photonCount[eventID]*8+5] = partList->GetParticle(i)
+						->GetPosition()[0];
+				photonData[m_photonCount[eventID]*8+6] = partList->GetParticle(i)
+						->GetPosition()[1];
+				photonData[m_photonCount[eventID]*8+7] = partList->GetParticle(i)
+						->GetPosition()[2];
+				m_photonCount[eventID]++;
+			}
+		}
+		m_electronEvent[eventID] = electronData;
+		m_positronEvent[eventID] = positronData;
+		m_photonEvent[eventID]   = photonData;
+	}
+}
+
+void OutputManager::OutputSource()
+{
+	if (m_particleSourceBool == false)
+	{
+		m_outputFile->AddGroup("Particles/ParticleSource");
+		m_particleSourceBool = true;
+	}
+
+	double* primeBuff = new double [m_primaryEvent.size()*8];
+	for (unsigned int i = 0; i < m_primaryEvent.size(); i++)
+	{
+		primeBuff[i*8]   = m_primaryEvent[i][0];
+		primeBuff[i*8+1] = m_primaryEvent[i][1];
+		primeBuff[i*8+2] = m_primaryEvent[i][2];
+		primeBuff[i*8+3] = m_primaryEvent[i][3];
+		primeBuff[i*8+4] = m_primaryEvent[i][4];
+		primeBuff[i*8+5] = m_primaryEvent[i][5];
+		primeBuff[i*8+6] = m_primaryEvent[i][6];
+		primeBuff[i*8+7] = m_primaryEvent[i][7];
+	}
+	m_outputFile->AddArray2D(primeBuff, m_primaryEvent.size(), 8,
+			"Particles/ParticleSource/Primary");
+
+	unsigned int totalElectrons = 0;
+	unsigned int totalPositrons = 0;
+	unsigned int totalPhotons = 0;
+
+	for (unsigned int i = 0; i < m_electronCount.size(); i++)
+	{
+		totalElectrons += m_electronCount[i];
+		totalPositrons += m_positronCount[i];
+		totalPhotons   += m_photonCount[i];
+	}
+
+	double* electronBuff = new double [totalElectrons*8];
+	double* positronBuff = new double [totalPositrons*8];
+	double* photonBuff   = new double [totalPhotons*8];
+	unsigned int electronIndex = 0;
+	unsigned int psoitronIndex = 0;
+	unsigned int photonIndex = 0;
+
+	for (unsigned int i = 0; i < m_electronEvent.size(); i++)
+	{
+		for (unsigned int j = 0; j < m_electronCount[i]; j++)
+		{
+			electronBuff[electronIndex]   = m_electronEvent[i][j*8];
+			electronBuff[electronIndex+1] = m_electronEvent[i][j*8+1];
+			electronBuff[electronIndex+2] = m_electronEvent[i][j*8+2];
+			electronBuff[electronIndex+3] = m_electronEvent[i][j*8+3];
+			electronBuff[electronIndex+4] = m_electronEvent[i][j*8+4];
+			electronBuff[electronIndex+5] = m_electronEvent[i][j*8+5];
+			electronBuff[electronIndex+6] = m_electronEvent[i][j*8+6];
+			electronBuff[electronIndex+7] = m_electronEvent[i][j*8+7];
+			electronIndex += 8;
+		}
+		for (unsigned int j = 0; j < m_positronCount[i]; j++)
+		{
+			positronBuff[psoitronIndex]   = m_positronEvent[i][j*8];
+			positronBuff[psoitronIndex+1] = m_positronEvent[i][j*8+1];
+			positronBuff[psoitronIndex+2] = m_positronEvent[i][j*8+2];
+			positronBuff[psoitronIndex+3] = m_positronEvent[i][j*8+3];
+			positronBuff[psoitronIndex+4] = m_positronEvent[i][j*8+4];
+			positronBuff[psoitronIndex+5] = m_positronEvent[i][j*8+5];
+			positronBuff[psoitronIndex+6] = m_positronEvent[i][j*8+6];
+			positronBuff[psoitronIndex+7] = m_positronEvent[i][j*8+7];
+			psoitronIndex += 8;
+		}
+		for (unsigned int j = 0; j < m_photonCount[i]; j++)
+		{
+			photonBuff[photonIndex]   = m_photonEvent[i][j*8];
+			photonBuff[photonIndex+1] = m_photonEvent[i][j*8+1];
+			photonBuff[photonIndex+2] = m_photonEvent[i][j*8+2];
+			photonBuff[photonIndex+3] = m_photonEvent[i][j*8+3];
+			photonBuff[photonIndex+4] = m_photonEvent[i][j*8+4];
+			photonBuff[photonIndex+5] = m_photonEvent[i][j*8+5];
+			photonBuff[photonIndex+6] = m_photonEvent[i][j*8+6];
+			photonBuff[photonIndex+7] = m_photonEvent[i][j*8+7];
+			photonIndex += 8;
+		}				
+	}
+	if (totalElectrons > 0)
+	{
+		m_outputFile->AddArray2D(electronBuff, totalElectrons, 8,
+				"Particles/ParticleSource/Electrons");
+	}
+	if (totalPositrons > 0)
+	{
+		m_outputFile->AddArray2D(positronBuff, totalElectrons, 8,
+				"Particles/ParticleSource/Positrons");
+	}
+	if (totalPhotons > 0)
+	{
+		m_outputFile->AddArray2D(photonBuff, totalPhotons, 8,
+				"Particles/ParticleSource/Photons");
+	}
+	delete [] primeBuff;
+	delete [] electronBuff;
+	delete [] positronBuff;
+	delete [] photonBuff;
+}
+
 void OutputManager::OutEMField(EMField* field, const std::vector<double> &tAxis,
-						   				  const std::vector<double> &xAxis,
-								 	      const std::vector<double> &yAxis,
-									      const std::vector<double> &zAxis)
+						   	   const std::vector<double> &xAxis,
+							   const std::vector<double> &yAxis,
+							   const std::vector<double> &zAxis)
 {
 	for (unsigned int t = 0; t < tAxis.size(); t++)
 	{
@@ -213,7 +417,7 @@ void OutputManager::OutEMField(EMField* field, const std::vector<double> &tAxis,
 			}
 			std::string dataName = groupName + "/E" + std::to_string(dir);
 			m_outputFile->AddArray3D(dataBuff, xAxis.size(), yAxis.size(), zAxis.size(), dataName);
-			delete dataBuff;
+			delete [] dataBuff;
 		}
 	}
 }

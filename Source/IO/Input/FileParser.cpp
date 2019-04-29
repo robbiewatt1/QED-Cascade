@@ -11,6 +11,7 @@ FileParser::FileParser(std::string fileName)
 	ReadGeneral();
 	ReadField();
 	ReadParticles();
+	ReadProcess();
 	ReadHistograms();
 }
 
@@ -124,8 +125,8 @@ void FileParser::ReadParticles()
 			source.Energy = m_reader->GetReal(partField, "energy", 0) / m_units->RefEnergy();
 			source.EnergyMin = m_reader->GetReal(partField, "min_energy", 0) / m_units->RefEnergy();
 			source.EnergyMax = m_reader->GetReal(partField, "max_energy", 0) / m_units->RefEnergy();
-
 			source.Radius = m_reader->GetReal(partField, "radius", 0) / m_units->RefLength();
+			source.Output = m_reader->GetBoolean(partField, "output", false);
 			m_particles.push_back(source);
 			i++;
 		} else

@@ -6,10 +6,10 @@ Particle(mass, charge, position, momentum, time, tracking)
 {
 	if (charge == -1)
 	{
-		m_name = "electron";
+		m_name = "Electron";
 	} else
 	{
-		m_name = "positron";
+		m_name = "Psitron";
 	}
 }
 
@@ -19,10 +19,10 @@ Particle(mass, charge, position, energy * direction.Norm(), time, tracking)
 {
 	if (charge == -1)
 	{
-		m_name = "electron";
+		m_name = "Electron";
 	} else
 	{
-		m_name = "positron";
+		m_name = "Positron";
 	}
 }
 

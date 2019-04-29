@@ -22,8 +22,6 @@ public:
 
 	~OutputManager();
 
-	void SetFields(bool partOn = false, bool fieldOn = false, bool qedOn = false);
-
 	// Particle Output methods
 	void SingleParticle(Particle* part, std::string name);
 
@@ -33,6 +31,14 @@ public:
 	// Saves data for a non tracked particle list
 	// format: id, energy, theta1, theta2, pos1, pos2, pos3,  
 	void ListProperties(ParticleList* partList, std::string setName);
+
+	// Outputs the full data of a particle source before and after the interaction
+	// this data is then used to train NN for the given interaction
+	void InitSource(unsigned int nEvents);
+
+	void StoreSource(ParticleList* partList, unsigned int eventID, bool primary);
+
+	void OutputSource();
 
 	// Physics package output methods
 	void OutEMField(EMField* field, const std::vector<double> &tAxis,
@@ -50,5 +56,15 @@ private:
 	// Boolians to avoid adding the same group twice
 	bool m_singlePartBool = false;
 	bool m_partListBool = false;
+	bool m_particleSourceBool = false;
+
+	std::vector<double*> m_primaryEvent;
+	std::vector<double*> m_electronEvent;
+	std::vector<double*> m_positronEvent;
+	std::vector<double*> m_photonEvent;
+	std::vector<unsigned int> m_electronCount;
+	std::vector<unsigned int> m_positronCount;
+	std::vector<unsigned int> m_photonCount;
+
 };
 #endif

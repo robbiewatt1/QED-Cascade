@@ -131,11 +131,16 @@ int main(int argc, char* argv[])
 									  inHistogram[i].Bins);
 	}
 
+	// Set up output manager
+	OutputManager* out = new OutputManager(inGeneral.fileName);
+
 	unsigned int nEvents(0);
 	for (unsigned int i = 0; i < inParticles.size(); i++)
 	{
 		nEvents += inParticles[i].Number;
 	}
+
+
 	std::cout << "Setup complete! " << nEvents << " events will be simulated.\n";
 	std::cout << "Entering main loop using " << omp_get_max_threads();
 	std::cout << " threads.\n";
@@ -144,11 +149,17 @@ int main(int argc, char* argv[])
 	// enter main loop
 	for (unsigned int i = 0; i < generators.size(); i++) // Loop sources
 	{
+		// set up the full event store
+		if (inParticles[i].Output == true) out->InitSource(generators[i]->GetSourceNumber());
+
 		#pragma omp parallel for
 		for (unsigned int j = 0; j < generators[i]->GetSourceNumber(); j++) // loop events
 		{
 			// Generate source
 			ParticleList* event = generators[i]->GenerateList();
+
+			// Store full event info
+			if (inParticles[i].Output == true) out->StoreSource(event, j, true);
 
 			unsigned int histCount(0);
 			double time(0);	
@@ -192,9 +203,11 @@ int main(int argc, char* argv[])
 					}
 				}
 			}
+			if (inParticles[i].Output == true) out->StoreSource(event, j, false);
 			// Free up the sapce
 			generators[i]->FreeSources(event);
 		}
+		if (inParticles[i].Output == true) out->OutputSource();
 	}
 
 	std::cout << "Simulation complete in time: "; 
@@ -202,15 +215,16 @@ int main(int argc, char* argv[])
 	std::cout << "Saving data to file: " << inGeneral.fileName;
 	std::cout << " and cleaning up...\n";
 	
-	OutputManager* out = new OutputManager(inGeneral.fileName);
 	for (unsigned int i = 0; i < inHistogram.size(); i++)
 	{
 		out->OutputHist(histograms[i]);
 		delete histograms[i];
 	}
+
 	delete field;
 	delete pusher;
 	delete input;
+	delete out;
 
 	return 0;
 }
