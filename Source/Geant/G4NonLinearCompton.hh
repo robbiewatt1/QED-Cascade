@@ -8,7 +8,7 @@
 
 #include "Particle.hh"
 #include "ParticleList.hh"
-#include "ParticlePusher.hh"
+#include "LorentzPusher.hh"
 #include "NonLinearCompton.hh"
 
 class G4NonLinearCompton: public G4VDiscreteProcess
@@ -45,7 +45,7 @@ private:
 	ParticleList* m_photonList;		// list of secondaries
 	EMField* m_field;				// field which particles are pushed through
 	NonLinearCompton* m_process;	// non linear compton process
-	ParticlePusher* m_pusher;		// particle poshuer
+	LorentzPusher* m_pusher;		// particle poshuer
 	
 	G4DynamicParticle* m_g4_part;	// g4 particle
 };

@@ -6,8 +6,8 @@
 #include "UnitsSystem.hh"
 #include "MCTools.hh"
 
-NonLinearBreitWheeler::NonLinearBreitWheeler(EMField* field, double dt):
-Process(field, dt)
+NonLinearBreitWheeler::NonLinearBreitWheeler(EMField* field, double dt, bool track):
+Process(field, dt, track)
 {
 	LoadTables();
 }
@@ -19,7 +19,7 @@ NonLinearBreitWheeler::~NonLinearBreitWheeler()
 
 void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) const
 {
-	if (part->GetType() != "Photon") return;
+	if (part->GetType() != "Photon" || part->IsAlive() == false) return;
 
 	double chi = CalculateChi(part);
 	double t = Numerics::Interpolate1D(m_t_chiAxis, m_t_dataTable, m_t_length, chi);
@@ -29,17 +29,15 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
 	// Now check if process hass occured. If so then emmit and react
 	if (part->GetOpticalDepth() < 0.0)
 	{
-	
 		double split = CalculateSplit(chi);
 		double pEnergy = split * part->GetEnergy();
 		double eEnergy = (1.0 - split) * part->GetEnergy();
 		ThreeVector pMomentum =  std::sqrt(pEnergy * pEnergy - 1.0) * part->GetDirection();
 		ThreeVector eMomentum =  std::sqrt(eEnergy * eEnergy - 1.0) * part->GetDirection();
 		Lepton* positron = new Lepton(1.0, 1.0, part->GetPosition(), 
-									  pMomentum, part->GetTime(), false);	
+									  pMomentum, part->GetTime(), m_track);	
 		Lepton* electron = new Lepton(1.0, -1.0, part->GetPosition(),
-									  eMomentum, part->GetTime(), false);
-	
+									  eMomentum, part->GetTime(), m_track);
 		partList->AddParticle(positron);
 		partList->AddParticle(electron);
 		part->Kill();

@@ -9,7 +9,7 @@ Particle(mass, charge, position, momentum, time, tracking)
 		m_name = "Electron";
 	} else
 	{
-		m_name = "Psitron";
+		m_name = "Positron";
 	}
 }
 

@@ -7,7 +7,10 @@ set(physics_source_files
 	Fields/EMField/PlaneEMField.cpp
 	Processes/NonLinearCompton.cpp
 	Processes/NonLinearBreitWheeler.cpp
-	ParticlePushers/ParticlePusher.cpp)
+	ParticlePushers/ParticlePusher.cpp
+    ParticlePushers/ParticlePusher.cpp
+    ParticlePushers/LandauPusher.cpp
+    ParticlePushers/LorentzPusher.cpp)
 set(physics_header_files
 	Fields/EMField/EMField.hh
 	Fields/EMField/GaussianEMField.hh
@@ -16,8 +19,9 @@ set(physics_header_files
     Processes/Process.hh
 	Processes/NonLinearCompton.hh
 	Processes/NonLinearBreitWheeler.hh
-    ParticlePushers/ParticlePusher.hh)
-
+    ParticlePushers/ParticlePusher.hh
+    ParticlePushers/LandauPusher.hh
+    ParticlePushers/LorentzPusher.hh)
 add_library(PhysicsQED SHARED ${physics_source_files})
 target_link_libraries(PhysicsQED Tools Particles)
 target_include_directories(PhysicsQED PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Fields/EMField 

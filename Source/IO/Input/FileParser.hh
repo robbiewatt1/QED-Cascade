@@ -3,14 +3,17 @@
 
 #include "INIReader.hh"
 #include "UnitsSystem.hh"
+#include <fstream>
 
 struct GeneralParameters
 {
 	// General
 	std::string units;
-	double timeStep;	// time step
-	double timeEnd;		// end of simulation
-	std::string fileName;
+	double timeStep;		// time step
+	double timeEnd;			// end of simulation
+	std::string pusher;		// Particle pusher used	
+	std::string fileName;	// Output file name
+	bool tracking;			// Turns on particle tracking
 };
 
 struct FieldParameters
@@ -66,7 +69,7 @@ struct HistogramParameters
 class FileParser
 {
 public:
-	FileParser(std::string fileName);
+	FileParser(std::string fileName, bool checkOutput = false);
 
 	~FileParser();
 
@@ -106,6 +109,9 @@ private:
 
 	INIReader* m_reader;
 	UnitsSystem* m_units;
+
+	bool m_checkOutput;
+	std::ofstream m_checkFile;
 };
 
 #endif

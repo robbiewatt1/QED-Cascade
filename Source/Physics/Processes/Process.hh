@@ -8,7 +8,7 @@
 class Process
 {
 public:
-	Process(EMField* field, double dt): m_field(field), m_dt(dt){ };
+	Process(EMField* field, double dt, bool track): m_field(field), m_dt(dt), m_track(track){ };
 	
 	virtual ~Process(){ };
 
@@ -17,5 +17,6 @@ public:
 protected:
 	EMField* m_field;
 	double m_dt;
+	bool m_track;
 };
 #endif

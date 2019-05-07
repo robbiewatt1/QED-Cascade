@@ -1,5 +1,6 @@
 #include "MCTools.hh"
 #include <random>
+#include <iostream>
 
 void MCTools::SetSeed(int seed)
 {

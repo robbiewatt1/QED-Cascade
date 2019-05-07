@@ -8,10 +8,9 @@
 #include "UnitsSystem.hh"
 
 
-NonLinearCompton::NonLinearCompton(EMField* field, double dt):
-Process(field, dt)
+NonLinearCompton::NonLinearCompton(EMField* field, double dt, bool track):
+Process(field, dt, track)
 {
-	MCTools::SetSeed(5);
 	LoadTables();
 }
 
@@ -22,7 +21,7 @@ NonLinearCompton::~NonLinearCompton()
 
 void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 {
-	if (part->GetType() != "Lepton") return;
+	if (part->GetType() != "Lepton" || part->IsAlive() == false) return;
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
@@ -37,9 +36,9 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 		ThreeVector gammaP = gammaE * part->GetDirection();
 		part->UpdateTrack(part->GetPosition(), part->GetMomentum() - gammaP);
 		// Add new partles to the simulation
-		Photon* gamma = new Photon(gammaE, part->GetPosition(), part->GetDirection(), 
-							  	   part->GetTime());
-		partList->AddParticle(gamma);
+		Photon* photon = new Photon(gammaE, part->GetPosition(), part->GetDirection(), 
+							  	   part->GetTime(), m_track);
+		partList->AddParticle(photon);
 		part->InitOpticalDepth();
 	}
 }

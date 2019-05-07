@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "ThreeVector.hh"
 #include "HDF5Output.hh"
 #include "Particle.hh"
 #include "ParticleList.hh"
@@ -38,7 +39,9 @@ public:
 
 	void StoreSource(ParticleList* partList, unsigned int eventID, bool primary);
 
-	void OutputSource();
+	void StoreTrack(ParticleList* partList, unsigned int eventID);
+
+	void OutputEvents(bool outSource, bool outTrack);
 
 	// Physics package output methods
 	void OutEMField(EMField* field, const std::vector<double> &tAxis,
@@ -47,7 +50,6 @@ public:
 							    	const std::vector<double> &zAxis);
 
 	void OutputHist(Histogram* hist);
-
 
 private:
 	HDF5Output* m_outputFile;
@@ -58,6 +60,7 @@ private:
 	bool m_partListBool = false;
 	bool m_particleSourceBool = false;
 
+	// Structures holding data for source outputs
 	std::vector<double*> m_primaryEvent;
 	std::vector<double*> m_electronEvent;
 	std::vector<double*> m_positronEvent;
@@ -66,5 +69,11 @@ private:
 	std::vector<unsigned int> m_positronCount;
 	std::vector<unsigned int> m_photonCount;
 
+	// structures holding data for tracking output
+	std::vector<unsigned int> m_idTrack;
+	std::vector<std::vector<ThreeVector>> m_positionTrack;
+	std::vector<std::vector<ThreeVector>> m_momentumTrack;
+	std::vector<std::vector<double>> m_timeTrack;
+	std::vector<std::vector<double>> m_gammaTrack;
 };
 #endif

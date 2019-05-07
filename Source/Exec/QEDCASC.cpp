@@ -7,6 +7,9 @@
 #include "PlaneEMField.hh"
 
 #include "ParticlePusher.hh"
+#include "LorentzPusher.hh"
+#include "LandauPusher.hh"
+
 #include "ParticleList.hh"
 #include "SourceGenerator.hh"
 
@@ -53,9 +56,9 @@ int main(int argc, char* argv[])
 	}
 
 	// Parse the file
-	FileParser* input = new FileParser(argv[1]);
+	FileParser* input = new FileParser(argv[1], true);
 
-	// Get the input paramter strucs
+	// Get the input paramter structs
 	GeneralParameters inGeneral = input->GetGeneral();
 	FieldParameters inField = input->GetField();
 	ProcessParameters inProcess = input->GetProcess();
@@ -78,47 +81,43 @@ int main(int argc, char* argv[])
 							   inField.Focus);
 	}
 
-	// set up the particle sources
-	std::vector<SourceGenerator*> generators(inParticles.size());
-	for (unsigned int i = 0; i < inParticles.size(); ++i)
-	{
-		SourceGenerator* source;
-		if (inParticles[i].Distro == "mono")
-		{
-			source = new SourceGenerator(inParticles[i].Type,
-										 inParticles[i].Number,
-										 inParticles[i].Energy,
-										 inParticles[i].Energy,
-										 inParticles[i].Radius,
-										 inParticles[i].Position,
-										 inParticles[i].Direction);
-		} else
-		{
-			source = new SourceGenerator(inParticles[i].Type,
-										 inParticles[i].Number,
-				 						 inParticles[i].EnergyMin,
-				 						 inParticles[i].EnergyMax,
-				 						 inParticles[i].Radius,
-				 						 inParticles[i].Position,
-				 						 inParticles[i].Direction);
-		}
-		generators[i] = source;
-	}
-
 	// Set up the physics pusher
-	ParticlePusher* pusher = new ParticlePusher(field, inGeneral.timeStep);
+	ParticlePusher* pusher;
+	if (inGeneral.pusher == "Lorentz")
+	{
+		pusher = new LorentzPusher(field, inGeneral.timeStep);
+	} else if (inGeneral.pusher == "Landau")
+	{
+		pusher = new LandauPusher(field, inGeneral.timeStep);
+	}
 	
 	// Set up the Physics list
 	std::vector<Process*> processList;
 	if (inProcess.NonLinearCompton == true)
 	{
-		NonLinearCompton* comptonNL = new NonLinearCompton(field, inGeneral.timeStep);
+		NonLinearCompton* comptonNL = new NonLinearCompton(field, inGeneral.timeStep,
+				inGeneral.tracking);
 		processList.push_back(comptonNL);
-	} else if (inProcess.NonLinearBreitWheeler == true)
+	}
+	if (inProcess.NonLinearBreitWheeler == true)
 	{
 		NonLinearBreitWheeler* breitWheelerNL = new NonLinearBreitWheeler(field, 
-													  		inGeneral.timeStep);
+													  		inGeneral.timeStep,
+													  		inGeneral.tracking);
 		processList.push_back(breitWheelerNL);
+	}
+
+	// set up the particle sources
+	std::vector<SourceGenerator*> generators(inParticles.size());
+	for (unsigned int i = 0; i < inParticles.size(); ++i)
+	{
+		SourceGenerator* source = new SourceGenerator(inParticles[i].Type,
+				inParticles[i].Distro, inParticles[i].Number,
+				inParticles[i].EnergyMin, inParticles[i].EnergyMax,
+				inParticles[i].Radius, inParticles[i].Position, 
+				inParticles[i].Direction,
+				inGeneral.tracking);
+		generators[i] = source;
 	}
 
 	// Set up the histograms
@@ -134,13 +133,12 @@ int main(int argc, char* argv[])
 	// Set up output manager
 	OutputManager* out = new OutputManager(inGeneral.fileName);
 
+	// Set up is complete, print info
 	unsigned int nEvents(0);
 	for (unsigned int i = 0; i < inParticles.size(); i++)
 	{
 		nEvents += inParticles[i].Number;
 	}
-
-
 	std::cout << "Setup complete! " << nEvents << " events will be simulated.\n";
 	std::cout << "Entering main loop using " << omp_get_max_threads();
 	std::cout << " threads.\n";
@@ -151,6 +149,8 @@ int main(int argc, char* argv[])
 	{
 		// set up the full event store
 		if (inParticles[i].Output == true) out->InitSource(generators[i]->GetSourceNumber());
+
+		int threadEvents = generators[i]->GetSourceNumber() / omp_get_max_threads();
 
 		#pragma omp parallel for
 		for (unsigned int j = 0; j < generators[i]->GetSourceNumber(); j++) // loop events
@@ -166,19 +166,21 @@ int main(int argc, char* argv[])
 			while(time < inGeneral.timeEnd) // loop time
 			{
 				// Check if time for histogram
-				if (histCount < histograms.size() && time >= histograms[histCount]->GetTime())
+				if (histCount < histograms.size())
 				{
-					for (unsigned int k = 0; k < event->GetNPart(); k++)
+					if(time >= histograms[histCount]->GetTime())
 					{
-						if (histograms[histCount]->GetParticle() == 
-							event->GetParticle(k)->GetName())
+						for (unsigned int k = 0; k < event->GetNPart(); k++)
 						{
-							histograms[histCount]->AppParticle(event->GetParticle(k));
+							if (histograms[histCount]->GetParticle() == 
+								event->GetParticle(k)->GetName())
+							{
+								histograms[histCount]->AppParticle(event->GetParticle(k));
+							}
 						}
+						histCount++;
 					}
-					histCount++;
 				}
-
 				// Push particles and interact
 				for (unsigned int k = 0; k < event->GetNPart(); k++) // Loop particles
 				{
@@ -190,7 +192,6 @@ int main(int argc, char* argv[])
 				}
 				time += inGeneral.timeStep;
 			}
-
 			// fill any non filled histograms
 			for (unsigned int k = histCount; k < histograms.size(); k++)
 			{
@@ -203,11 +204,21 @@ int main(int argc, char* argv[])
 					}
 				}
 			}
+
+			// Store source data and tracking
 			if (inParticles[i].Output == true) out->StoreSource(event, j, false);
+			if (inGeneral.tracking == true) out->StoreTrack(event, j);
+
 			// Free up the sapce
 			generators[i]->FreeSources(event);
+			
+			// Approx % complete timer
+			if (omp_get_thread_num() == 0 && j % 10 == 0)
+			{
+				std::cout << "Approximately " << (double)j / threadEvents * 100.0 << "% complete \r";
+			}
 		}
-		if (inParticles[i].Output == true) out->OutputSource();
+		out->OutputEvents(inParticles[i].Output, inGeneral.tracking);
 	}
 
 	std::cout << "Simulation complete in time: "; 

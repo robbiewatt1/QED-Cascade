@@ -1,7 +1,7 @@
 #include "ParticlePusher.hh"
 
 ParticlePusher::ParticlePusher(EMField* field, double dt):
-m_field(field), m_dt(dt), m_time(0)
+m_field(field), m_dt(dt)
 {
 }
 
@@ -71,17 +71,9 @@ void ParticlePusher::PushParticleList(ParticleList* partList)
     }
 }
 
-ThreeVector ParticlePusher::PushPosition(double mass, const ThreeVector &momentum)
+ThreeVector ParticlePusher::PushPosition(double mass, const ThreeVector &momentum) const
 {
     double gamma  = std::sqrt(1.0 + momentum.Mag2() / (mass * mass));
     ThreeVector newPosition = momentum / (mass * gamma);
     return newPosition;
-}
-
-ThreeVector ParticlePusher::PushMomentum(double mass, double charge, const ThreeVector &momentum,
-                                         const ThreeVector &Efield, const ThreeVector &Bfield)
-{
-    double gamma = std::sqrt(1.0 + momentum.Mag2() / (mass * mass));
-    ThreeVector newMomentum = charge * (Efield + (momentum.Cross(Bfield) / (mass * gamma)));
-    return newMomentum;
 }

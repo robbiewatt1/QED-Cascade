@@ -13,5 +13,6 @@ lib/
 *.xmf
 *.m
 *.ini
+input-check.txt
 
 QEDCASC

@@ -8,10 +8,12 @@
 class SourceGenerator
  {
  public:
- 	SourceGenerator(std::string type, unsigned int nPart, 
-					double energyMin, double energyMax, 
-					double deltaPos, const ThreeVector &position,
-					const ThreeVector &direction);
+ 	SourceGenerator(std::string type, std::string distro, 
+ 					unsigned int nPart, double energyMin,
+ 					double energyMax, double deltaPos, 
+ 					const ThreeVector &position,
+					const ThreeVector &direction,
+					bool track = false);
  	
  	~SourceGenerator();
 
@@ -32,5 +34,6 @@ private:
 	std::vector<double> m_energy;
 	unsigned int m_partCount;
 	ThreeMatrix m_rotaion;
+	bool m_track;
 };
 #endif

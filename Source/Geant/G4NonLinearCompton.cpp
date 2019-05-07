@@ -98,8 +98,8 @@ void G4NonLinearCompton::SetStaticField(double* EField, double* BField)
 {
 	m_field = new StaticEMField(ThreeVector(EField[0], EField[1], EField[2]),
 							    ThreeVector(BField[0], BField[1], BField[2]));
-	m_process = new NonLinearCompton(m_field, m_dt);
-	m_pusher  = new ParticlePusher(m_field, m_dt);
+	m_process = new NonLinearCompton(m_field, m_dt, false);
+	m_pusher  = new LorentzPusher(m_field, m_dt);
 }
 
 void G4NonLinearCompton::SetPlaneField(double maxE, double wavelength, double polerisation,
@@ -109,8 +109,8 @@ void G4NonLinearCompton::SetPlaneField(double maxE, double wavelength, double po
 							   wavelength / m_units->RefLength(),
 							   polerisation,
 							   ThreeVector(direction[0], direction[1], direction[2]));	
-	m_process = new NonLinearCompton(m_field, m_dt);
-	m_pusher  = new ParticlePusher(m_field, m_dt);
+	m_process = new NonLinearCompton(m_field, m_dt, false);
+	m_pusher  = new LorentzPusher(m_field, m_dt);
 }
 
 void G4NonLinearCompton::SetGaussianField(double maxE, double wavelength, double tau,
@@ -124,6 +124,6 @@ void G4NonLinearCompton::SetGaussianField(double maxE, double wavelength, double
 								  polerisation,
 							  	  ThreeVector(start[0], start[1], start[2]),
 							  	  ThreeVector(focus[0], focus[1], focus[2]));	
-	m_process = new NonLinearCompton(m_field, m_dt);
-	m_pusher  = new ParticlePusher(m_field, m_dt);
+	m_process = new NonLinearCompton(m_field, m_dt, false);
+	m_pusher  = new LorentzPusher(m_field, m_dt);
 }

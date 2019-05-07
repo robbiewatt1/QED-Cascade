@@ -80,6 +80,33 @@ void Histogram::AppParticle(Particle* part)
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);
 				m_binValues[index]++;
 			}
+		} else if (m_type == "PX" || "px")
+		{
+			m_entries++;
+			double xPos = part->GetMomentum()[0];
+			if (xPos > m_binCentres[0] && xPos < m_binCentres[m_nBins-1])
+			{
+				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, xPos);
+				m_binValues[index]++;
+			}
+		} else if (m_type == "PY" || "py")
+		{
+			m_entries++;
+			double yPos = part->GetMomentum()[1];
+			if (yPos > m_binCentres[0] && yPos < m_binCentres[m_nBins-1])
+			{
+				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, yPos);
+				m_binValues[index]++;
+			}
+		} else if (m_type == "PZ" || "pz")
+		{
+			m_entries++;
+			double zPos =  part->GetMomentum()[2];
+			if (zPos > m_binCentres[0] && zPos < m_binCentres[m_nBins-1])
+			{
+				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);
+				m_binValues[index]++;
+			}		
 		} else
 		{
 			std::cerr << "Error: Particle property \"" << m_type << "\" not found\n";
