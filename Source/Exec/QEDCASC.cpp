@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
 			generators[i]->FreeSources(event);
 			
 			// Approx % complete timer
-			if (omp_get_thread_num() == 0 && j % 10 == 0)
+			if (omp_get_thread_num() == 0 && j % 5 == 0)
 			{
 				std::cout << "Approximately " << (double)j / threadEvents * 100.0 << "% complete \r";
 			}

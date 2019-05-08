@@ -289,16 +289,15 @@ void OutputManager::StoreSource(ParticleList* partList, unsigned int eventID, bo
 
 void OutputManager::StoreTrack(ParticleList* partList, unsigned int eventID)
 {
-
 	for (unsigned int i = 0; i < partList->GetNPart(); i++)
 	{
+
 		m_idTrack.push_back(eventID);
 		m_positionTrack.push_back(partList->GetParticle(i)->GetPosHist());
 		m_momentumTrack.push_back(partList->GetParticle(i)->GetMomHist());
 		m_timeTrack.push_back(partList->GetParticle(i)->GetTimeHist());
 		m_gammaTrack.push_back(partList->GetParticle(i)->GetGammaHist());
 	}
-
 }
 
 void OutputManager::OutputEvents(bool outSource, bool outTrack)
@@ -393,7 +392,6 @@ void OutputManager::OutputEvents(bool outSource, bool outTrack)
 			m_outputFile->AddArray2D(positronBuff, totalPositrons, 8,
 					"Particles/ParticleSource/Positrons");
 		}
-
 		if (totalPhotons > 0)
 		{
 			m_outputFile->AddArray2D(photonBuff, totalPhotons, 8,
