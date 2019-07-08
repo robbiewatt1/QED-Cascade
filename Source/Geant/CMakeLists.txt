@@ -7,15 +7,21 @@ set(geant_source_files
 set(geant_header_files
     G4NonLinearCompton.hh)
 
-add_library(GeantQED SHARED ${geant_source_files})
+if(BUILD_TENSORFLOW)
+	find_package(TensorflowCC REQUIRED COMPONENTS Shared)
+	set(tf_header Tensorflow/TensorflowGraph.hh)
+	set(tf_source Tensorflow/TensorflowGraph.cpp)
+endif()
+
+add_library(GeantQED SHARED ${geant_source_files} ${tf_source})
 include(${Geant4_USE_FILE})
 message(${Geant4_USE_FILE})
-target_link_libraries(GeantQED ${Geant4_LIBRARIES} Tools Particles PhysicsQED)
+target_link_libraries(GeantQED ${Geant4_LIBRARIES} TensorflowCC::Shared Tools Particles PhysicsQED)
 target_include_directories(GeantQED PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
        				           ${Geant4_INCLUDE_DIRS})
 install(TARGETS GeantQED
 	LIBRARY DESTINATION lib)
-install(FILES ${geant_header_files}
+install(FILES ${geant_header_files} ${tf_header}
         DESTINATION include)
 
 

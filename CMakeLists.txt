@@ -9,7 +9,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 option(BUILD_TESTS "Build test executables" OFF)
 option(BUILD_GEANT "Build geant executables" OFF)
-
+option(BUILD_TENSORFLOW "Build the geant4 tensorflow package" OFF)
 
 INCLUDE_DIRECTORIES(Source)
 add_subdirectory(Source/IO)
@@ -27,4 +27,5 @@ if(BUILD_GEANT)
         message("Geant4 lib built")
 	add_subdirectory(Source/Geant)
 endif(BUILD_GEANT)
+
 message(${CMAKE_INSTALL_PREFIX})
