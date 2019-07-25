@@ -7,7 +7,7 @@
 class NonLinearBreitWheeler: public Process 
 {
 public:
-	NonLinearBreitWheeler(EMField* field, double dt, bool track);
+	NonLinearBreitWheeler(EMField* field, double dt, bool track = false);
 
 	virtual ~NonLinearBreitWheeler();
 

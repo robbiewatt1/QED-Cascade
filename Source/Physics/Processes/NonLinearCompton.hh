@@ -10,7 +10,7 @@
 class NonLinearCompton: public Process
 {
 public:
-    NonLinearCompton(EMField* field, double dt, bool track);
+    NonLinearCompton(EMField* field, double dt, bool track = false);
     
    virtual ~NonLinearCompton();
 

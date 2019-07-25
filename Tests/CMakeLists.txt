@@ -5,7 +5,7 @@ ADD_EXECUTABLE(Laser LaserTest.cpp)
 ADD_EXECUTABLE(File InputTest.cpp)
 ADD_EXECUTABLE(Main MainTest.cpp)
 ADD_EXECUTABLE(Geant GeantTest.cpp)
-
+ADD_EXECUTABLE(TF tfTest.cpp)
 
 TARGET_LINK_LIBRARIES(Compton Tools IO Particles PhysicsQED)
 TARGET_LINK_LIBRARIES(Pusher Tools IO Particles PhysicsQED)
@@ -14,4 +14,4 @@ TARGET_LINK_LIBRARIES(File Tools IO)
 TARGET_LINK_LIBRARIES(Main Tools IO Particles PhysicsQED)
 TARGET_LINK_LIBRARIES(breitwheeler Tools IO Particles PhysicsQED)
 TARGET_LINK_LIBRARIES(Geant GeantQED)
-
+TARGET_LINK_LIBRARIES(TF GeantQED)

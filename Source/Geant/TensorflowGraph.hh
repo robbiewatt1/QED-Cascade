@@ -10,11 +10,13 @@ using namespace tensorflow;
 class TensorflowGraph
 {
 public:
-	TensorflowGraph(std::string graphDir);
+    TensorflowGraph(std::string graphPath);
 
-	~TensorflowGraph();
+    ~TensorflowGraph();
+
+    void runGraph();
 
 private:
-	Session* tfSession;
+    Session* tfSession;
 };
 #endif
