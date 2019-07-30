@@ -5,12 +5,15 @@
 
 namespace MCTools
 {
-	void SetSeed(int seed);
+    void SetSeed(int seed);
 
-	double RandDouble(double low, double high);
+    double RandDouble(double low, double high);
 
-	std::vector<double> SampleNorm(double mean, double variance, unsigned int nSamples);
+    std::vector<double> SampleNorm(double mean, double variance, unsigned int nSamples);
 
-	std::vector<double> SampleUniform(double low, double high, unsigned int nSamples);
+    std::vector<double> SampleUniform(double low, double high, unsigned int nSamples);
+
+    static std::random_device rd;
+    static std::mt19937 generator(rd());
 }
 #endif
