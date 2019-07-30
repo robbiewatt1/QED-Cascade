@@ -114,8 +114,8 @@ int main(int argc, char* argv[])
         SourceGenerator* source = new SourceGenerator(inParticles[i].Type,
                 inParticles[i].Distro, inParticles[i].Number,
                 inParticles[i].EnergyMin, inParticles[i].EnergyMax,
-                inParticles[i].Radius, inParticles[i].Position, 
-                inParticles[i].Direction,
+                inParticles[i].Radius, inParticles[i].Duration,
+                inParticles[i].Position, inParticles[i].Direction,
                 inGeneral.tracking);
         generators[i] = source;
     }
@@ -218,8 +218,7 @@ int main(int argc, char* argv[])
                 std::cout << "Approximately " << (double)j / threadEvents * 100.0 << "% complete \r";
             }
         }
-        std::cerr << "here" << std::endl;
-   //     out->OutputEvents(inParticles[i].Output, inGeneral.tracking);
+        out->OutputEvents(inParticles[i].Output, inGeneral.tracking);
     }
 
     std::cout << "Simulation complete in time: "; 
