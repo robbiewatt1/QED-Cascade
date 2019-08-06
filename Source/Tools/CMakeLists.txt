@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 project(Tools C CXX)
 
+
+find_package(Eigen3 REQUIRED)
+
+message(${EIGEN3_INCLUDE_DIR})
 set(tools_source_files
     Numerics.cpp
     MCTools.cpp
@@ -13,6 +17,7 @@ set(tools_header_files
     UnitsSystem.hh)
 
 add_library(Tools SHARED  ${tools_source_files})
+target_link_libraries(Tools Eigen3::Eigen)
 target_include_directories(Tools PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS Tools
