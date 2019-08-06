@@ -57,13 +57,14 @@ int main(int argc, char* argv[])
 
     // Parse the file
     FileParser* input = new FileParser(argv[1], true);
-
     // Get the input paramter structs
     GeneralParameters inGeneral = input->GetGeneral();
     FieldParameters inField = input->GetField();
     ProcessParameters inProcess = input->GetProcess();
     std::vector<ParticleParameters> inParticles = input->GetParticle();
     std::vector<HistogramParameters> inHistogram = input->GetHistograms();
+    delete input;
+
 
     // Set up the fields
     EMField* field;
@@ -234,7 +235,6 @@ int main(int argc, char* argv[])
 
     delete field;
     delete pusher;
-    delete input;
     delete out;
 
     return 0;
