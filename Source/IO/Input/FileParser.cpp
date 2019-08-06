@@ -190,7 +190,7 @@ void FileParser::ReadParticles()
             source.Number   = m_reader->GetInteger(partField, "number_particles", 1);
             source.Name     = m_reader->GetString(partField, "name", partField);
             source.Type     = m_reader->GetString(partField, "particle_type", "Electron");
-            source.Distro   = m_reader->GetString(partField, "energy_distrobution", "mono");
+            source.Distro   = m_reader->GetString(partField, "energy_distribution", "mono");
             source.Position = m_reader->GetThreeVector(partField, "position", ThreeVector(0, 0, 0))
                                                                              / m_units->RefLength();
             source.Direction = m_reader->GetThreeVector(partField, "direction", ThreeVector(0, 0, 1));
