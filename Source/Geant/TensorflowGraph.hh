@@ -10,13 +10,16 @@ using namespace tensorflow;
 class TensorflowGraph
 {
 public:
-    TensorflowGraph(std::string graphPath);
+    TensorflowGraph(std::string graphPath, int inputShape);
 
     ~TensorflowGraph();
 
-    void runGraph();
+    void runGraph(std::vector<double> input, std::vector<tensorflow::Tensor> finalOutput);
 
 private:
     Session* tfSession;
+    Tensor inputTens;
+
+    int m_inputShape;
 };
 #endif

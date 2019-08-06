@@ -6,7 +6,8 @@
 
 using namespace tensorflow;
 
-TensorflowGraph::TensorflowGraph(std::string graphPath)
+TensorflowGraph::TensorflowGraph(std::string graphPath, int inputShape, int outputShape):
+m_inputshape(inputShape), m_outputShape(outputShape)
 {
     // Set up the tendorfloe seesion
     tfSession = NewSession(SessionOptions());
@@ -31,6 +32,9 @@ TensorflowGraph::TensorflowGraph(std::string graphPath)
     {
         throw std::runtime_error("Error adding graph! " + status.ToString());
     }
+
+    // Create input and output tensors
+    inputTens = Tensor(DT_DOUBLE, tensorflow::TensorShape({1, m_inputShape}));
 }
 
 TensorflowGraph::~TensorflowGraph()
@@ -38,32 +42,22 @@ TensorflowGraph::~TensorflowGraph()
     delete tfSession;
 }
 
-void TensorflowGraph::runGraph()
+void TensorflowGraph::runGraph(const std::vector<double> &input, 
+        std::vector<tensorflow::Tensor> &finalOutput)
 {
-    Tensor a(DT_FLOAT, TensorShape());
-    a.scalar<float>()() = 3.0;
-
-    Tensor b(DT_FLOAT, TensorShape());
-    b.scalar<float>()() = 2.0;
-
-    std::vector<std::pair<string, tensorflow::Tensor>> inputs = 
+    auto input_tensor_mapped = inputTens.tensor<double, 2>();
+    for(int i = 0, i < m_inputShape; i++)
     {
-        { "a", a },
-        { "b", b },
+        input_tensor_mapped(0, i) = input[i];
+    }
+    std::vector<std::pair<string, tensorflow::Tensor>> feedDict = 
+    {
+        { "In", inputTens },
     };
-    std::vector<tensorflow::Tensor> outputs;
-
-    Status status;
-    status = tfSession->Run({inputs}, {"c"}, {}, &outputs);
-/*
+    tensorflow::Status status = tfSession->Run(feedDict,
+            {"frac", "mean", "sigma", "skew"}, {}, &finalOutput);
     if (!status.ok()) 
     {
         throw std::runtime_error("Error running graph! " + status.ToString());
-
     }
-    auto output_c = outputs[0].scalar<float>();
-    std::cout << typeid(output_c).name() << std::endl;
-    std::cout << outputs[0].DebugString() << "\n"; // Tensor<type: float shape: [] values: 30>
-    std::cout << typeid(output_c()).name() << "\n"; // 30
-*/
 }
