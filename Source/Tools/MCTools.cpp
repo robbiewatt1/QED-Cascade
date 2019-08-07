@@ -52,6 +52,21 @@ Eigen::VectorXd MCTools::RandNormNd(const Eigen::VectorXd& mean,
     return mean + lMatrix * ei_sample;
 }
 
+Eigen::VectorXd MCTools::RandSinhArcsinhNd(const Eigen::VectorXd& mean,
+    const Eigen::VectorXd& covar, const Eigen::VectorXd& skew)
+{
+    // Convert covar to diagonal matrix
+    Eigen::MatrixXd covarMatrix = covar.asDiagonal();
+
+    // Sample multivariate normal
+    Eigen::VectorXd sample = RandNormNd(mean, covarMatrix);
+
+    double norm = 2.0 / std::sinh(std::asinh(2.0));
+
+    return mean + covarMatrix * (Eigen::sinh(Eigen::asinh(sample.array())
+                                 + skew.array())).matrix() * norm;
+}
+
 std::vector<double> MCTools::SampleNorm(double mean, double variance, unsigned int nSamples)
 {
 

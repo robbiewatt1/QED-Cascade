@@ -17,8 +17,8 @@ namespace MCTools
     Eigen::VectorXd RandNormNd(const Eigen::VectorXd& mean,
             const Eigen::MatrixXd& covar);
 
-    Eigen::VectorXd RandSinhArcsinhNd(Eigen::VectorXd mean, Eigen::VectorXd covar,
-            Eigen::VectorXd skew);
+    Eigen::VectorXd RandSinhArcsinhNd(const Eigen::VectorXd& mean,
+        const Eigen::VectorXd& covar, const Eigen::VectorXd& skew);
 
     std::vector<double> SampleNorm(double mean, double variance,
             unsigned int nSamples);
