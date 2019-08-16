@@ -6,8 +6,9 @@
 
 using namespace tensorflow;
 
-TensorflowGraph::TensorflowGraph(std::string graphPath, int inputShape, int outputShape):
-m_inputshape(inputShape), m_outputShape(outputShape)
+TensorflowGraph::TensorflowGraph(std::string graphPath, int inputShape,
+    const std::vector<std::string>& outputs):
+m_inputShape(inputShape), m_outputs(outputs)
 {
     // Set up the tendorfloe seesion
     tfSession = NewSession(SessionOptions());
@@ -42,11 +43,11 @@ TensorflowGraph::~TensorflowGraph()
     delete tfSession;
 }
 
-void TensorflowGraph::runGraph(const std::vector<double> &input, 
-        std::vector<tensorflow::Tensor> &finalOutput)
+void TensorflowGraph::runGraph(const std::vector<double> &input,
+    std::vector<tensorflow::Tensor> &finalOutput)
 {
     auto input_tensor_mapped = inputTens.tensor<double, 2>();
-    for(int i = 0, i < m_inputShape; i++)
+    for(int i = 0; i < m_inputShape; i++)
     {
         input_tensor_mapped(0, i) = input[i];
     }
@@ -55,7 +56,7 @@ void TensorflowGraph::runGraph(const std::vector<double> &input,
         { "In", inputTens },
     };
     tensorflow::Status status = tfSession->Run(feedDict,
-            {"frac", "mean", "sigma", "skew"}, {}, &finalOutput);
+            m_outputs, {}, &finalOutput);
     if (!status.ok()) 
     {
         throw std::runtime_error("Error running graph! " + status.ToString());
