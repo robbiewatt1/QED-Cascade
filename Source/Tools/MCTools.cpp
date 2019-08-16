@@ -19,11 +19,35 @@ double MCTools::RandNorm(double mean, double variance)
     return dist(generator);
 }
 
-unsigned long int MCTools::RandPoisson(double mean)
+unsigned int MCTools::RandPoisson(double mean)
 {
-    std::poisson_distribution<unsigned long int> dist(mean);
+    std::poisson_distribution<unsigned int> dist(mean);
     return dist(generator);
 }
+
+unsigned int MCTools::RandDiscrete(const std::vector<double>& distro)
+{
+    // Create CDF
+    std::vector<double> cdf(distro.size());
+    cdf[0] = distro[0];
+    for(unsigned int i = 1; i < distro.size(); i++)
+    {
+        cdf[i] = cdf[i-1] + distro[i];
+
+    }
+    double rand = RandDouble(0.0, *(cdf.end() - 1));
+    unsigned int sample(0);
+    for (unsigned int i = 1; i < distro.size(); i++)
+    {
+        if (rand < cdf[i])
+        {
+            sample = i;
+            break;
+        }
+    }
+    return sample;
+}
+
 
 Eigen::VectorXd MCTools::RandNormNd(const Eigen::VectorXd& mean,
         const Eigen::MatrixXd& covar)

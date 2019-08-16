@@ -12,7 +12,9 @@ namespace MCTools
 
     double RandNorm(double mean, double variance);
 
-    unsigned long int RandPoisson(double mean);
+    unsigned int RandPoisson(double mean);
+
+    unsigned int RandDiscrete(const std::vector<double>& distro);
 
     Eigen::VectorXd RandNormNd(const Eigen::VectorXd& mean,
             const Eigen::MatrixXd& covar);
