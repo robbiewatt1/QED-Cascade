@@ -1,26 +1,30 @@
 #include <stdexcept>
 
 #include "TensorflowGraph.hh"
-#include "tensorflow/core/public/session.h"
-#include "tensorflow/core/platform/env.h"
 
-using namespace tensorflow;
+//using namespace tensorflow;
 
 TensorflowGraph::TensorflowGraph(std::string graphPath, int inputShape,
-    const std::vector<std::string>& outputs):
+    const std::vector<std::string>& outputs, int threads):
 m_inputShape(inputShape), m_outputs(outputs)
 {
-    // Set up the tendorfloe seesion
-    tfSession = NewSession(SessionOptions());
+    // Set up the tendorflow seesion
+    tensorflow::SessionOptions options;
+    tensorflow::ConfigProto & config = options.config;
+    config.set_inter_op_parallelism_threads(threads);
+    config.set_intra_op_parallelism_threads(threads);
+    config.set_use_per_session_threads(false);  
+    tfSession = tensorflow::NewSession(options);
+
     if (tfSession == nullptr)
     {
         throw std::runtime_error("Could not create Tensorflow session.");
     }
 
     // Read the graph
-    Status status;
-    GraphDef graph_def;
-    status = ReadBinaryProto(Env::Default(), graphPath, &graph_def);
+    tensorflow::Status status;
+    tensorflow::GraphDef graph_def;
+    status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), graphPath, &graph_def);
     if (!status.ok())
     {
         throw std::runtime_error("Error reading graph definition from " + graphPath + ": "
@@ -33,25 +37,24 @@ m_inputShape(inputShape), m_outputs(outputs)
     {
         throw std::runtime_error("Error adding graph! " + status.ToString());
     }
-
-    // Create input and output tensors
-    inputTens = Tensor(DT_DOUBLE, tensorflow::TensorShape({1, m_inputShape}));
 }
 
 TensorflowGraph::~TensorflowGraph()
 {
-    delete tfSession;
 }
 
 void TensorflowGraph::runGraph(const std::vector<double> &input,
     std::vector<tensorflow::Tensor> &finalOutput)
 {
+
+    tensorflow::Tensor inputTens = tensorflow::Tensor(tensorflow::DT_DOUBLE,
+            tensorflow::TensorShape({1, m_inputShape}));
     auto input_tensor_mapped = inputTens.tensor<double, 2>();
     for(int i = 0; i < m_inputShape; i++)
     {
         input_tensor_mapped(0, i) = input[i];
     }
-    std::vector<std::pair<string, tensorflow::Tensor>> feedDict = 
+    std::vector<std::pair<std::string, tensorflow::Tensor>> feedDict = 
     {
         { "In", inputTens },
     };

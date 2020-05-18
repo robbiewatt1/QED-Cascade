@@ -48,6 +48,7 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
     while(time < m_tEnd)
     {
         m_pusher->PushParticle(m_part);
+        m_pusher->PushParticleList(m_photonList);
         m_process->Interact(m_part, m_photonList);
         time += m_dt;
     }
@@ -70,6 +71,8 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
     aParticleChange.ProposeMomentumDirection(partDirection);
     aParticleChange.ProposeEnergy(m_part->GetEnergy() / m_units->G4Energy());
 
+    delete m_part;
+    delete m_photonList;
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 }
 

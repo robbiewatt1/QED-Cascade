@@ -46,5 +46,7 @@ private:
     UnitsSystem* m_units;
     double m_timeLag;        // time taken to reach laser block. 
     bool m_pSwitch = false;  // switch determining if process occured
+
+    G4DynamicParticle* m_g4_part;   // g4 particle
 };
 #endif

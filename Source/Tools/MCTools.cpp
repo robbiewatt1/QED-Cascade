@@ -48,7 +48,6 @@ unsigned int MCTools::RandDiscrete(const std::vector<double>& distro)
     return sample;
 }
 
-
 Eigen::VectorXd MCTools::RandNormNd(const Eigen::VectorXd& mean,
         const Eigen::MatrixXd& covar)
 {
