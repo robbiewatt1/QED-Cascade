@@ -13,13 +13,13 @@ class FocusingField: public EMField
 {
 public:
     FocusingField(double maxE,  double waveLength, double tau, double waist,
-        double polAngle, double phase, const ThreeVector& startPos,
+        double polAngle, const ThreeVector& startPos,
         const ThreeVector& focusPos);
  
     virtual ~FocusingField();
 
     void GetField(double time, const ThreeVector &position, ThreeVector &eField,
-        ThreeVector &bField) override const;
+        ThreeVector &bField) const override;
 
     double m_maxE;  // Beam max intensity
     double m_waveLength;    // wavelength
@@ -28,6 +28,9 @@ public:
     double m_polAngle; // Polerisation angle
     double m_phase;    // Phase of pulse
     double m_waveNum;   // Wave number
+    double m_rayleigh;  // rayleight length
+    double m_eps;       // divergence angle
+    double m_t0;        // time from start to focus
 
     ThreeMatrix m_rotaion;  // Matrix to rotate so beam goes inb z axis
     ThreeMatrix m_rotationInv;  // Matrix to rotate back

@@ -477,7 +477,8 @@ void OutputManager::OutEMField(EMField* field, const std::vector<double> &tAxis,
         m_outputFile->AddGroup(groupName);
         for (int dir = 0; dir < 3; dir++)
         {
-            double* dataBuff = new double[xAxis.size()*yAxis.size()*zAxis.size()];
+            double* dataBuffE = new double[xAxis.size()*yAxis.size()*zAxis.size()];
+            double* dataBuffB = new double[xAxis.size()*yAxis.size()*zAxis.size()];
             for (unsigned int i = 0; i < xAxis.size(); i++)
             {
                 for (unsigned int j = 0; j < yAxis.size(); j++)
@@ -488,13 +489,19 @@ void OutputManager::OutEMField(EMField* field, const std::vector<double> &tAxis,
                         ThreeVector efield, bfield;
                         field->GetField(tAxis[t], ThreeVector(xAxis[i], yAxis[j], zAxis[k]),
                                        efield, bfield);
-                        dataBuff[index] = efield[dir];
+                        dataBuffE[index] = efield[dir];
+                        dataBuffB[index] = bfield[dir];
                     }
                 }
             }
-            std::string dataName = groupName + "/E" + std::to_string(dir);
-            m_outputFile->AddArray3D(dataBuff, xAxis.size(), yAxis.size(), zAxis.size(), dataName);
-            delete [] dataBuff;
+            std::string dataNameE = groupName + "/E" + std::to_string(dir);
+            std::string dataNameB = groupName + "/B" + std::to_string(dir);
+            std::cout << dataNameE << std::endl;
+            m_outputFile->AddArray3D(dataBuffE, xAxis.size(), yAxis.size(), zAxis.size(), dataNameE);
+            m_outputFile->AddArray3D(dataBuffB, xAxis.size(), yAxis.size(), zAxis.size(), dataNameB);
+            delete [] dataBuffE;
+            delete [] dataBuffB;
+
         }
     }
 }

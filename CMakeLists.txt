@@ -25,5 +25,3 @@ endif(BUILD_TESTS)
 if(BUILD_GEANT)
 	add_subdirectory(Source/Geant)
 endif(BUILD_GEANT)
-
-message(${CMAKE_INSTALL_PREFIX})
