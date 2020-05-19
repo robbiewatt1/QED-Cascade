@@ -1,8 +1,6 @@
 #ifndef GaussianEMField_HH
 #define GaussianEMField_HH
 
-#include <vector>
-
 #include "EMField.hh"
 #include "ThreeVector.hh"
 #include "ThreeMatrix.hh"
