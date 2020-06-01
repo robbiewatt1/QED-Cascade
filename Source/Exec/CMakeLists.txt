@@ -1,7 +1,20 @@
-ADD_EXECUTABLE(QEDCASC QEDCASC.cpp)
 
-TARGET_LINK_LIBRARIES(QEDCASC Tools IO Particles PhysicsQED)
-	
+if(BUILD_OPENMP)
+    add_compile_definitions(USEOPENMP)
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fopenmp")
+endif(BUILD_OPENMP)
+
+if(BUILD_MPI)
+    add_compile_definitions(USEMPI)
+    find_package(MPI)
+    ADD_EXECUTABLE(QEDCASC QEDCASC.cpp)
+    TARGET_LINK_LIBRARIES(QEDCASC Tools IO Particles PhysicsQED
+       MPI::MPI_CXX)
+else(BUILD_MPI)
+    ADD_EXECUTABLE(QEDCASC QEDCASC.cpp)
+    TARGET_LINK_LIBRARIES(QEDCASC Tools IO Particles PhysicsQED)
+endif(BUILD_MPI)
+
 INSTALL(TARGETS QEDCASC
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib)

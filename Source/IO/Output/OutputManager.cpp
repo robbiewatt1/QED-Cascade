@@ -4,25 +4,51 @@
 OutputManager::OutputManager(std::string fileName):
 m_units(NULL)
 {
+#ifdef USEMPI
+    // Only open on master
+    int id;
+    MPI_Comm_rank(MPI_COMM_WORLD, &id);
+    if(id == 0){
+#endif
     m_outputFile = new HDF5Output(fileName);
     m_outputFile->AddGroup("Particles");
     m_outputFile->AddGroup("Fields");
     m_outputFile->AddGroup("Histograms");
+#ifdef USEMPI
+    }
+#endif
 }
 
 OutputManager::OutputManager(std::string fileName, UnitsSystem* units):
 m_units(units)
 {
+#ifdef USEMPI
+    // Only open on master
+    int id;
+    MPI_Comm_rank(MPI_COMM_WORLD, &id);
+    if(id == 0){
+#endif
     m_outputFile = new HDF5Output(fileName);
     m_outputFile->AddGroup("Particles");
     m_outputFile->AddGroup("Fields");
     m_outputFile->AddGroup("Histograms");
+#ifdef USEMPI
+    }
+#endif
 }
 
 OutputManager::~OutputManager()
 {
+#ifdef USEMPI
+    // Only close on master
+    int id;
+    MPI_Comm_rank(MPI_COMM_WORLD, &id);
+    if(id == 0){
+#endif
     delete m_outputFile;
-
+#ifdef USEMPI
+    }
+#endif
     for (unsigned int i = 0; i < m_primaryEvent.size(); i++)
     {
         delete [] m_primaryEvent[i];
@@ -496,12 +522,10 @@ void OutputManager::OutEMField(EMField* field, const std::vector<double> &tAxis,
             }
             std::string dataNameE = groupName + "/E" + std::to_string(dir);
             std::string dataNameB = groupName + "/B" + std::to_string(dir);
-            std::cout << dataNameE << std::endl;
             m_outputFile->AddArray3D(dataBuffE, xAxis.size(), yAxis.size(), zAxis.size(), dataNameE);
             m_outputFile->AddArray3D(dataBuffB, xAxis.size(), yAxis.size(), zAxis.size(), dataNameB);
             delete [] dataBuffE;
             delete [] dataBuffB;
-
         }
     }
 }
@@ -514,3 +538,398 @@ void OutputManager::OutputHist(Histogram* hist)
     m_outputFile->AddArray1D(hist->GetBinValues(), hist->GetNBins(), groupName + "/BinValues");
 
 }
+
+#ifdef USEMPI
+void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
+{
+    int primaryTag = 1;
+    int electronTag = 2;
+    int positronTag = 3;
+    int photonTag = 4;
+    // check if master or slave
+    int id, nProc;
+    MPI_Comm_rank(MPI_COMM_WORLD, &id);
+    MPI_Comm_size(MPI_COMM_WORLD, &nProc);
+    if (outSource == true)
+    {
+        if (id == 0)
+        {
+            // We are master
+            if (m_particleSourceBool == false)
+            {
+                m_outputFile->AddGroup("Particles/ParticleSource");
+                m_particleSourceBool = true;
+            }
+
+            // First start with primary sources
+            int arraysize[nProc];
+            int totalSize = m_primaryEvent.size() * 8;
+            // We need to know the size of the arrays that we are recieving
+            for (int i = 1; i < nProc; ++i)
+            {
+                MPI_Status status;
+                MPI_Probe(i, primaryTag, MPI_COMM_WORLD, &status);
+                MPI_Get_count(&status, MPI_DOUBLE, &arraysize[i]);
+                totalSize += arraysize[i];
+            }
+            // Now create the buffer array;
+            double* primeBuff = new double [totalSize];
+
+            // Fill the prime buff with own data
+            for (long unsigned int i = 0; i < m_primaryEvent.size(); i++)
+            {
+                primeBuff[i*8]   = m_primaryEvent[i][0];
+                primeBuff[i*8+1] = m_primaryEvent[i][1];
+                primeBuff[i*8+2] = m_primaryEvent[i][2];
+                primeBuff[i*8+3] = m_primaryEvent[i][3];
+                primeBuff[i*8+4] = m_primaryEvent[i][4];
+                primeBuff[i*8+5] = m_primaryEvent[i][5];
+                primeBuff[i*8+6] = m_primaryEvent[i][6];
+                primeBuff[i*8+7] = m_primaryEvent[i][7];
+            }
+
+            int primeBuffIndex = m_primaryEvent.size() * 8;
+            // Now fill with other
+            for (int i = 1; i < nProc; ++i)
+            {
+                double* procBuff = new double [arraysize[i]];
+                MPI_Status status;
+                MPI_Recv(procBuff, arraysize[i], MPI_DOUBLE, i,
+                    primaryTag, MPI_COMM_WORLD, &status);
+                for (int j = 0; j < arraysize[i] / 8; j++)
+                {
+                    primeBuff[primeBuffIndex]   = procBuff[j*8];
+                    primeBuff[primeBuffIndex+1] = procBuff[j*8+1];
+                    primeBuff[primeBuffIndex+2] = procBuff[j*8+2];
+                    primeBuff[primeBuffIndex+3] = procBuff[j*8+3];
+                    primeBuff[primeBuffIndex+4] = procBuff[j*8+4];
+                    primeBuff[primeBuffIndex+5] = procBuff[j*8+5];
+                    primeBuff[primeBuffIndex+6] = procBuff[j*8+6];
+                    primeBuff[primeBuffIndex+7] = procBuff[j*8+7];
+                    primeBuffIndex +=8;
+                }
+                delete[] procBuff;
+            }
+            m_outputFile->AddArray2D(primeBuff, totalSize / 8, 8,
+                "Particles/ParticleSource/Primary");
+            delete[] primeBuff;
+
+            // Now we move on the end events
+            long unsigned int totalElectrons = 0;
+            long unsigned int totalPositrons = 0;
+            long unsigned int totalPhotons = 0;
+            for (unsigned int i = 0; i < m_electronCount.size(); i++)
+            {
+                totalElectrons += m_electronCount[i];
+                totalPositrons += m_positronCount[i];
+                totalPhotons   += m_photonCount[i];
+            }
+
+            // Now do the same for slaves
+            int electronArraysize[nProc];
+            int positronArraysize[nProc];
+            int photonArraysize[nProc];
+            int totalelectronSize = totalElectrons * 8;
+            int totalpositronSize = totalPositrons * 8;
+            int totalphotonSize = totalPhotons * 8;
+            for (int i = 1; i < nProc; ++i)
+            {
+                MPI_Status status;
+                MPI_Recv(&electronArraysize[i], 1, MPI_INT, i, electronTag,
+                    MPI_COMM_WORLD, &status);
+                totalelectronSize += electronArraysize[i];
+                MPI_Recv(&positronArraysize[i], 1, MPI_INT, i, positronTag,
+                    MPI_COMM_WORLD, &status);
+                totalpositronSize += positronArraysize[i];
+                MPI_Recv(&photonArraysize[i], 1, MPI_INT, i, photonTag,
+                    MPI_COMM_WORLD, &status);
+                totalphotonSize += photonArraysize[i];
+            }
+
+            double* electronBuff = new double [totalelectronSize];
+            double* positronBuff = new double [totalpositronSize];
+            double* photonBuff   = new double [totalphotonSize];
+            long unsigned int electronIndex = 0;
+            long unsigned int positronIndex = 0;
+            long unsigned int photonIndex = 0;
+
+            // Start filling with master data
+            for (unsigned int i = 0; i < m_electronEvent.size(); i++)
+            {
+                for (unsigned int j = 0; j < m_electronCount[i]; j++)
+                {
+                    electronBuff[electronIndex]   = m_electronEvent[i][j*8];
+                    electronBuff[electronIndex+1] = m_electronEvent[i][j*8+1];
+                    electronBuff[electronIndex+2] = m_electronEvent[i][j*8+2];
+                    electronBuff[electronIndex+3] = m_electronEvent[i][j*8+3];
+                    electronBuff[electronIndex+4] = m_electronEvent[i][j*8+4];
+                    electronBuff[electronIndex+5] = m_electronEvent[i][j*8+5];
+                    electronBuff[electronIndex+6] = m_electronEvent[i][j*8+6];
+                    electronBuff[electronIndex+7] = m_electronEvent[i][j*8+7];
+                    electronIndex += 8;
+                }
+                for (unsigned int j = 0; j < m_positronCount[i]; j++)
+                {
+                    positronBuff[positronIndex]   = m_positronEvent[i][j*8];
+                    positronBuff[positronIndex+1] = m_positronEvent[i][j*8+1];
+                    positronBuff[positronIndex+2] = m_positronEvent[i][j*8+2];
+                    positronBuff[positronIndex+3] = m_positronEvent[i][j*8+3];
+                    positronBuff[positronIndex+4] = m_positronEvent[i][j*8+4];
+                    positronBuff[positronIndex+5] = m_positronEvent[i][j*8+5];
+                    positronBuff[positronIndex+6] = m_positronEvent[i][j*8+6];
+                    positronBuff[positronIndex+7] = m_positronEvent[i][j*8+7];
+                    positronIndex += 8;
+                }
+                for (unsigned int j = 0; j < m_photonCount[i]; j++)
+                {
+                    photonBuff[photonIndex]   = m_photonEvent[i][j*8];
+                    photonBuff[photonIndex+1] = m_photonEvent[i][j*8+1];
+                    photonBuff[photonIndex+2] = m_photonEvent[i][j*8+2];
+                    photonBuff[photonIndex+3] = m_photonEvent[i][j*8+3];
+                    photonBuff[photonIndex+4] = m_photonEvent[i][j*8+4];
+                    photonBuff[photonIndex+5] = m_photonEvent[i][j*8+5];
+                    photonBuff[photonIndex+6] = m_photonEvent[i][j*8+6];
+                    photonBuff[photonIndex+7] = m_photonEvent[i][j*8+7];
+                    photonIndex += 8;
+                }
+            }
+            
+            // Now start filling up the array with slave data
+            for (int i = 1; i < nProc; ++i)
+            {
+                double* procElectronBuff = new double [electronArraysize[i]];
+                MPI_Status statusE;
+                MPI_Recv(procElectronBuff, electronArraysize[i], MPI_DOUBLE,
+                    i, electronTag, MPI_COMM_WORLD, &statusE);
+                for (int j = 0; j < electronArraysize[i] / 8; j++)
+                {
+                    electronBuff[electronIndex]   = procElectronBuff[j*8];
+                    electronBuff[electronIndex+1] = procElectronBuff[j*8+1];
+                    electronBuff[electronIndex+2] = procElectronBuff[j*8+2];
+                    electronBuff[electronIndex+3] = procElectronBuff[j*8+3];
+                    electronBuff[electronIndex+4] = procElectronBuff[j*8+4];
+                    electronBuff[electronIndex+5] = procElectronBuff[j*8+5];
+                    electronBuff[electronIndex+6] = procElectronBuff[j*8+6];
+                    electronBuff[electronIndex+7] = procElectronBuff[j*8+7];
+                    electronIndex +=8;
+                }
+                delete[] procElectronBuff;
+
+                double* procPositronBuff = new double [positronArraysize[i]];
+                MPI_Status statusP;
+                MPI_Recv(procPositronBuff, positronArraysize[i], MPI_DOUBLE, i,
+                    positronTag, MPI_COMM_WORLD, &statusP);
+                for (int j = 0; j < positronArraysize[i] / 8; j++)
+                {
+                    positronBuff[positronIndex]   = procPositronBuff[j*8];
+                    positronBuff[positronIndex+1] = procPositronBuff[j*8+1];
+                    positronBuff[positronIndex+2] = procPositronBuff[j*8+2];
+                    positronBuff[positronIndex+3] = procPositronBuff[j*8+3];
+                    positronBuff[positronIndex+4] = procPositronBuff[j*8+4];
+                    positronBuff[positronIndex+5] = procPositronBuff[j*8+5];
+                    positronBuff[positronIndex+6] = procPositronBuff[j*8+6];
+                    positronBuff[positronIndex+7] = procPositronBuff[j*8+7];
+                    positronIndex +=8;
+                }
+                delete[] procPositronBuff;
+
+                double* procPhotonnBuff  = new double [photonArraysize[i]];
+                MPI_Status statusG;
+                int test = MPI_Recv(procPhotonnBuff, photonArraysize[i], MPI_DOUBLE, i,
+                    photonTag, MPI_COMM_WORLD, &statusG);
+                for (int j = 0; j < photonArraysize[i] / 8; j++)
+                {
+                    photonBuff[photonIndex]   = procPhotonnBuff[j*8];
+                    photonBuff[photonIndex+1] = procPhotonnBuff[j*8+1];
+                    photonBuff[photonIndex+2] = procPhotonnBuff[j*8+2];
+                    photonBuff[photonIndex+3] = procPhotonnBuff[j*8+3];
+                    photonBuff[photonIndex+4] = procPhotonnBuff[j*8+4];
+                    photonBuff[photonIndex+5] = procPhotonnBuff[j*8+5];
+                    photonBuff[photonIndex+6] = procPhotonnBuff[j*8+6];
+                    photonBuff[photonIndex+7] = procPhotonnBuff[j*8+7];
+                    photonIndex +=8;
+                }
+                delete[] procPhotonnBuff;
+            }
+            if (totalelectronSize > 0)
+            {
+                m_outputFile->AddArray2D(electronBuff, totalelectronSize / 8, 8,
+                        "Particles/ParticleSource/Electrons");
+            }
+            if (totalpositronSize > 0)
+            {
+                m_outputFile->AddArray2D(positronBuff, totalpositronSize / 8, 8,
+                        "Particles/ParticleSource/Positrons");
+            }
+            if (totalphotonSize > 0)
+            {
+                m_outputFile->AddArray2D(photonBuff, totalphotonSize / 8, 8,
+                        "Particles/ParticleSource/Photons");
+            }
+            delete [] electronBuff;
+            delete [] positronBuff;
+            delete [] photonBuff;
+
+            if(outTrack == true)
+            {
+                std::cerr << "Warnimg: Tracking source is not available when"
+                             "using MPI." << std::endl;
+            }
+
+        } else
+        {
+            // We are slave
+            // Start with the primary source
+            double* primeBuff = new double [m_primaryEvent.size()*8];
+            for (unsigned int i = 0; i < m_primaryEvent.size(); i++)
+            {
+                primeBuff[i*8]   = m_primaryEvent[i][0];
+                primeBuff[i*8+1] = m_primaryEvent[i][1];
+                primeBuff[i*8+2] = m_primaryEvent[i][2];
+                primeBuff[i*8+3] = m_primaryEvent[i][3];
+                primeBuff[i*8+4] = m_primaryEvent[i][4];
+                primeBuff[i*8+5] = m_primaryEvent[i][5];
+                primeBuff[i*8+6] = m_primaryEvent[i][6];
+                primeBuff[i*8+7] = m_primaryEvent[i][7];
+            }
+            // Sed over primary buff data
+            MPI_Send(primeBuff, m_primaryEvent.size() * 8, MPI_DOUBLE, 0,
+                primaryTag, MPI_COMM_WORLD);
+            delete[] primeBuff;
+
+            // Not send over final data
+
+            // Get the total number of each partile
+            // Now we move on the end events
+            long unsigned int totalElectrons = 0;
+            long unsigned int totalPositrons = 0;
+            long unsigned int totalPhotons = 0;
+            for (unsigned int i = 0; i < m_electronCount.size(); i++)
+            {
+                totalElectrons += m_electronCount[i];
+                totalPositrons += m_positronCount[i];
+                totalPhotons   += m_photonCount[i];
+            }
+            double* electronBuff = new double[totalElectrons*8];
+            double* positronBuff = new double[totalPositrons*8];
+            double* photonBuff   = new double[totalPhotons*8];
+
+            long unsigned int electronIndex = 0;
+            long unsigned int psoitronIndex = 0;
+            long unsigned int photonIndex = 0;
+            // Start filling the buffer arrays
+            for (unsigned int i = 0; i < m_electronEvent.size(); i++)
+            {
+                for (unsigned int j = 0; j < m_electronCount[i]; j++)
+                {
+                    electronBuff[electronIndex]   = m_electronEvent[i][j*8];
+                    electronBuff[electronIndex+1] = m_electronEvent[i][j*8+1];
+                    electronBuff[electronIndex+2] = m_electronEvent[i][j*8+2];
+                    electronBuff[electronIndex+3] = m_electronEvent[i][j*8+3];
+                    electronBuff[electronIndex+4] = m_electronEvent[i][j*8+4];
+                    electronBuff[electronIndex+5] = m_electronEvent[i][j*8+5];
+                    electronBuff[electronIndex+6] = m_electronEvent[i][j*8+6];
+                    electronBuff[electronIndex+7] = m_electronEvent[i][j*8+7];
+                    electronIndex += 8;
+                }
+                for (unsigned int j = 0; j < m_positronCount[i]; j++)
+                {
+                    positronBuff[psoitronIndex]   = m_positronEvent[i][j*8];
+                    positronBuff[psoitronIndex+1] = m_positronEvent[i][j*8+1];
+                    positronBuff[psoitronIndex+2] = m_positronEvent[i][j*8+2];
+                    positronBuff[psoitronIndex+3] = m_positronEvent[i][j*8+3];
+                    positronBuff[psoitronIndex+4] = m_positronEvent[i][j*8+4];
+                    positronBuff[psoitronIndex+5] = m_positronEvent[i][j*8+5];
+                    positronBuff[psoitronIndex+6] = m_positronEvent[i][j*8+6];
+                    positronBuff[psoitronIndex+7] = m_positronEvent[i][j*8+7];
+                    psoitronIndex += 8;
+                }
+                for (unsigned int j = 0; j < m_photonCount[i]; j++)
+                {
+                    photonBuff[photonIndex]   = m_photonEvent[i][j*8];
+                    photonBuff[photonIndex+1] = m_photonEvent[i][j*8+1];
+                    photonBuff[photonIndex+2] = m_photonEvent[i][j*8+2];
+                    photonBuff[photonIndex+3] = m_photonEvent[i][j*8+3];
+                    photonBuff[photonIndex+4] = m_photonEvent[i][j*8+4];
+                    photonBuff[photonIndex+5] = m_photonEvent[i][j*8+5];
+                    photonBuff[photonIndex+6] = m_photonEvent[i][j*8+6];
+                    photonBuff[photonIndex+7] = m_photonEvent[i][j*8+7];
+                    photonIndex += 8;
+                }
+            }
+        // Send over array sizes
+        long unsigned int electronSize = totalElectrons * 8;
+        long unsigned int positronSize = totalPositrons * 8;
+        long unsigned int photonSize = totalPhotons * 8;
+        MPI_Send(&electronSize, 1, MPI_INT, 0, electronTag,
+            MPI_COMM_WORLD);
+        MPI_Send(&positronSize, 1, MPI_INT, 0, positronTag,
+            MPI_COMM_WORLD);
+        MPI_Send(&photonSize, 1, MPI_INT, 0, photonTag,
+            MPI_COMM_WORLD);
+        // Sed over arrays
+        MPI_Send(electronBuff, electronSize, MPI_DOUBLE, 0, electronTag,
+            MPI_COMM_WORLD);
+        MPI_Send(positronBuff, positronSize, MPI_DOUBLE, 0, positronTag,
+            MPI_COMM_WORLD);
+        MPI_Send(photonBuff, photonSize, MPI_DOUBLE, 0, photonTag, 
+            MPI_COMM_WORLD);
+        delete[] electronBuff;
+        delete[] positronBuff;
+        delete[] photonBuff;
+        }
+    }
+}
+
+void OutputManager::OutputHistMPI(Histogram* hist)
+{
+
+    // Collect all histograms from other processors are sum them. They will all
+    // have the same bin centres so just need to send over the bin values
+
+    // check if master or slave
+    int histTag = 0;
+    int id, nProc;
+    MPI_Comm_rank(MPI_COMM_WORLD, &id);
+    MPI_Comm_size(MPI_COMM_WORLD, &nProc);
+
+    if(id == 0)
+    {
+        // We are master,
+        double* binValues = new double [hist->GetNBins()];
+        double* dataBuff = new double [hist->GetNBins()];
+        for (int rank = 1; rank < nProc; rank++)
+        {
+            MPI_Status status;
+            MPI_Recv(dataBuff, hist->GetNBins(), MPI_DOUBLE, MPI_ANY_SOURCE,
+                histTag, MPI_COMM_WORLD ,&status);
+            // Sum bins
+            for(unsigned int i = 0; i < hist->GetNBins(); i++)
+            {
+                binValues[i] += dataBuff[i];
+            }
+        }
+        // Finally add our own 
+        for(unsigned int i = 0; i < hist->GetNBins(); i++)
+        {
+            binValues[i] += hist->GetBinValues()[i];
+        }
+
+        // Now save to the file
+        std::string groupName = "Histograms/"+ hist->GetName();
+        m_outputFile->AddGroup(groupName);
+        m_outputFile->AddArray1D(hist->GetBinCentres(), hist->GetNBins(),
+            groupName + "/BinCentres");
+        m_outputFile->AddArray1D(hist->GetBinValues(), hist->GetNBins(),
+            groupName + "/BinValues");
+
+        delete[] binValues;
+        delete[] dataBuff;
+    } else
+    {
+        // We are slave
+        MPI_Send(hist->GetBinValues(), hist->GetNBins(), MPI_DOUBLE, 0, histTag,
+            MPI_COMM_WORLD);
+    }
+}
+#endif

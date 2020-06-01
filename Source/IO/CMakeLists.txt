@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 project(IO C CXX)
 
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
-
 set(io_source_files
     Output/HDF5Output.cpp
     Output/OutputManager.cpp
@@ -18,11 +17,24 @@ set(io_header_files
     Input/INIReader.hh
     Input/FileParser.hh)
 
-add_library(IO SHARED ${io_source_files})
-target_link_libraries(IO ${HDF5_LIBRARIES} Tools Particles PhysicsQED)
-target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Output
-				     ${CMAKE_CURRENT_SOURCE_DIR}/Input
-       				     ${HDF5_INCLUDE_DIRS})
+
+if(BUILD_MPI)
+    add_compile_definitions(USEMPI)
+    find_package(MPI)
+    add_library(IO SHARED ${io_source_files})
+    target_link_libraries(IO ${HDF5_LIBRARIES} Tools Particles PhysicsQED MPI::MPI_CXX)
+    target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Output
+                         ${CMAKE_CURRENT_SOURCE_DIR}/Input
+                             ${HDF5_INCLUDE_DIRS})
+else(BUILD_MPI)
+    add_library(IO SHARED ${io_source_files})
+    target_link_libraries(IO ${HDF5_LIBRARIES} Tools Particles PhysicsQED)
+    target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Output
+                         ${CMAKE_CURRENT_SOURCE_DIR}/Input
+                             ${HDF5_INCLUDE_DIRS})
+endif(BUILD_MPI)
+
+
 
 install(TARGETS IO
 	LIBRARY DESTINATION lib)

@@ -1,10 +1,11 @@
 #include <string>
-#include <omp.h>
 
 #include "EMField.hh"
 #include "GaussianEMField.hh"
 #include "StaticEMField.hh"
 #include "PlaneEMField.hh"
+#include "FocusingField.hh"
+
 
 #include "ParticlePusher.hh"
 #include "LorentzPusher.hh"
@@ -19,6 +20,13 @@
 #include "FileParser.hh"
 #include "Histogram.hh"
 #include "OutputManager.hh"
+
+#ifdef USEOPENMP
+    #include <omp.h>
+#endif
+#ifdef USEMPI
+    #include <mpi.h>
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -55,6 +63,10 @@ int main(int argc, char* argv[])
         }
     }
 
+    // set up MPI if we are using it 
+#ifdef USEMPI
+    MPI_Init(&argc, &argv);
+#endif
     // Parse the file
     FileParser* input = new FileParser(argv[1], true);
     // Get the input paramter structs
@@ -73,13 +85,22 @@ int main(int argc, char* argv[])
         field = new StaticEMField(inField.E, inField.B);
     } else if (inField.Type == "plane")
     {
-        field = new PlaneEMField(inField.MaxE, inField.Wavelength, inField.Polerisation,
-                               inField.Direction);
+        field = new PlaneEMField(inField.MaxE, inField.Wavelength,
+            inField.Polerisation, inField.Direction);
+    } else if (inField.Type == "gaussian")
+    {
+        field = new GaussianEMField(inField.MaxE, inField.Wavelength,
+            inField.Duration, inField.Waist, inField.Polerisation,
+            inField.Start, inField.Focus);
+    } else if (inField.Type == "focusing")
+    {
+        field = new FocusingField(inField.MaxE, inField.Wavelength,
+            inField.Duration, inField.Waist, inField.Polerisation,
+            inField.Start, inField.Focus);
     } else
     {
-        field = new GaussianEMField(inField.MaxE, inField.Wavelength, inField.Duration,
-                               inField.Waist, inField.Polerisation, inField.Start,
-                               inField.Focus);
+        std::cerr << "Error: unknown field type." << std::endl;
+        return 1;
     }
 
     // Set up the physics pusher
@@ -90,6 +111,10 @@ int main(int argc, char* argv[])
     } else if (inGeneral.pusher == "Landau")
     {
         pusher = new LandauPusher(field, inGeneral.timeStep);
+    } else
+    {
+        std::cerr << "Error: Unkown Pusher Type" << std::endl;
+        return 1;
     }
     
     // Set up the Physics list
@@ -133,27 +158,29 @@ int main(int argc, char* argv[])
 
     // Set up output manager
     OutputManager* out = new OutputManager(inGeneral.fileName);
-
     // Set up is complete, print info
     unsigned int nEvents(0);
     for (unsigned int i = 0; i < inParticles.size(); i++)
     {
         nEvents += inParticles[i].Number;
     }
+
+#ifdef USEOPENMP
     std::cout << "Setup complete! " << nEvents << " events will be simulated.\n";
     std::cout << "Entering main loop using " << omp_get_max_threads();
     std::cout << " threads.\n";
     double startTime = omp_get_wtime();
-
+#endif
     // enter main loop
     for (unsigned int i = 0; i < generators.size(); i++) // Loop sources
     {
         // set up the full event store
         if (inParticles[i].Output == true) out->InitSource(generators[i]->GetSourceNumber());
 
-        int threadEvents = generators[i]->GetSourceNumber() / omp_get_max_threads();
-
+        int threadEvents = generators[i]->GetSourceNumber();
+#ifdef USEOPENMP
         #pragma omp parallel for
+#endif
         for (unsigned int j = 0; j < generators[i]->GetSourceNumber(); j++) // loop events
         {
             // Generate source
@@ -214,28 +241,45 @@ int main(int argc, char* argv[])
             generators[i]->FreeSources(event);
             
             // Approx % complete timer
+#ifdef USEOPENMP
+
             if (omp_get_thread_num() == 0 && j % 5 == 0)
             {
                 std::cout << "Approximately " << (double)j / threadEvents * 100.0 << "% complete \r";
             }
+#endif
         }
+#ifdef USEMPI
+        out->OutputEventsMPI(inParticles[i].Output, inGeneral.tracking);
+#else
         out->OutputEvents(inParticles[i].Output, inGeneral.tracking);
+#endif
     }
 
+#ifdef USEOPENMP
     std::cout << "Simulation complete in time: "; 
     std::cout << omp_get_wtime() - startTime << std::endl;
     std::cout << "Saving data to file: " << inGeneral.fileName;
     std::cout << " and cleaning up...\n";
-    
+#endif
+
     for (unsigned int i = 0; i < inHistogram.size(); i++)
     {
+#ifdef USEMPI  
         out->OutputHist(histograms[i]);
+#else
+        out->OutputHist(histograms[i]);
+#endif
         delete histograms[i];
     }
 
     delete field;
     delete pusher;
     delete out;
+
+#ifdef USEMPI  
+    MPI_Finalize();
+#endif
 
     return 0;
 }

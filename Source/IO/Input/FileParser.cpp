@@ -89,7 +89,7 @@ void FileParser::ReadField()
     {
         m_field.Type = m_reader->GetString("Field", "field_type", "");
         if (m_field.Type != "gaussian" && m_field.Type != "plane"
-            && m_field.Type != "static")
+            && m_field.Type != "static" && m_field.Type != "focusing")
          {
             std::cerr << "Input error: Field type \"" << m_field.Type << "\" is not recognise.\n";
             std::cerr << "Exiting!\n";
@@ -128,6 +128,31 @@ void FileParser::ReadField()
                 m_checkFile << "\n\n";
             }
          } else if (m_field.Type == "gaussian")
+         {
+            m_field.MaxE = m_reader->GetReal("Field", "e_max", 0) / m_units->RefEField();
+            m_field.Wavelength = m_reader->GetReal("Field", "wavelength", 1) / m_units->RefLength();
+            m_field.Duration = m_reader->GetReal("Field", "duration", 1) / m_units->RefTime();
+            m_field.Waist = m_reader->GetReal("Field", "waist", 1) / m_units->RefLength();
+            m_field.Polerisation = m_reader->GetReal("Field", "polerisation", 0);
+            m_field.Start = m_reader->GetThreeVector("Field", "start", ThreeVector(0,0,0)) 
+                                                                    / m_units->RefLength();
+            m_field.Focus = m_reader->GetThreeVector("Field", "focus", ThreeVector(0,0,0))
+                                                                    / m_units->RefLength();
+            if (m_checkOutput == true)
+            {
+                m_checkFile << "Field input parameters \n";
+                m_checkFile << "Field type  = "   << m_field.Type << "\n";
+                m_checkFile << "Max E       = "   << m_field.MaxE << "\n";
+                m_checkFile << "Duration    = "   << m_field.Duration << "\n";
+                m_checkFile << "Waist       = "   << m_field.Waist << "\n";             
+                m_checkFile << "Wavelength  = "   << m_field.Wavelength << "\n";
+                m_checkFile << "Start       = ["  << m_field.Start[0] << " "
+                            << m_field.Start[1]   << " " << m_field.Start[2] << "]\n";
+                m_checkFile << "Focus       = ["  << m_field.Focus[0] << " "
+                            << m_field.Focus[1]   << " " << m_field.Focus[2] << "]\n";
+                m_checkFile << "\n\n";
+            }                                                                   
+         } else if (m_field.Type == "focusing")
          {
             m_field.MaxE = m_reader->GetReal("Field", "e_max", 0) / m_units->RefEField();
             m_field.Wavelength = m_reader->GetReal("Field", "wavelength", 1) / m_units->RefLength();
