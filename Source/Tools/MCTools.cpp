@@ -13,9 +13,9 @@ double MCTools::RandDouble(double low, double high)
     return dist(generator);
 }
 
-double MCTools::RandNorm(double mean, double variance)
+double MCTools::RandNorm(double mean, double sig)
 {
-    std::normal_distribution<double> dist(mean, variance);
+    std::normal_distribution<double> dist(mean, sig);
     return dist(generator);
 }
 
@@ -90,10 +90,10 @@ Eigen::VectorXd MCTools::RandSinhArcsinhNd(const Eigen::VectorXd& mean,
                                  + skew.array())).matrix() * norm;
 }
 
-std::vector<double> MCTools::SampleNorm(double mean, double variance, unsigned int nSamples)
+std::vector<double> MCTools::SampleNorm(double mean, double sig, unsigned int nSamples)
 {
 
-    std::normal_distribution<double> normDist(mean, variance); 
+    std::normal_distribution<double> normDist(mean, sig); 
     std::vector<double> samples(nSamples);
 
     for (unsigned int i = 0; i < nSamples; i++)

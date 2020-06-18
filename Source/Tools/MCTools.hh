@@ -10,7 +10,7 @@ namespace MCTools
 
     double RandDouble(double low, double high);
 
-    double RandNorm(double mean, double variance);
+    double RandNorm(double mean, double sig);
 
     unsigned int RandPoisson(double mean);
 
@@ -22,7 +22,7 @@ namespace MCTools
     Eigen::VectorXd RandSinhArcsinhNd(const Eigen::VectorXd& mean,
         const Eigen::VectorXd& covar, const Eigen::VectorXd& skew);
 
-    std::vector<double> SampleNorm(double mean, double variance,
+    std::vector<double> SampleNorm(double mean, double sig,
             unsigned int nSamples);
 
     std::vector<double> SampleUniform(double low, double high,

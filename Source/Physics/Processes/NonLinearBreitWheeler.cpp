@@ -46,10 +46,12 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
 
 double NonLinearBreitWheeler::CalculateSplit(double chi) const
 {
-	double rand = MCTools::RandDouble(0,1);
+	double rand = MCTools::RandDouble(0, 1);
 	int chiIndex = Numerics::ArrayIndex(m_eFract_chiAxis, m_efract_length, chi);
-	int fracIndex = Numerics::ArrayIndex(m_eFract_dataTable[chiIndex], m_efract_length, rand);
-	return m_eFract_fractAxis[fracIndex];
+//	int fracIndex = Numerics::ArrayIndex(m_eFract_dataTable[chiIndex], m_efract_length, rand);
+//	return m_eFract_fractAxis[fracIndex];
+	return Numerics::Interpolate1D(m_eFract_dataTable[chiIndex],
+		m_eFract_fractAxis, m_efract_length, rand);
 }
 
 double NonLinearBreitWheeler::CalculateChi(Particle* part) const

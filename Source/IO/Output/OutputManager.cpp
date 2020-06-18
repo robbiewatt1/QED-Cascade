@@ -735,7 +735,7 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
 
                 double* procPhotonnBuff  = new double [photonArraysize[i]];
                 MPI_Status statusG;
-                int test = MPI_Recv(procPhotonnBuff, photonArraysize[i], MPI_DOUBLE, i,
+                MPI_Recv(procPhotonnBuff, photonArraysize[i], MPI_DOUBLE, i,
                     photonTag, MPI_COMM_WORLD, &statusG);
                 for (int j = 0; j < photonArraysize[i] / 8; j++)
                 {
@@ -883,7 +883,6 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
 
 void OutputManager::OutputHistMPI(Histogram* hist)
 {
-
     // Collect all histograms from other processors are sum them. They will all
     // have the same bin centres so just need to send over the bin values
 
@@ -898,6 +897,14 @@ void OutputManager::OutputHistMPI(Histogram* hist)
         // We are master,
         double* binValues = new double [hist->GetNBins()];
         double* dataBuff = new double [hist->GetNBins()];
+
+        // Start by adding our own
+        for(unsigned int i = 0; i < hist->GetNBins(); i++)
+        {
+            binValues[i] = hist->GetBinValues()[i];
+        }
+
+        // Now add slaves
         for (int rank = 1; rank < nProc; rank++)
         {
             MPI_Status status;
@@ -909,18 +916,13 @@ void OutputManager::OutputHistMPI(Histogram* hist)
                 binValues[i] += dataBuff[i];
             }
         }
-        // Finally add our own 
-        for(unsigned int i = 0; i < hist->GetNBins(); i++)
-        {
-            binValues[i] += hist->GetBinValues()[i];
-        }
 
         // Now save to the file
         std::string groupName = "Histograms/"+ hist->GetName();
         m_outputFile->AddGroup(groupName);
         m_outputFile->AddArray1D(hist->GetBinCentres(), hist->GetNBins(),
             groupName + "/BinCentres");
-        m_outputFile->AddArray1D(hist->GetBinValues(), hist->GetNBins(),
+        m_outputFile->AddArray1D(binValues, hist->GetNBins(),
             groupName + "/BinValues");
 
         delete[] binValues;

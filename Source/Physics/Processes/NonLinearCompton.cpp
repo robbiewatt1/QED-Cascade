@@ -8,8 +8,9 @@
 #include "UnitsSystem.hh"
 
 
-NonLinearCompton::NonLinearCompton(EMField* field, double dt, bool track):
-Process(field, dt, track)
+NonLinearCompton::NonLinearCompton(EMField* field, double dt, bool track,
+	double eMin):
+m_eMin(eMin), Process(field, dt, track)
 {
 	LoadTables();
 }
@@ -26,19 +27,23 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
 	double h = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable, m_h_length, eta);
-	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta * h / part->GetGamma();
+	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta * h
+		/ (part->GetGamma() * 2.0 * UnitsSystem::pi);
 	part->UpdateOpticalDepth(deltaOD);
 	// Now check if process hass occured. If so then emmit and react
 	if (part->GetOpticalDepth() < 0.0)
 	{
 		double chi = CalculateChi(eta);
-		double gammaE = chi * part->GetGamma() / eta;
+		double gammaE = 2.0 * chi * part->GetGamma() / eta;
 		ThreeVector gammaP = gammaE * part->GetDirection();
 		part->UpdateTrack(part->GetPosition(), part->GetMomentum() - gammaP);
 		// Add new partles to the simulation
-		Photon* photon = new Photon(gammaE, part->GetPosition(), part->GetDirection(), 
-							  	   part->GetTime(), m_track);
-		partList->AddParticle(photon);
+		if (gammaE > m_eMin)
+		{
+			Photon* photon = new Photon(gammaE, part->GetPosition(), part->GetDirection(), 
+								  	   part->GetTime(), m_track);
+			partList->AddParticle(photon);
+		}
 		part->InitOpticalDepth();
 	}
 }
@@ -58,13 +63,15 @@ double NonLinearCompton::CalculateEta(Particle* part) const
 
 double NonLinearCompton::CalculateChi(double eta) const
 {
-	double rand = MCTools::RandDouble(0,1);
+	double rand = MCTools::RandDouble(0, 1);
 	// Need to first find closest index for given eta;
 	int etaIndex = Numerics::ArrayIndex(m_phEn_etaAxis, m_phEn_etaLength, eta);
 	// Now need to find closest index for random value
-	int chiIndex = Numerics::ArrayIndex(m_phEn_dataTable[etaIndex], m_phEn_etaLength, rand);
+//	int chiIndex = Numerics::ArrayIndex(m_phEn_dataTable[etaIndex], m_phEn_etaLength, rand);
 	// Now find the chi value from the table
-	return m_phEn_chiAxis[etaIndex][chiIndex];
+	return Numerics::Interpolate1D(m_phEn_dataTable[etaIndex],
+		m_phEn_chiAxis[etaIndex], m_phEn_chiLength, rand);
+//	return m_phEn_chiAxis[etaIndex][chiIndex];
 }
 
 void NonLinearCompton::LoadTables()

@@ -69,7 +69,7 @@ void FocusingField::GetField(double time, const ThreeVector &position,
     eField[1] = E_0 * xe * ye * (m_eps * m_eps * S[2] + m_eps * m_eps * m_eps
         * m_eps * (rho2 * S[4] - rho2 * rho2 * S[5] / 4.0));
     eField[2] = E_0 * xe * (m_eps * C[1] + m_eps * m_eps * m_eps * (-C[2] / 2.0 +
-        rho2 * C[3] - rho2 * rho2 * C[5] / 4.0));
+        rho2 * C[3] - rho2 * rho2 * C[4] / 4.0));
     bField[0] = 0;
     bField[1] = E_0 * (S[0] + m_eps * m_eps * (rho2 * S[2] / 2.0 - rho2 * rho2
         * S[3] / 4.0) + m_eps * m_eps * m_eps * m_eps * (- S[2] / 8.0 + rho2

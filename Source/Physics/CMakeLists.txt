@@ -11,6 +11,7 @@ set(physics_source_files
 	ParticlePushers/ParticlePusher.cpp
         ParticlePushers/ParticlePusher.cpp
         ParticlePushers/LandauPusher.cpp
+        ParticlePushers/ModifiedLandauPusher.cpp
         ParticlePushers/LorentzPusher.cpp)
 set(physics_header_files
 	Fields/EMField/EMField.hh
@@ -23,6 +24,7 @@ set(physics_header_files
 	Processes/NonLinearBreitWheeler.hh
         ParticlePushers/ParticlePusher.hh
         ParticlePushers/LandauPusher.hh
+        ParticlePushers/ModifiedLandauPusher.hh
         ParticlePushers/LorentzPusher.hh)
 add_library(PhysicsQED SHARED ${physics_source_files})
 target_link_libraries(PhysicsQED Tools Particles)

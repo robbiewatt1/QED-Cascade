@@ -5,6 +5,8 @@ build/*
 Install/*
 Tests/python/*
 Tests/
+Inputs/*
+Sims/*
 Tables/TensorflowGraphs
 
 bin/

@@ -14,6 +14,7 @@ struct GeneralParameters
     std::string pusher;     // Particle pusher used 
     std::string fileName;   // Output file name
     bool tracking;          // Turns on particle tracking
+    double minEnergy;       // Min energy of tracked particle
 };
 
 struct FieldParameters

@@ -10,7 +10,8 @@
 class NonLinearCompton: public Process
 {
 public:
-    NonLinearCompton(EMField* field, double dt, bool track = false);
+    NonLinearCompton(EMField* field, double dt, bool track = false,
+        double eMin = 0);
     
    virtual ~NonLinearCompton();
 
@@ -32,6 +33,9 @@ private:
     void UnloadTables();
 
 private:
+
+    // Minimum energy of tracked photon
+    double m_eMin;
 
     // Data tables for h factor
     double* m_h_dataTable;

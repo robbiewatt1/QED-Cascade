@@ -10,6 +10,7 @@
 #include "ParticlePusher.hh"
 #include "LorentzPusher.hh"
 #include "LandauPusher.hh"
+#include "ModifiedLandauPusher.hh"
 
 #include "ParticleList.hh"
 #include "SourceGenerator.hh"
@@ -20,6 +21,8 @@
 #include "FileParser.hh"
 #include "Histogram.hh"
 #include "OutputManager.hh"
+
+#include "MCTools.hh"
 
 #ifdef USEOPENMP
     #include <omp.h>
@@ -66,6 +69,10 @@ int main(int argc, char* argv[])
     // set up MPI if we are using it 
 #ifdef USEMPI
     MPI_Init(&argc, &argv);
+    // Set random seed with MPI rank
+    int id;
+    MPI_Comm_rank(MPI_COMM_WORLD, &id);
+    MCTools::SetSeed(id);
 #endif
     // Parse the file
     FileParser* input = new FileParser(argv[1], true);
@@ -111,6 +118,9 @@ int main(int argc, char* argv[])
     } else if (inGeneral.pusher == "Landau")
     {
         pusher = new LandauPusher(field, inGeneral.timeStep);
+    } else if (inGeneral.pusher == "ModifiedLandau")
+    {
+        pusher = new ModifiedLandauPusher(field, inGeneral.timeStep);
     } else
     {
         std::cerr << "Error: Unkown Pusher Type" << std::endl;
@@ -122,7 +132,7 @@ int main(int argc, char* argv[])
     if (inProcess.NonLinearCompton == true)
     {
         NonLinearCompton* comptonNL = new NonLinearCompton(field, inGeneral.timeStep,
-                inGeneral.tracking);
+                inGeneral.tracking, inGeneral.minEnergy);
         processList.push_back(comptonNL);
     }
     if (inProcess.NonLinearBreitWheeler == true)
@@ -196,6 +206,7 @@ int main(int argc, char* argv[])
                 // Check if time for histogram
                 if (histCount < histograms.size())
                 {
+                 //   std::cout << histCount << " " << histograms[histCount]->GetTime() << std::endl;
                     if(time >= histograms[histCount]->GetTime())
                     {
                         for (unsigned int k = 0; k < event->GetNPart(); k++)
@@ -265,8 +276,8 @@ int main(int argc, char* argv[])
 
     for (unsigned int i = 0; i < inHistogram.size(); i++)
     {
-#ifdef USEMPI  
-        out->OutputHist(histograms[i]);
+#ifdef USEMPI
+        out->OutputHistMPI(histograms[i]);
 #else
         out->OutputHist(histograms[i]);
 #endif
