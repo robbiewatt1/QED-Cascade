@@ -17,5 +17,9 @@ double Interpolate1D(double* samplePoints, double* sampleData, unsigned int samp
 					 double queryPoint);
 
 int ArrayIndex(double* samplePoints, unsigned int sampleSize, double queryPoint);
+
+
+void ClosestPoints(double* samplePoints, unsigned int sampleSize,
+    double queryPoint, int& index, double& frac);
 }
 #endif

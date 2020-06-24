@@ -933,5 +933,7 @@ void OutputManager::OutputHistMPI(Histogram* hist)
         MPI_Send(hist->GetBinValues(), hist->GetNBins(), MPI_DOUBLE, 0, histTag,
             MPI_COMM_WORLD);
     }
+    // Wait for everyone to finish
+    MPI_Barrier(MPI_COMM_WORLD);
 }
 #endif

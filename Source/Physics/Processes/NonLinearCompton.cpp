@@ -26,8 +26,10 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
-	double h = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable, m_h_length, eta);
-	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta * h
+	double logh = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable,
+		m_h_length, std::log10(eta));
+	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta
+		* std::pow(10.0, logh)
 		/ (part->GetGamma() * 2.0 * UnitsSystem::pi);
 	part->UpdateOpticalDepth(deltaOD);
 	// Now check if process hass occured. If so then emmit and react
@@ -64,14 +66,15 @@ double NonLinearCompton::CalculateEta(Particle* part) const
 double NonLinearCompton::CalculateChi(double eta) const
 {
 	double rand = MCTools::RandDouble(0, 1);
-	// Need to first find closest index for given eta;
-	int etaIndex = Numerics::ArrayIndex(m_phEn_etaAxis, m_phEn_etaLength, eta);
-	// Now need to find closest index for random value
-//	int chiIndex = Numerics::ArrayIndex(m_phEn_dataTable[etaIndex], m_phEn_etaLength, rand);
-	// Now find the chi value from the table
-	return Numerics::Interpolate1D(m_phEn_dataTable[etaIndex],
-		m_phEn_chiAxis[etaIndex], m_phEn_chiLength, rand);
-//	return m_phEn_chiAxis[etaIndex][chiIndex];
+	int lowIndex;
+	double frac;
+	Numerics::ClosestPoints(m_phEn_etaAxis, m_phEn_etaLength, std::log10(eta),
+		lowIndex, frac);
+	double lowValue = Numerics::Interpolate1D(m_phEn_dataTable[lowIndex],
+		m_phEn_chiAxis[lowIndex], m_phEn_chiLength, rand);
+	double highValue = Numerics::Interpolate1D(m_phEn_dataTable[lowIndex+1],
+		m_phEn_chiAxis[lowIndex+1], m_phEn_chiLength, rand);
+	return std::pow(10.0, (1.0 - frac) * lowValue + frac * highValue);
 }
 
 void NonLinearCompton::LoadTables()
@@ -117,8 +120,8 @@ void NonLinearCompton::LoadTables()
 	for (unsigned int i = 0; i < m_h_length; i++)
 	{
 		hFile >> logEta >> logH;
-		m_h_etaAxis[i] = std::pow(10.0, logEta);
-		m_h_dataTable[i] = std::pow(10.0, logH);
+		m_h_etaAxis[i] = logEta;
+		m_h_dataTable[i] = logH;
 
 	}
 
@@ -144,13 +147,13 @@ void NonLinearCompton::LoadTables()
 	double deltaEta = (logMaxEta - logMinEta) / (m_phEn_etaLength - 1.0);
 	for (unsigned int i = 0; i < m_phEn_etaLength; i++)
 	{
-		m_phEn_etaAxis[i] = std::pow(10.0, logMinEta + i * deltaEta);
-		double minChi = std::log10(m_phEn_chiMinAxis[i]);
-		double deltaChi = (std::log10(m_phEn_etaAxis[i]) - std::log10(2.0) - minChi) 
-						  / (m_phEn_etaLength - 1.0);
+		double logMinChi = std::log10(m_phEn_chiMinAxis[i]);
+		m_phEn_etaAxis[i] = logMinEta + i * deltaEta;
+		double deltaChi = (m_phEn_etaAxis[i] - std::log10(2.0)
+			- logMinChi)  / (m_phEn_etaLength - 1.0);
 		for (unsigned int j = 0; j < m_phEn_chiLength; j++)
 		{
-			m_phEn_chiAxis[i][j] = std::pow(10.0, minChi + j * deltaChi);
+			m_phEn_chiAxis[i][j] = logMinChi + j * deltaChi;
 		}
 	}
 
@@ -159,6 +162,7 @@ void NonLinearCompton::LoadTables()
 		for (unsigned int j = 0; j < m_phEn_chiLength; j++)
 		{
 			phEnFile >> m_phEn_dataTable[i][j];
+
 		}
 	}
 }

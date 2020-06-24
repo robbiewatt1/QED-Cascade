@@ -22,8 +22,10 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
 	if (part->GetType() != "Photon" || part->IsAlive() == false) return;
 
 	double chi = CalculateChi(part);
-	double t = Numerics::Interpolate1D(m_t_chiAxis, m_t_dataTable, m_t_length, chi);
-	double deltaOD = m_dt * UnitsSystem::alpha * chi * t / part->GetEnergy();
+	double logt = Numerics::Interpolate1D(m_t_chiAxis, m_t_dataTable,
+		m_t_length, std::log10(chi));
+	double deltaOD = m_dt * UnitsSystem::alpha * chi * std::pow(10.0, logt)
+		/ part->GetEnergy();
 	part->UpdateOpticalDepth(deltaOD);
 
 	// Now check if process hass occured. If so then emmit and react
@@ -38,7 +40,7 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
 									  pMomentum, part->GetTime(), m_track);	
 		Lepton* electron = new Lepton(1.0, -1.0, part->GetPosition(),
 									  eMomentum, part->GetTime(), m_track);
-		partList->AddParticle(positron);
+ 		partList->AddParticle(positron);
 		partList->AddParticle(electron);
 		part->Kill();
 	}
@@ -47,11 +49,15 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
 double NonLinearBreitWheeler::CalculateSplit(double chi) const
 {
 	double rand = MCTools::RandDouble(0, 1);
-	int chiIndex = Numerics::ArrayIndex(m_eFract_chiAxis, m_efract_length, chi);
-//	int fracIndex = Numerics::ArrayIndex(m_eFract_dataTable[chiIndex], m_efract_length, rand);
-//	return m_eFract_fractAxis[fracIndex];
-	return Numerics::Interpolate1D(m_eFract_dataTable[chiIndex],
+	int lowIndex;
+	double frac;
+	Numerics::ClosestPoints(m_eFract_chiAxis, m_efract_length, std::log10(chi),
+		lowIndex, frac);
+	double lowValue = Numerics::Interpolate1D(m_eFract_dataTable[lowIndex],
 		m_eFract_fractAxis, m_efract_length, rand);
+	double highValue = Numerics::Interpolate1D(m_eFract_dataTable[lowIndex+1],
+		m_eFract_fractAxis, m_efract_length, rand);
+	return (1.0 - frac) * lowValue + frac * highValue;
 }
 
 double NonLinearBreitWheeler::CalculateChi(Particle* part) const
@@ -61,7 +67,7 @@ double NonLinearBreitWheeler::CalculateChi(Particle* part) const
 	m_field->GetField(part->GetTime(), part->GetPosition(), eField, bField);
 	ThreeVector ePara = eField.Dot(partDir) * partDir;
 	ThreeVector ePerp = eField - ePara;
-	return part->GetEnergy() * (ePerp + partDir.Cross(bField)).Mag();
+	return 0.5 * part->GetEnergy() * (ePerp + partDir.Cross(bField)).Mag();
 }
 
 void NonLinearBreitWheeler::LoadTables()
@@ -115,8 +121,8 @@ void NonLinearBreitWheeler::LoadTables()
 	for (unsigned int i = 0; i < m_t_length; i++)
 	{
 		tFile >> logChi >> logTable;
-		m_t_chiAxis[i]   = std::pow(10, logChi);
-		m_t_dataTable[i] = std::pow(10, logTable);
+		m_t_chiAxis[i]   = logChi;
+		m_t_dataTable[i] = logTable;
 	}
 
 	fractFile >> m_efract_length;
@@ -127,7 +133,7 @@ void NonLinearBreitWheeler::LoadTables()
 	for (unsigned int i = 0; i < m_efract_length; i++)
 	{
 		chiFile >> logChi;
-		m_eFract_chiAxis[i] = std::pow(10, logChi);
+		m_eFract_chiAxis[i] = logChi;
 		epsilonFile >> m_eFract_fractAxis[i];
 		m_eFract_dataTable[i] = new double [m_efract_length];
 		for (unsigned int j = 0; j < m_efract_length; j++)

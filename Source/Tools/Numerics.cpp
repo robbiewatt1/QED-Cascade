@@ -78,10 +78,36 @@ int Numerics::ArrayIndex(double* samplePoints, unsigned int sampleSize, double q
 			return lowIndex;
 		} else
 		{
-			return lowIndex+1;
+			return lowIndex + 1;
 		}
 	} else
 	{
 		return sampleSize - 1;
+	}
+}
+
+void Numerics::ClosestPoints(double* samplePoints, unsigned int sampleSize,
+    double queryPoint, int& lowIndex, double& frac)
+{
+	lowIndex = 0;
+	for (unsigned int i = 0; i < sampleSize; i++)
+	{
+		if (samplePoints[i] < queryPoint)
+		{
+			lowIndex = i;
+		} else
+		{
+			break;
+		}
+	}
+	if (lowIndex < sampleSize - 2)
+	{
+		frac = (queryPoint - samplePoints[lowIndex]) / (samplePoints[lowIndex+1]
+			- samplePoints[lowIndex]);
+	} else
+	{
+		std::cerr << "Error: Tables can't handle your extreme simulation."
+			<< std::endl;
+		std::exit(-1);
 	}
 }
