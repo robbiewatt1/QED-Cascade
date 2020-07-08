@@ -6,7 +6,6 @@
 #include "PlaneEMField.hh"
 #include "FocusingField.hh"
 
-
 #include "ParticlePusher.hh"
 #include "LorentzPusher.hh"
 #include "LandauPusher.hh"
@@ -138,8 +137,7 @@ int main(int argc, char* argv[])
     if (inProcess.NonLinearBreitWheeler == true)
     {
         NonLinearBreitWheeler* breitWheelerNL = new NonLinearBreitWheeler(field, 
-                                                            inGeneral.timeStep,
-                                                            inGeneral.tracking);
+            inGeneral.timeStep, inGeneral.tracking);
         processList.push_back(breitWheelerNL);
     }
 
@@ -151,8 +149,8 @@ int main(int argc, char* argv[])
                 inParticles[i].Distro, inParticles[i].Number,
                 inParticles[i].EnergyMin, inParticles[i].EnergyMax,
                 inParticles[i].Radius, inParticles[i].Duration,
-                inParticles[i].Position, inParticles[i].Direction,
-                inGeneral.tracking);
+                inParticles[i].Divergence, inParticles[i].Position, 
+                inParticles[i].Direction, inGeneral.tracking);
         generators[i] = source;
     }
 
@@ -160,10 +158,9 @@ int main(int argc, char* argv[])
     std::vector<Histogram*> histograms(inHistogram.size());
     for (unsigned int i = 0; i < inHistogram.size(); i++)
     {
-        histograms[i] = new Histogram(inHistogram[i].Name, inHistogram[i].Particle,
-                                      inHistogram[i].Type, inHistogram[i].Time, 
-                                      inHistogram[i].MinBin, inHistogram[i].MaxBin, 
-                                      inHistogram[i].Bins);
+        histograms[i] = new Histogram(inHistogram[i].Name,
+            inHistogram[i].Particle, inHistogram[i].Type, inHistogram[i].Time,
+            inHistogram[i].MinBin, inHistogram[i].MaxBin, inHistogram[i].Bins);
     }
 
     // Set up output manager

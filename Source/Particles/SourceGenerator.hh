@@ -11,7 +11,7 @@ class SourceGenerator
     SourceGenerator(std::string type, std::string distro, 
                     unsigned int nPart, double energyMin,
                     double energyMax, double deltaPos, 
-                    double deltaTau,
+                    double deltaTau, double deltaDir,
                     const ThreeVector &position,
                     const ThreeVector &direction,
                     bool track = false);
@@ -32,7 +32,9 @@ private:
     ThreeVector m_direction;
     std::vector<double> m_radialPos;
     std::vector<double> m_longPos;
-    std::vector<double> m_angle;
+    std::vector<double> m_phiPos;
+    std::vector<double> m_thetaDir;
+    std::vector<double> m_phiDir;
     std::vector<double> m_energy;
     unsigned int m_partCount;
     ThreeMatrix m_rotaion;

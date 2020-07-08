@@ -44,6 +44,7 @@ struct ParticleParameters
     double EnergyMin;       // source min energy
     double EnergyMax;       // source max energy
     double Radius;          // source size
+    double Divergence;      // source divergence
     double Duration;        // source Duration
     bool Output;            // Output individual particle data
 };

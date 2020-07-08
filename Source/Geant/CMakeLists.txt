@@ -3,8 +3,10 @@ project(GeantQED C CXX)
 find_package(Geant4 REQUIRED)
 
 set(geant_source_files
+    G4CascadeGenerator.cpp
     G4NonLinearCompton.cpp)
 set(geant_header_files
+    G4CascadeGenerator.hh
     G4NonLinearCompton.hh)
 
 if(BUILD_TENSORFLOW)
@@ -17,7 +19,7 @@ endif()
 
 add_library(GeantQED SHARED ${geant_source_files} ${tf_source_files})
 include(${Geant4_USE_FILE})
-target_link_libraries(GeantQED ${Geant4_LIBRARIES} Tools Particles PhysicsQED)
+target_link_libraries(GeantQED ${Geant4_LIBRARIES} Tools IO Particles PhysicsQED)
 if(BUILD_TENSORFLOW)
     target_link_libraries(GeantQED TensorflowCC::Shared)
 endif()

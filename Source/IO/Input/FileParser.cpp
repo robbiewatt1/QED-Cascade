@@ -225,6 +225,7 @@ void FileParser::ReadParticles()
             source.EnergyMin = m_reader->GetReal(partField, "min_energy", 0) / m_units->RefEnergy();
             source.EnergyMax = m_reader->GetReal(partField, "max_energy", 0) / m_units->RefEnergy();
             source.Radius    = m_reader->GetReal(partField, "radius", 0) / m_units->RefLength();
+            source.Divergence    = m_reader->GetReal(partField, "divergence", 0);
             source.Duration  = m_reader->GetReal(partField, "duration", 0) / m_units->RefTime();
             source.Output    = m_reader->GetBoolean(partField, "output", false);
             m_particles.push_back(source);
@@ -239,6 +240,7 @@ void FileParser::ReadParticles()
                 m_checkFile << "Energy Min = " << source.EnergyMin << "\n";
                 m_checkFile << "Energy Max = " << source.EnergyMax << "\n";
                 m_checkFile << "Radius     = " << source.Radius << "\n";
+                m_checkFile << "Divergence     = " << source.Divergence << "\n";
                 m_checkFile << "Duration   = " << source.Duration << "\n";
                 m_checkFile << "Output     = " << source.Output << "\n";
                 m_checkFile << "Direction  = [" << source.Direction[0] << " "
