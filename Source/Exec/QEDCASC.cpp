@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     {
         SourceGenerator* source = new SourceGenerator(inParticles[i].Type,
                 inParticles[i].Distro, inParticles[i].Number,
-                inParticles[i].EnergyMin, inParticles[i].EnergyMax,
+                inParticles[i].Energy1, inParticles[i].Energy2,
                 inParticles[i].Radius, inParticles[i].Duration,
                 inParticles[i].Divergence, inParticles[i].Position, 
                 inParticles[i].Direction, inGeneral.tracking);

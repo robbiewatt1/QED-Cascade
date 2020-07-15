@@ -20,8 +20,7 @@ m_type(type), m_nPart(nPart), m_partCount(0), m_track(track)
     m_phiPos = MCTools::SampleUniform(0, 2.0 * UnitsSystem::pi, nPart);
     m_thetaDir = MCTools::SampleNorm(0, deltaDir, nPart);
     m_phiDir = MCTools::SampleUniform(0, 2.0 * UnitsSystem::pi, nPart);
-
-    if (distro == "exp")
+    if (distro == "gaussian")
     {
         m_energy = MCTools::SampleNorm(energy1, energy2, nPart);
     } else if(distro == "linear")

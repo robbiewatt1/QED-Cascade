@@ -40,9 +40,8 @@ struct ParticleParameters
     std::string Distro;     // Energy distrobution
     ThreeVector Position;   // positions
     ThreeVector Direction;  // directions
-    double Energy;          // source energy
-    double EnergyMin;       // source min energy
-    double EnergyMax;       // source max energy
+    double Energy1;         // source min energy
+    double Energy2;         // source max energy
     double Radius;          // source size
     double Divergence;      // source divergence
     double Duration;        // source Duration

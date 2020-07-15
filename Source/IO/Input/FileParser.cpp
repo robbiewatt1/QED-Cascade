@@ -221,9 +221,8 @@ void FileParser::ReadParticles()
             source.Position = m_reader->GetThreeVector(partField, "position", ThreeVector(0, 0, 0))
                                                                              / m_units->RefLength();
             source.Direction = m_reader->GetThreeVector(partField, "direction", ThreeVector(0, 0, 1));
-            source.Energy    = m_reader->GetReal(partField, "energy", 0) / m_units->RefEnergy();
-            source.EnergyMin = m_reader->GetReal(partField, "min_energy", 0) / m_units->RefEnergy();
-            source.EnergyMax = m_reader->GetReal(partField, "max_energy", 0) / m_units->RefEnergy();
+            source.Energy1 = m_reader->GetReal(partField, "energy_mean", 0) / m_units->RefEnergy();
+            source.Energy2 = m_reader->GetReal(partField, "energy_sig", 0) / m_units->RefEnergy();
             source.Radius    = m_reader->GetReal(partField, "radius", 0) / m_units->RefLength();
             source.Divergence    = m_reader->GetReal(partField, "divergence", 0);
             source.Duration  = m_reader->GetReal(partField, "duration", 0) / m_units->RefTime();
@@ -236,9 +235,8 @@ void FileParser::ReadParticles()
                 m_checkFile << "Name       = " << source.Name << "\n";              
                 m_checkFile << "Number     = " << source.Number << "\n";
                 m_checkFile << "Type       = " << source.Type << "\n";
-                m_checkFile << "Energy     = " << source.Energy << "\n";
-                m_checkFile << "Energy Min = " << source.EnergyMin << "\n";
-                m_checkFile << "Energy Max = " << source.EnergyMax << "\n";
+                m_checkFile << "Energy1    = " << source.Energy1 << "\n";
+                m_checkFile << "Energy2    = " << source.Energy2 << "\n";
                 m_checkFile << "Radius     = " << source.Radius << "\n";
                 m_checkFile << "Divergence     = " << source.Divergence << "\n";
                 m_checkFile << "Duration   = " << source.Duration << "\n";
