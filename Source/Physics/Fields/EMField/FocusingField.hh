@@ -4,6 +4,8 @@
 #include "EMField.hh"
 #include "ThreeVector.hh"
 #include "ThreeMatrix.hh"
+#include <vector>
+
 
 
 /* Based on Fields of a Gaussian beam beyond the paraxial approximation

@@ -1,7 +1,6 @@
 #include "FocusingField.hh"
 
 #include "UnitsSystem.hh"
-#include <vector>
 
 FocusingField::FocusingField(double maxE,  double waveLength, double tau,
     double waist, double polAngle, const ThreeVector& startPos,
@@ -41,7 +40,7 @@ void FocusingField::GetField(double time, const ThreeVector &position,
     double E_0 = m_maxE * std::exp(- r2 / (w * w) - (time - m_t0 - position_p[2])
             * (time - m_t0 - position_p[2]) / (m_tau * m_tau));
 
-    if (E_0 < 1.0e-16)
+    if (E_0 < 1.0e-15)
     {
           eField = ThreeVector(0, 0, 0);
           bField = ThreeVector(0, 0, 0);
@@ -49,12 +48,12 @@ void FocusingField::GetField(double time, const ThreeVector &position,
     }
 
     // Calculate the S and C componnetest
-    std::vector<double> S(7);
+    double S[7];
     for (int i = 0; i < 7; ++i)
     {
         S[i] = std::pow(m_waist / w, i + 1) * std::sin(phi + (i + 1) * phi_G);
     }
-    std::vector<double> C(5);
+    double C[5];
     for (int i = 0; i < 5; ++i)
     {
         C[i] = std::pow(m_waist / w, i + 1) * std::cos(phi + (i + 1) * phi_G);
@@ -76,7 +75,7 @@ void FocusingField::GetField(double time, const ThreeVector &position,
         * S[3] / 4.0 + 5.0 * rho2 * rho2 * S[4] / 16.0 - rho2 * rho2 * rho2
         * S[5] / 4.0 + rho2 * rho2 *rho2 * rho2 * S[6] / 32.0));
     bField[2] = E_0 * ye * (m_eps * C[1] + m_eps * m_eps * m_eps * (C[2] / 2.0
-        + rho2 * C[3] / 2.0 - rho2 * rho2 * C[4] / 4,0));
+        + rho2 * C[3] / 2.0 - rho2 * rho2 * C[4] / 4.0));
     eField[0] = eField[0] * std::cos(m_polAngle)
         - eField[1] * std::sin(m_polAngle) ;
     eField[1] = eField[0] * std::sin(m_polAngle)

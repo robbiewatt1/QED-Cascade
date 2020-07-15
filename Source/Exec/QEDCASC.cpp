@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
             if (inParticles[i].Output == true) out->StoreSource(event, j, true);
 
             unsigned int histCount(0);
-            double time(0); 
+            double time(0);
             while(time < inGeneral.timeEnd) // loop time
             {
                 // Check if time for histogram

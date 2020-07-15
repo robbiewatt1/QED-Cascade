@@ -12,7 +12,7 @@ ParticlePusher::~ParticlePusher()
 void ParticlePusher::PushParticle(Particle *part)
 {
     if (part->IsAlive() == false) return;
-    if (part->GetType() == "Photon")
+    if (part->GetMass() == 0)
     {
         ThreeVector positionNew = part->GetPosition() + (m_dt / part->GetMomentum().Mag())
                                  * part->GetMomentum();

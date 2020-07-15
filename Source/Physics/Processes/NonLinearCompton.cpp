@@ -22,7 +22,7 @@ NonLinearCompton::~NonLinearCompton()
 
 void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 {
-	if (part->GetType() != "Lepton" || part->IsAlive() == false) return;
+	if (part->GetMass() == 0 || part->IsAlive() == false) return;
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
