@@ -9,7 +9,9 @@
 #include <cctype>
 #include <cstdlib>
 #include <sstream>
+#include <sys/stat.h>
 #include "ini.hh"
+
 #include "INIReader.hh"
 
 using std::string;
@@ -20,6 +22,14 @@ INIReader::INIReader()
 
 INIReader::INIReader(const string& filename)
 {
+    
+    struct stat buffer;
+    if (stat (filename.c_str(), &buffer) != 0)
+    {
+        std::cerr << "Error: SFQED input not found." << std::endl;
+        exit(1);
+    }
+
     _error = ini_parse(filename.c_str(), ValueHandler, this);
 }
 
