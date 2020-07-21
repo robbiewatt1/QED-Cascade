@@ -84,9 +84,9 @@ G4VUserPrimaryGeneratorAction(), m_currentEvent(0), m_currentSecondary(-1)
     // set up the particle sources
     m_source = new SourceGenerator(inParticles.Type,
         inParticles.Distro, inParticles.Number,
-        inParticles.EnergyMin, inParticles.EnergyMax,
-        inParticles.Radius, inParticles.Duration, inParticles.Divergence,
-        inParticles.Position, inParticles.Direction, false);
+        inParticles.Energy1, inParticles.Energy2, inParticles.Radius,
+        inParticles.Duration, inParticles.Divergence, inParticles.Position,
+        inParticles.Direction, false);
 
     // Set up the Physics list
     if (inProcess.NonLinearCompton == true)

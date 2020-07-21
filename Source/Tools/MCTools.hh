@@ -2,7 +2,10 @@
 #define MCTOOLS_HH
 
 #include <random>
+
+#ifdef USEGEANT
 #include <Eigen/Dense>
+#endif
 
 namespace MCTools
 {
@@ -16,17 +19,19 @@ namespace MCTools
 
     unsigned int RandDiscrete(const std::vector<double>& distro);
 
-    Eigen::VectorXd RandNormNd(const Eigen::VectorXd& mean,
-            const Eigen::MatrixXd& covar);
-
-    Eigen::VectorXd RandSinhArcsinhNd(const Eigen::VectorXd& mean,
-        const Eigen::VectorXd& covar, const Eigen::VectorXd& skew);
-
     std::vector<double> SampleNorm(double mean, double sig,
             unsigned int nSamples);
 
     std::vector<double> SampleUniform(double low, double high,
             unsigned int nSamples);
+
+#ifdef USEGEANT
+    Eigen::VectorXd RandNormNd(const Eigen::VectorXd& mean,
+            const Eigen::MatrixXd& covar);
+
+    Eigen::VectorXd RandSinhArcsinhNd(const Eigen::VectorXd& mean,
+        const Eigen::VectorXd& covar, const Eigen::VectorXd& skew);
+#endif
 
     static std::random_device rd;
     static std::mt19937 generator(rd());

@@ -24,7 +24,7 @@ INIReader::INIReader(const string& filename)
 {
     
     struct stat buffer;
-    if (stat (filename.c_str(), &buffer) == 0)
+    if (stat (filename.c_str(), &buffer) != 0)
     {
         std::cerr << "Error: SFQED input not found." << std::endl;
         exit(1);

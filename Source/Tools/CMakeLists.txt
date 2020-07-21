@@ -2,9 +2,13 @@ cmake_minimum_required(VERSION 3.5)
 project(Tools C CXX)
 
 
+if(BUILD_GEANT)
+    add_compile_definitions(USEGEANT)
+endif(BUILD_GEANT)
+
+
 find_package(Eigen3 REQUIRED)
 
-message(${EIGEN3_INCLUDE_DIR})
 set(tools_source_files
     Numerics.cpp
     MCTools.cpp

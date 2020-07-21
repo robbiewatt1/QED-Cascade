@@ -48,6 +48,7 @@ unsigned int MCTools::RandDiscrete(const std::vector<double>& distro)
     return sample;
 }
 
+#ifdef USEGEANT
 Eigen::VectorXd MCTools::RandNormNd(const Eigen::VectorXd& mean,
         const Eigen::MatrixXd& covar)
 {
@@ -89,6 +90,7 @@ Eigen::VectorXd MCTools::RandSinhArcsinhNd(const Eigen::VectorXd& mean,
     return mean + covarMatrix * (Eigen::sinh(Eigen::asinh(sample.array())
                                  + skew.array())).matrix() * norm;
 }
+#endif
 
 std::vector<double> MCTools::SampleNorm(double mean, double sig, unsigned int nSamples)
 {
