@@ -12,10 +12,10 @@ m_fileName(fileName), m_group(NULL)
 {
     if (append == true)
     {
-        m_file = new H5::H5File(m_fileName, H5F_ACC_RDWR);
+        m_file = new H5::H5File(m_fileName.c_str(), H5F_ACC_RDWR);
     } else
     {
-        m_file = new H5::H5File(m_fileName, H5F_ACC_TRUNC);
+        m_file = new H5::H5File(m_fileName.c_str(), H5F_ACC_TRUNC);
     }
 }
 
@@ -37,7 +37,7 @@ void HDF5Output::AddGroup(std::string groupName)
     } H5E_END_TRY
     if (status == 0)
     {
-        m_group = new H5::Group(m_file->createGroup(groupName));
+        m_group = new H5::Group(m_file->createGroup(groupName.c_str()));
     }
 }
 
@@ -47,13 +47,13 @@ void HDF5Output::AddSubGroup(std::string subGroupName)
     {
         delete m_subGroup;
     }
-    m_subGroup = new H5::Group(m_file->createGroup(subGroupName));
+    m_subGroup = new H5::Group(m_file->createGroup(subGroupName.c_str()));
 }
 
 void HDF5Output::AddArray1D(double* data, hsize_t length, std::string dataName)
 {
-    H5::DataSet* set = new H5::DataSet(m_file->createDataSet(dataName, H5::PredType::NATIVE_DOUBLE,
-                                                              H5::DataSpace(1, &length)));
+    H5::DataSet* set = new H5::DataSet(m_file->createDataSet(dataName.c_str(), 
+        H5::PredType::NATIVE_DOUBLE, H5::DataSpace(1, &length)));
     set->write(data, H5::PredType::NATIVE_DOUBLE);
     delete set;
 }
@@ -62,19 +62,19 @@ void HDF5Output::AddArray2D(double* data, hsize_t xLength, hsize_t yLength,
                            std::string dataName)
 {
     hsize_t dimensions[2] = {xLength, yLength};
-    H5::DataSet* set = new H5::DataSet(m_file->createDataSet(dataName, H5::PredType::NATIVE_DOUBLE,
-                                                               H5::DataSpace(2, dimensions)));
+    H5::DataSet* set = new H5::DataSet(m_file->createDataSet(dataName.c_str(),
+        H5::PredType::NATIVE_DOUBLE, H5::DataSpace(2, dimensions)));
     set->write(data, H5::PredType::NATIVE_DOUBLE);
     delete set;
 }
 
-void HDF5Output::AddArray3D(double* data, hsize_t xLength, hsize_t yLength, hsize_t zLength, 
-                           std::string dataName)
+void HDF5Output::AddArray3D(double* data, hsize_t xLength, hsize_t yLength,
+    hsize_t zLength, std::string dataName)
 {
     hsize_t dimensions[3] = {xLength, yLength, zLength};
 
-    H5::DataSet* set = new H5::DataSet(m_file->createDataSet(dataName, H5::PredType::NATIVE_DOUBLE,
-                                                               H5::DataSpace(3, dimensions)));
+    H5::DataSet* set = new H5::DataSet(m_file->createDataSet(dataName.c_str(),
+        H5::PredType::NATIVE_DOUBLE, H5::DataSpace(3, dimensions)));
     set->write(data, H5::PredType::NATIVE_DOUBLE);
     delete set;
 }
