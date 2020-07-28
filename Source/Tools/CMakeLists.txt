@@ -4,10 +4,9 @@ project(Tools C CXX)
 
 if(BUILD_GEANT)
     add_compile_definitions(USEGEANT)
+    find_package(Eigen3 REQUIRED)
 endif(BUILD_GEANT)
 
-
-find_package(Eigen3 REQUIRED)
 
 set(tools_source_files
     Numerics.cpp
@@ -21,7 +20,11 @@ set(tools_header_files
     UnitsSystem.hh)
 
 add_library(Tools SHARED  ${tools_source_files})
-target_link_libraries(Tools Eigen3::Eigen)
+
+if(BUILD_GEANT)
+    target_link_libraries(Tools Eigen3::Eigen)
+endif(BUILD_GEANT)
+
 target_include_directories(Tools PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS Tools
