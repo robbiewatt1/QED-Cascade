@@ -15,9 +15,9 @@ m_type(type), m_nPart(nPart), m_partCount(0), m_track(track)
 {
     m_direction = direction.Norm();
     m_position  = position;
-    m_radialPos = MCTools::SampleNorm(0, deltaPos, nPart);
-    m_longPos   = MCTools::SampleNorm(0, deltaTau, nPart);
-    m_phiPos = MCTools::SampleUniform(0, 2.0 * UnitsSystem::pi, nPart);
+    m_xPos = MCTools::SampleNorm(0, deltaPos, nPart);
+    m_yPos = MCTools::SampleNorm(0, deltaPos, nPart);
+    m_zPos = MCTools::SampleNorm(0, deltaTau, nPart);
     m_thetaDir = MCTools::SampleNorm(0, deltaDir, nPart);
     m_phiDir = MCTools::SampleUniform(0, 2.0 * UnitsSystem::pi, nPart);
     if (distro == "gaussian")
@@ -47,11 +47,9 @@ ParticleList* SourceGenerator::GenerateList()
     }
     ParticleList* list = new ParticleList(std::to_string(m_partCount));
 
-    ThreeVector partPosition = ThreeVector(std::cos(m_phiPos[m_partCount])
-                                           * m_radialPos[m_partCount],
-                                           std::sin(m_phiPos[m_partCount])
-                                           * m_radialPos[m_partCount],
-                                           m_longPos[m_partCount]);
+    ThreeVector partPosition = ThreeVector(m_xPos[m_partCount],
+                                           m_yPos[m_partCount],
+                                           m_zPos[m_partCount]);
     partPosition = m_rotaion * partPosition + m_position;
 
     ThreeVector partDirection = ThreeVector(std::sin(m_thetaDir[m_partCount])

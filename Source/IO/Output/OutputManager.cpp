@@ -457,10 +457,10 @@ void OutputManager::OutputEvents(bool outSource, bool outTrack)
             std::string eventName = "Particles/ParticleTrack/Event" + std::to_string(i);
             m_outputFile->AddGroup(eventName);
 
-            double posBuff[3*m_positionTrack[i].size()];
-            double momBuff[3*m_momentumTrack[i].size()];
-            double timeBuff[m_timeTrack[i].size()];
-            double gammaBuff[m_gammaTrack[i].size()];       
+            double* posBuff = new double [3*m_positionTrack[i].size()];
+            double* momBuff = new double [3*m_momentumTrack[i].size()];
+            double* timeBuff = new double [m_timeTrack[i].size()];
+            double* gammaBuff = new double [m_gammaTrack[i].size()];       
             for (unsigned int j = 0; j < m_positionTrack[i].size(); j++)
             {
                 for (unsigned int k = 0; k < 3; k++)
@@ -487,7 +487,13 @@ void OutputManager::OutputEvents(bool outSource, bool outTrack)
             m_outputFile->AddArray2D(momBuff, m_momentumTrack[i].size(), 3, eventName + "/Momentum");
             m_outputFile->AddArray1D(timeBuff, m_timeTrack[i].size(), eventName + "/Time");
             m_outputFile->AddArray1D(gammaBuff, m_gammaTrack[i].size(), eventName + "/Gamma");
+        
+            delete[] posBuff;
+            delete[]momBuff;
+            delete[] timeBuff;
+            delete[] gammaBuff;
         }
+
     }
 }
 
@@ -498,8 +504,9 @@ void OutputManager::OutEMField(EMField* field, const std::vector<double> &tAxis,
 {
     for (unsigned int t = 0; t < tAxis.size(); t++)
     {
-        std::string groupName = "Fields/" + std::to_string(tAxis[t]);
-        groupName.erase(groupName.find_last_not_of('0') + 1, std::string::npos);
+
+        std::string groupName = "Fields/" + std::to_string(t);
+        //groupName.erase(groupName.find_last_not_of('0') + 1, std::string::npos);
         m_outputFile->AddGroup(groupName);
         for (int dir = 0; dir < 3; dir++)
         {

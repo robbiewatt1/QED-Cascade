@@ -30,9 +30,9 @@ private:
     unsigned int m_nPart;
     ThreeVector m_position;
     ThreeVector m_direction;
-    std::vector<double> m_radialPos;
-    std::vector<double> m_longPos;
-    std::vector<double> m_phiPos;
+    std::vector<double> m_xPos;
+    std::vector<double> m_yPos;
+    std::vector<double> m_zPos;
     std::vector<double> m_thetaDir;
     std::vector<double> m_phiDir;
     std::vector<double> m_energy;

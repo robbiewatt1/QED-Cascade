@@ -32,7 +32,7 @@ void GaussianEMField::GetField(double time, const ThreeVector &position,
 	double r2 		 = position_p[0] * position_p[0] + position_p[1] * position_p[1];
 	double rayleigh  = m_waveNum * m_waist * m_waist / 2.0;
 	double curvature = (position_p[2] + rayleigh * rayleigh
-										/ (position_p[2] + 1e-20));
+										/ (position_p[2] + 1e-99));
 	// Adding small number to stop divergence at zero
 	double beamWaist = m_waist * std::sqrt(1.0 + position_p[2] * position_p[2] 
 										   / (rayleigh * rayleigh));

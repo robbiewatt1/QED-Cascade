@@ -33,7 +33,6 @@ private:
     void UnloadTables();
 
 private:
-
     // Minimum energy of tracked photon
     double m_eMin;
 

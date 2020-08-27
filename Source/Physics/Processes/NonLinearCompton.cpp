@@ -26,8 +26,17 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 	// First we need to update the optical depth of the particle based on local values
 	// Still need to decide of units and constants here
 	double eta = CalculateEta(part);
-	double logh = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable,
-		m_h_length, std::log10(eta));
+
+	// Check for very small values of eta and skip interpolation
+	double logh;
+	if (eta < 1.0e-12)
+	{
+		logh = 5.24;
+	} else
+	{
+		logh = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable,
+			m_h_length, std::log10(eta));
+	}
 	double deltaOD = m_dt * std::sqrt(3) * UnitsSystem::alpha * eta
 		* std::pow(10.0, logh)
 		/ (part->GetGamma() * 2.0 * UnitsSystem::pi);
