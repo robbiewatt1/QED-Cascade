@@ -154,7 +154,6 @@ void G4CascadeGenerator::GeneratePrimaries(G4Event* anEvent)
         {
             SimulateEvent();
         }
-        m_event->GetParticle(m_currentSecondary)->GetName();
         // Load the gun params
         if(m_event->GetParticle(m_currentSecondary)->GetName() == "Electron")
         {  
@@ -174,6 +173,7 @@ void G4CascadeGenerator::GeneratePrimaries(G4Event* anEvent)
 
          ThreeVector dir = m_event->GetParticle(m_currentSecondary)
             ->GetDirection();
+
         m_particleGun->SetParticleMomentumDirection(
             G4ThreeVector(dir[0], dir[1], dir[2]));
         m_currentSecondary--;
