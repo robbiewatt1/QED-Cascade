@@ -13,6 +13,8 @@ m_maxE(maxE), m_waveLength(waveLength), m_polAngle(polAngle)
     m_rotaion = direction.RotateToAxis(ThreeVector(0,0,1));
     m_rotationInv = m_rotaion.Inverse();
     m_waveNum = 2.0 * UnitsSystem::pi / m_waveLength;
+    std::cout << maxE << " " <<m_waveLength << std::endl;
+
 }
 
 PlaneEMField::~PlaneEMField()

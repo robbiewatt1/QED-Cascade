@@ -18,6 +18,7 @@ m_maxE(maxE), m_waveLength(waveLength), m_tau(tau), m_waist(waist), m_polAngle(p
 	m_rotaion = m_waveVec.RotateToAxis(ThreeVector(0,0,1));
 	m_rotationInv = m_rotaion.Inverse();
 	m_waveNum = 2.0 * UnitsSystem::pi / m_waveLength;
+	std::cout << maxE << " " <<m_waveLength << std::endl;
 }
 
 GaussianEMField::~GaussianEMField()
@@ -38,10 +39,11 @@ void GaussianEMField::GetField(double time, const ThreeVector &position,
 										   / (rayleigh * rayleigh));
 	double E0 = m_maxE * (m_waist / beamWaist) 
 				* std::exp(-1.0 * r2 / (beamWaist * beamWaist))
-				* std::cos(position_p[2] * m_waveNum + r2 * m_waveNum / (2.0 * curvature)) 
+				* std::cos((position_p[2] - time) * m_waveNum + r2 * m_waveNum / (2.0 * curvature))
 				* std::exp(-1.0 * (time - t0 - position_p[2]) 
 							* (time - t0 - position_p[2]) / (m_tau * m_tau));
 	
+
 	eField[0] = E0 * std::cos(m_polAngle);
 	eField[1] = E0 * std::sin(m_polAngle);
 	eField[2] = 0;
