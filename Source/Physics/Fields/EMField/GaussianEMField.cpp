@@ -18,7 +18,6 @@ m_maxE(maxE), m_waveLength(waveLength), m_tau(tau), m_waist(waist), m_polAngle(p
 	m_rotaion = m_waveVec.RotateToAxis(ThreeVector(0,0,1));
 	m_rotationInv = m_rotaion.Inverse();
 	m_waveNum = 2.0 * UnitsSystem::pi / m_waveLength;
-	std::cout << maxE << " " <<m_waveLength << std::endl;
 }
 
 GaussianEMField::~GaussianEMField()
