@@ -79,6 +79,7 @@ int main(int argc, char* argv[])
     GeneralParameters inGeneral = input->GetGeneral();
     FieldParameters inField = input->GetField();
     ProcessParameters inProcess = input->GetProcess();
+    ImportancParameters inImportance = input->GetImportance();
     std::vector<ParticleParameters> inParticles = input->GetParticle();
     std::vector<HistogramParameters> inHistogram = input->GetHistograms();
     delete input;
@@ -105,7 +106,7 @@ int main(int argc, char* argv[])
             inField.Start, inField.Focus);
     } else
     {
-        std::cerr << "Error: unknown field type." << std::endl;
+        std::cerr << "Error: unknown field type: " << inField.Type << std::endl;
         return 1;
     }
 
@@ -130,14 +131,24 @@ int main(int argc, char* argv[])
     std::vector<Process*> processList;
     if (inProcess.NonLinearCompton == true)
     {
-        NonLinearCompton* comptonNL = new NonLinearCompton(field, inGeneral.timeStep,
-                inGeneral.tracking, inGeneral.minEnergy);
+        NonLinearCompton* comptonNL = new NonLinearCompton(field,
+            inGeneral.timeStep, inGeneral.tracking, inGeneral.minEnergy);
+        if (inImportance.NLC_Importance == true)
+        {
+            comptonNL->AddImportance(inImportance.NLC_Samples,
+                inImportance.NLC_Groups, inImportance.NLC_Weights);
+        }
         processList.push_back(comptonNL);
     }
     if (inProcess.NonLinearBreitWheeler == true)
     {
         NonLinearBreitWheeler* breitWheelerNL = new NonLinearBreitWheeler(field, 
             inGeneral.timeStep, inGeneral.tracking);
+        if (inImportance.NBW_Importance == true)
+        {
+            breitWheelerNL->AddImportance(inImportance.NBW_Samples,
+                inImportance.NBW_Groups, inImportance.NBW_Weights);
+        }
         processList.push_back(breitWheelerNL);
     }
 

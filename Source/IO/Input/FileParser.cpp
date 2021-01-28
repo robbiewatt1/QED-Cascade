@@ -22,6 +22,7 @@ m_checkOutput(checkOutput)
     ReadField();
     ReadParticles();
     ReadProcess();
+    ReadImportance();
     ReadHistograms();
 }
 
@@ -185,22 +186,132 @@ void FileParser::ReadField()
 
 void FileParser::ReadProcess()
 {
-    m_process.NonLinearCompton = m_reader->GetBoolean("Process", "NonLinearCompton", false);
-    m_process.NonLinearBreitWheeler = m_reader->GetBoolean("Process", "NonLinearBreitWheeler",
-                                                           false);
-    m_process.Trident = m_reader->GetBoolean("Process", "Trident", false);
-    m_process.LinearCompton = m_reader->GetBoolean("Process", "LinearCompton", false);
-    m_process.LinearBreitWheeler = m_reader->GetBoolean("Process", "LinearBreitWheeler", false);
+    if (std::find(m_sections.begin(), m_sections.end(), "Process") != m_sections.end())
+    {
+        m_process.NonLinearCompton = m_reader->GetBoolean("Process", "NonLinearCompton", false);
+        m_process.NonLinearBreitWheeler = m_reader->GetBoolean("Process", "NonLinearBreitWheeler",
+                                                               false);
+    }
 
     if (m_checkOutput == true)
     {
         m_checkFile << "Processes turned on \n";
         m_checkFile << "NonLinearCompton      = " << m_process.NonLinearCompton << "\n";
         m_checkFile << "NonLinearBreitWheeler = " << m_process.NonLinearBreitWheeler << "\n";
-        m_checkFile << "Trident               = " << m_process.Trident << "\n";
-        m_checkFile << "LinearCompton         = " << m_process.LinearCompton << "\n";
-        m_checkFile << "LinearBreitWheeler    = " << m_process.LinearBreitWheeler << "\n";
         m_checkFile << "\n\n";
+    }
+}
+
+void FileParser::ReadImportance()
+{
+    m_importance.NLC_Importance = false;
+    m_importance.NBW_Importance = false;
+    if (std::find(m_sections.begin(), m_sections.end(), "Importance") != m_sections.end())
+    {
+        m_importance.NLC_Samples = m_reader->GetInteger("Importance", "NLC_Samples", 0);
+        m_importance.NBW_Samples = m_reader->GetInteger("Importance", "NBW_Samples", 0);
+
+        double weight, group;
+        unsigned int i(1);
+        while(true)
+        {
+            std::string weightField = "NLC_weight_" + std::to_string(i);
+            weight = m_reader->GetReal("Importance", weightField, -1);
+            if (weight >= 0)
+            {
+                m_importance.NLC_Weights.push_back(weight);
+                i++;
+            } else 
+            {
+                break;
+            }
+        }
+        i = 1;
+        while(true)
+        {
+            std::string groupField = "NLC_group_" + std::to_string(i);
+            group = m_reader->GetReal("Importance", groupField, -1);
+            if (group >= 0)
+            {
+                m_importance.NLC_Groups.push_back(group / m_units->RefEnergy());
+                i++;
+            } else 
+            {
+                break;
+            } 
+        }
+        i = 1;
+        while(true)
+        {
+            std::string weightField = "NBW_weight_" + std::to_string(i);
+            weight = m_reader->GetReal("Importance", weightField, -1);
+            if (weight >= 0)
+            {
+                m_importance.NBW_Weights.push_back(weight);
+                i++;
+            } else 
+            {
+                break;
+            } 
+        }
+        i = 1;
+        while(true)
+        {
+            std::string groupField = "NBW_group_" + std::to_string(i);
+            group = m_reader->GetReal("Importance", groupField, -1);
+            if (group >= 0)
+            {
+                m_importance.NBW_Groups.push_back(group / m_units->RefEnergy());
+                i++;
+            } else 
+            {
+                break;
+            } 
+        }
+
+        // Chech that weights and groups are same size
+        if (m_importance.NBW_Groups.size() != m_importance.NBW_Weights.size()
+            || m_importance.NLC_Groups.size() != m_importance.NLC_Weights.size())
+        {
+            std::cout << m_importance.NLC_Groups.size()  << " " << m_importance.NLC_Weights.size() << std::endl;
+            std::cerr << "Error: Importance sampling array length missmatch" << std::endl;
+            std::exit(-1);
+        }
+
+        // If so set bool for importance sampling to on
+        if (m_importance.NLC_Groups.size() > 0) m_importance.NLC_Importance = true;
+        if (m_importance.NBW_Groups.size() > 0) m_importance.NBW_Importance = true;
+
+        // Check if we need to output
+        if (m_checkOutput == true)
+        {
+            m_checkFile << "NLC Samples " << m_importance.NLC_Samples << "\n";            
+            m_checkFile << "NLC Weights " << "\n";
+            for(std::vector<double>::iterator it = m_importance.NLC_Weights.begin();
+                it != m_importance.NLC_Weights.end(); ++it)
+            {
+                m_checkFile << *it << "\n";
+            }
+            m_checkFile << "NLC Groups" << "\n";
+            for(std::vector<double>::iterator it = m_importance.NLC_Groups.begin();
+                it != m_importance.NLC_Groups.end(); ++it)
+            {
+                m_checkFile << *it << "\n";
+            }
+            m_checkFile << "NBW Samples " << m_importance.NBW_Samples << "\n";
+            m_checkFile << "NBW Weights" << "\n";
+            for(std::vector<double>::iterator it = m_importance.NBW_Weights.begin();
+                it != m_importance.NBW_Weights.end(); ++it)
+            {
+                m_checkFile << *it << "\n";
+            }
+            m_checkFile << "NBW Groups" << "\n";
+            for(std::vector<double>::iterator it = m_importance.NBW_Groups.begin();
+                it != m_importance.NBW_Groups.end(); ++it)
+            {
+                m_checkFile << *it << "\n";
+            }
+        }
     }
 }
 
