@@ -14,6 +14,7 @@ struct GeneralParameters
     std::string pusher;     // Particle pusher used 
     std::string fileName;   // Output file name
     bool tracking;          // Turns on particle tracking
+    bool importance;          // Turns on particle tracking
     double minEnergy;       // Min energy of tracked particle
 };
 
@@ -54,18 +55,6 @@ struct ProcessParameters
     bool NonLinearBreitWheeler; // Turn on non-linear Breit-Wheeler
 };
 
-struct ImportancParameters
-{
-    bool NLC_Importance;
-    bool NBW_Importance;
-    unsigned int NLC_Samples;
-    unsigned int NBW_Samples;
-    std::vector<double> NLC_Weights; // Weights for non-linear comnpton
-    std::vector<double> NLC_Groups;  // Groups for non-linear comnpton
-    std::vector<double> NBW_Weights; // Weights for non-linear Breit-Wheeler
-    std::vector<double> NBW_Groups;  // Groups for non-linear Breit-Wheeler
-};
-
 struct HistogramParameters
 {
     std::string Name;       // names of the histograms
@@ -90,8 +79,6 @@ public:
 
     ProcessParameters GetProcess() const {return m_process;}
 
-    ImportancParameters GetImportance() const {return m_importance;}
-
     std::vector<ParticleParameters> GetParticle() const {return m_particles;}
 
     std::vector<HistogramParameters> GetHistograms() const {return m_histograms;}
@@ -108,8 +95,6 @@ private:
 
     void ReadProcess();
 
-    void ReadImportance();
-
     void ReadParticles();
 
     void ReadHistograms();
@@ -119,7 +104,6 @@ private:
     GeneralParameters m_general;
     FieldParameters m_field;
     ProcessParameters m_process;
-    ImportancParameters m_importance;
     std::vector<ParticleParameters> m_particles;
     std::vector<HistogramParameters> m_histograms;
 

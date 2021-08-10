@@ -1,14 +1,14 @@
 #include "Photon.hh"
 
-Photon::Photon(const ThreeVector &position, const ThreeVector &momentum,
-			   double time, bool tracking):
-Particle(0.0, 0.0, position, momentum, time, tracking)
+Photon::Photon(const ThreeVector &position, const ThreeVector &momentum, 
+    double weight, double time, bool tracking):
+Particle(0.0, 0.0, position, momentum, weight, time, tracking)
 {
 }
 
-Photon::Photon(double energy, const ThreeVector &position, const ThreeVector &direction,
-			   double time, bool tracking):
-Particle(0.0, 0.0, position, energy * direction.Norm(), time, tracking)
+Photon::Photon(double energy, const ThreeVector &position,
+    const ThreeVector &direction, double weight, double time, bool tracking):
+Particle(0.0, 0.0, position, energy * direction.Norm(), weight, time, tracking)
 {
 }
 

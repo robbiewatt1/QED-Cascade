@@ -62,17 +62,17 @@ ParticleList* SourceGenerator::GenerateList()
     if (m_type == "Photon" || m_type == "photon")
     {
         Photon* part = new Photon(m_energy[m_partCount], partPosition,
-            partDirection, 0, m_track);
+            partDirection, 1, 0, m_track);
         list->AddParticle(part);
     } else if (m_type == "Electron" || m_type == "electron")
     {
         Lepton* part = new Lepton(1.0, -1.0, m_energy[m_partCount],
-            partPosition, partDirection, 0, m_track);
+            partPosition, partDirection, 1, 0, m_track);
         list->AddParticle(part);
     } else if (m_type == "Positron" || m_type == "positron")
     {
         Lepton* part = new Lepton(1.0, 1.0, m_energy[m_partCount],
-            partPosition, partDirection, 0, m_track);
+            partPosition, partDirection, 1, 0, m_track);
         list->AddParticle(part);
     } else
     {

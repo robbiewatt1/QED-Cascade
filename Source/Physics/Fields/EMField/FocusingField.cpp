@@ -35,7 +35,7 @@ void FocusingField::GetField(double time, const ThreeVector &position,
     double curvature = position_p[2] + m_rayleigh * m_rayleigh
         / (position_p[2] + 1e-99);
     double phi_G = std::atan(ze);
-    double phi = m_waveNum * (time - position_p[2] - r2 / (2.0 * curvature));
+    double phi = m_waveNum * (time - position_p[2] - r2 / (2.0 * curvature)) + 1.5;
     double w = m_waist * std::sqrt(1 + ze * ze);
     double E_0 = m_maxE * std::exp(- r2 / (w * w) - (time - m_t0 - position_p[2])
             * (time - m_t0 - position_p[2]) / (m_tau * m_tau));

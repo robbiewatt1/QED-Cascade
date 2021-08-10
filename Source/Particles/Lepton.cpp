@@ -1,8 +1,8 @@
 #include "Lepton.hh"
 
 Lepton::Lepton(double mass, double charge, const ThreeVector &position, 
-			   const ThreeVector &momentum, double time, bool tracking):
-Particle(mass, charge, position, momentum, time, tracking)
+	const ThreeVector &momentum, double weight, double time, bool tracking):
+Particle(mass, charge, position, momentum, weight, time, tracking)
 {
 	if (charge == -1)
 	{
@@ -13,9 +13,11 @@ Particle(mass, charge, position, momentum, time, tracking)
 	}
 }
 
-Lepton::Lepton(double mass, double charge, double energy, const ThreeVector &position,
-			   const ThreeVector &direction, double time, bool tracking):
-Particle(mass, charge, position, energy * direction.Norm(), time, tracking)
+Lepton::Lepton(double mass, double charge, double energy,
+	const ThreeVector &position, const ThreeVector &direction, double weight, 
+	double time, bool tracking):
+Particle(mass, charge, position, energy * direction.Norm(), weight, time, 
+	tracking)
 {
 	if (charge == -1)
 	{

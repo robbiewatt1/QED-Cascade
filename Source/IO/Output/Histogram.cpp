@@ -51,7 +51,7 @@ void Histogram::AppParticle(Particle* part)
 			if (energy > m_binCentres[0] && energy < m_binCentres[m_nBins-1])
 			{
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, energy);
-				m_binValues[index]++;
+				m_binValues[index] += part->GetWeight();
 			}
 		} else if (m_type == "X" || "x")
 		{
@@ -60,7 +60,7 @@ void Histogram::AppParticle(Particle* part)
 			if (xPos > m_binCentres[0] && xPos < m_binCentres[m_nBins-1])
 			{
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, xPos);
-				m_binValues[index]++;
+				m_binValues[index] += part->GetWeight();
 			}
 		} else if (m_type == "Y" || "y")
 		{
@@ -69,7 +69,7 @@ void Histogram::AppParticle(Particle* part)
 			if (yPos > m_binCentres[0] && yPos < m_binCentres[m_nBins-1])
 			{
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, yPos);
-				m_binValues[index]++;
+				m_binValues[index] += part->GetWeight();
 			}
 		} else if (m_type == "Z" || "z")
 		{
@@ -78,7 +78,7 @@ void Histogram::AppParticle(Particle* part)
 			if (zPos > m_binCentres[0] && zPos < m_binCentres[m_nBins-1])
 			{
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);
-				m_binValues[index]++;
+				m_binValues[index] += part->GetWeight();
 			}
 		} else if (m_type == "PX" || "px")
 		{
@@ -87,7 +87,7 @@ void Histogram::AppParticle(Particle* part)
 			if (xPos > m_binCentres[0] && xPos < m_binCentres[m_nBins-1])
 			{
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, xPos);
-				m_binValues[index]++;
+				m_binValues[index] += part->GetWeight();
 			}
 		} else if (m_type == "PY" || "py")
 		{
@@ -96,7 +96,7 @@ void Histogram::AppParticle(Particle* part)
 			if (yPos > m_binCentres[0] && yPos < m_binCentres[m_nBins-1])
 			{
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, yPos);
-				m_binValues[index]++;
+				m_binValues[index] += part->GetWeight();
 			}
 		} else if (m_type == "PZ" || "pz")
 		{
@@ -105,7 +105,7 @@ void Histogram::AppParticle(Particle* part)
 			if (zPos > m_binCentres[0] && zPos < m_binCentres[m_nBins-1])
 			{
 				unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);
-				m_binValues[index]++;
+				m_binValues[index] += part->GetWeight();
 			}		
 		} else
 		{
@@ -132,7 +132,7 @@ void Histogram::Fill(ParticleList* partList)
 				if (energy > m_binCentres[0] && energy < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, energy);
-					m_binValues[index]++;
+					m_binValues[index] += partList->GetParticle(i)->GetWeight();
 				}
 			}
 			
@@ -145,7 +145,7 @@ void Histogram::Fill(ParticleList* partList)
 				if (xPos > m_binCentres[0] && xPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, xPos);
-					m_binValues[index]++;
+					m_binValues[index] += partList->GetParticle(i)->GetWeight();
 				}
 			}
 		} else if (m_type == "Y" || "y")
@@ -157,7 +157,7 @@ void Histogram::Fill(ParticleList* partList)
 				if (yPos > m_binCentres[0] && yPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, yPos);
-					m_binValues[index]++;
+					m_binValues[index] += partList->GetParticle(i)->GetWeight();
 				}
 			}
 		} else if (m_type == "Z" || "z")
@@ -169,7 +169,7 @@ void Histogram::Fill(ParticleList* partList)
 				if (zPos > m_binCentres[0] && zPos < m_binCentres[m_nBins-1])
 				{
 					unsigned int index = Numerics::ArrayIndex(m_binCentres, m_nBins, zPos);
-					m_binValues[index]++;
+					m_binValues[index] += partList->GetParticle(i)->GetWeight();
 				}
 			}
 		} else

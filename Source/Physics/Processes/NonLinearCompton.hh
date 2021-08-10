@@ -10,8 +10,8 @@
 class NonLinearCompton: public Process
 {
 public:
-    NonLinearCompton(EMField* field, double dt, bool track = false,
-        double eMin = 0);
+    NonLinearCompton(EMField* field, double dt, double eMin = 0,
+        bool importance = false, bool track = false);
     
    virtual ~NonLinearCompton();
 
@@ -26,7 +26,11 @@ private:
 
     double CalculateH(double eta) const;
 
-    double CalculateChi(double eta) const;  // Very bad method at the moment
+    double CalculateChi(double eta) const;
+
+    double CalculateChiMin(Particle* part, double energyMin) const;
+
+    double CalculateRate(double eta, double chi) const;
 
     void LoadTables();
 
@@ -47,5 +51,11 @@ private:
     double* m_phEn_chiMinAxis;  
     double* m_phEn_etaAxis;
     unsigned int m_phEn_etaLength, m_phEn_chiLength;
+
+    unsigned int m_rate_size_x, m_rate_size_y;
+    double** m_log_rate;
+    double** m_log_chi_rate;
+    double* m_log_eta_rate;  
+    double m_chi_min_rate;
 };
 #endif

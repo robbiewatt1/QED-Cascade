@@ -16,8 +16,10 @@ double SimpsonsRule(const std::vector<double> &axis, const std::vector<double> &
 double Interpolate1D(double* samplePoints, double* sampleData, unsigned int sampleSize, 
 					 double queryPoint);
 
-int ArrayIndex(double* samplePoints, unsigned int sampleSize, double queryPoint);
+double interpolate2D(double* sampleX, double* sampleY, double** sampleZ,
+    unsigned int sampleSize[2], double queryPoint[2]);
 
+int ArrayIndex(double* samplePoints, unsigned int sampleSize, double queryPoint);
 
 void ClosestPoints(double* samplePoints, unsigned int sampleSize,
     double queryPoint, int& index, double& frac);

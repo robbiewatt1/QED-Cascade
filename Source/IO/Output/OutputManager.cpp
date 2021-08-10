@@ -222,15 +222,16 @@ void OutputManager::StoreSource(ParticleList* partList, unsigned int eventID, bo
 {
     if (primary == true)
     {
-        double* dataBuff = new double[8];
+        double* dataBuff = new double[9];
         dataBuff[0] = eventID;
         dataBuff[1] = partList->GetParticle(0)->GetEnergy(),
-        dataBuff[2] = partList->GetParticle(0)->GetMomentum()[0],
-        dataBuff[3] = partList->GetParticle(0)->GetMomentum()[1],
-        dataBuff[4] = partList->GetParticle(0)->GetMomentum()[2],
-        dataBuff[5] = partList->GetParticle(0)->GetPosition()[0],
-        dataBuff[6] = partList->GetParticle(0)->GetPosition()[1],
+        dataBuff[2] = partList->GetParticle(0)->GetMomentum()[0];
+        dataBuff[3] = partList->GetParticle(0)->GetMomentum()[1];
+        dataBuff[4] = partList->GetParticle(0)->GetMomentum()[2];
+        dataBuff[5] = partList->GetParticle(0)->GetPosition()[0];
+        dataBuff[6] = partList->GetParticle(0)->GetPosition()[1];
         dataBuff[7] = partList->GetParticle(0)->GetPosition()[2];
+        dataBuff[8] = partList->GetParticle(0)->GetWeight();
         m_primaryEvent[eventID] = dataBuff;
     } else
     {
@@ -243,9 +244,9 @@ void OutputManager::StoreSource(ParticleList* partList, unsigned int eventID, bo
             if (partList->GetParticle(i)->GetName() == "Positron") m_positronCount[eventID]++;
             if (partList->GetParticle(i)->GetName() == "Photon") m_photonCount[eventID]++;
         }
-        double* electronData = new double [m_electronCount[eventID]*8];
-        double* positronData = new double [m_positronCount[eventID]*8];
-        double* photonData   = new double [m_photonCount[eventID]*8];
+        double* electronData = new double [m_electronCount[eventID]*9];
+        double* positronData = new double [m_positronCount[eventID]*9];
+        double* photonData   = new double [m_photonCount[eventID]*9];
         m_electronCount[eventID] = 0;
         m_positronCount[eventID] = 0;
         m_photonCount[eventID] = 0;
@@ -253,57 +254,63 @@ void OutputManager::StoreSource(ParticleList* partList, unsigned int eventID, bo
         {
             if (partList->GetParticle(i)->GetName() == "Electron")
             {
-                electronData[m_electronCount[eventID]*8]   = eventID;
-                electronData[m_electronCount[eventID]*8+1] = partList->GetParticle(i)
+                electronData[m_electronCount[eventID]*9]   = eventID;
+                electronData[m_electronCount[eventID]*9+1] = partList->GetParticle(i)
                         ->GetEnergy();
-                electronData[m_electronCount[eventID]*8+2] = partList->GetParticle(i)
+                electronData[m_electronCount[eventID]*9+2] = partList->GetParticle(i)
                         ->GetMomentum()[0];
-                electronData[m_electronCount[eventID]*8+3] = partList->GetParticle(i)
+                electronData[m_electronCount[eventID]*9+3] = partList->GetParticle(i)
                         ->GetMomentum()[1];
-                electronData[m_electronCount[eventID]*8+4] = partList->GetParticle(i)
+                electronData[m_electronCount[eventID]*9+4] = partList->GetParticle(i)
                         ->GetMomentum()[2];
-                electronData[m_electronCount[eventID]*8+5] = partList->GetParticle(i)
+                electronData[m_electronCount[eventID]*9+5] = partList->GetParticle(i)
                         ->GetPosition()[0];
-                electronData[m_electronCount[eventID]*8+6] = partList->GetParticle(i)
+                electronData[m_electronCount[eventID]*9+6] = partList->GetParticle(i)
                         ->GetPosition()[1];
-                electronData[m_electronCount[eventID]*8+7] = partList->GetParticle(i)
+                electronData[m_electronCount[eventID]*9+7] = partList->GetParticle(i)
                         ->GetPosition()[2];
+                electronData[m_electronCount[eventID]*9+8]   = partList->GetParticle(i)
+                        ->GetWeight();
                 m_electronCount[eventID]++;
             } else if (partList->GetParticle(i)->GetName() == "Positron")
             {
-                positronData[m_positronCount[eventID]*8]   = eventID;
-                positronData[m_positronCount[eventID]*8+1] = partList->GetParticle(i)
+                positronData[m_positronCount[eventID]*9]   = eventID;
+                positronData[m_positronCount[eventID]*9+1] = partList->GetParticle(i)
                         ->GetEnergy();
-                positronData[m_positronCount[eventID]*8+2] = partList->GetParticle(i)
+                positronData[m_positronCount[eventID]*9+2] = partList->GetParticle(i)
                         ->GetMomentum()[0];
-                positronData[m_positronCount[eventID]*8+3] = partList->GetParticle(i)
+                positronData[m_positronCount[eventID]*9+3] = partList->GetParticle(i)
                         ->GetMomentum()[1];
-                positronData[m_positronCount[eventID]*8+4] = partList->GetParticle(i)
+                positronData[m_positronCount[eventID]*9+4] = partList->GetParticle(i)
                         ->GetMomentum()[2];
-                positronData[m_positronCount[eventID]*8+5] = partList->GetParticle(i)
+                positronData[m_positronCount[eventID]*9+5] = partList->GetParticle(i)
                         ->GetPosition()[0];
-                positronData[m_positronCount[eventID]*8+6] = partList->GetParticle(i)
+                positronData[m_positronCount[eventID]*9+6] = partList->GetParticle(i)
                         ->GetPosition()[1];
-                positronData[m_positronCount[eventID]*8+7] = partList->GetParticle(i)
+                positronData[m_positronCount[eventID]*9+7] = partList->GetParticle(i)
                         ->GetPosition()[2];
+                positronData[m_positronCount[eventID]*9+8] = partList->GetParticle(i)
+                        ->GetWeight();
                 m_positronCount[eventID]++;
             }  else if (partList->GetParticle(i)->GetName() == "Photon")
             {
-                photonData[m_photonCount[eventID]*8]   = eventID;
-                photonData[m_photonCount[eventID]*8+1] = partList->GetParticle(i)
+                photonData[m_photonCount[eventID]*9]   = eventID;
+                photonData[m_photonCount[eventID]*9+1] = partList->GetParticle(i)
                         ->GetEnergy();
-                photonData[m_photonCount[eventID]*8+2] = partList->GetParticle(i)
+                photonData[m_photonCount[eventID]*9+2] = partList->GetParticle(i)
                         ->GetMomentum()[0];
-                photonData[m_photonCount[eventID]*8+3] = partList->GetParticle(i)
+                photonData[m_photonCount[eventID]*9+3] = partList->GetParticle(i)
                         ->GetMomentum()[1];
-                photonData[m_photonCount[eventID]*8+4] = partList->GetParticle(i)
+                photonData[m_photonCount[eventID]*9+4] = partList->GetParticle(i)
                         ->GetMomentum()[2];
-                photonData[m_photonCount[eventID]*8+5] = partList->GetParticle(i)
+                photonData[m_photonCount[eventID]*9+5] = partList->GetParticle(i)
                         ->GetPosition()[0];
-                photonData[m_photonCount[eventID]*8+6] = partList->GetParticle(i)
+                photonData[m_photonCount[eventID]*9+6] = partList->GetParticle(i)
                         ->GetPosition()[1];
-                photonData[m_photonCount[eventID]*8+7] = partList->GetParticle(i)
+                photonData[m_photonCount[eventID]*9+7] = partList->GetParticle(i)
                         ->GetPosition()[2];
+                photonData[m_photonCount[eventID]*9+8] = partList->GetParticle(i)
+                        ->GetWeight();
                 m_photonCount[eventID]++;
             }
         }
@@ -335,19 +342,20 @@ void OutputManager::OutputEvents(bool outSource, bool outTrack)
             m_outputFile->AddGroup("Particles/ParticleSource");
             m_particleSourceBool = true;
         }
-        double* primeBuff = new double [m_primaryEvent.size()*8];
+        double* primeBuff = new double [m_primaryEvent.size()*9];
         for (unsigned int i = 0; i < m_primaryEvent.size(); i++)
         {
-            primeBuff[i*8]   = m_primaryEvent[i][0];
-            primeBuff[i*8+1] = m_primaryEvent[i][1];
-            primeBuff[i*8+2] = m_primaryEvent[i][2];
-            primeBuff[i*8+3] = m_primaryEvent[i][3];
-            primeBuff[i*8+4] = m_primaryEvent[i][4];
-            primeBuff[i*8+5] = m_primaryEvent[i][5];
-            primeBuff[i*8+6] = m_primaryEvent[i][6];
-            primeBuff[i*8+7] = m_primaryEvent[i][7];
+            primeBuff[i*9]   = m_primaryEvent[i][0];
+            primeBuff[i*9+1] = m_primaryEvent[i][1];
+            primeBuff[i*9+2] = m_primaryEvent[i][2];
+            primeBuff[i*9+3] = m_primaryEvent[i][3];
+            primeBuff[i*9+4] = m_primaryEvent[i][4];
+            primeBuff[i*9+5] = m_primaryEvent[i][5];
+            primeBuff[i*9+6] = m_primaryEvent[i][6];
+            primeBuff[i*9+7] = m_primaryEvent[i][7];
+            primeBuff[i*9+8] = m_primaryEvent[i][8];
         }
-        m_outputFile->AddArray2D(primeBuff, m_primaryEvent.size(), 8,
+        m_outputFile->AddArray2D(primeBuff, m_primaryEvent.size(), 9,
                 "Particles/ParticleSource/Primary");
 
         unsigned int totalElectrons = 0;
@@ -361,9 +369,9 @@ void OutputManager::OutputEvents(bool outSource, bool outTrack)
             totalPhotons   += m_photonCount[i];
         }
 
-        double* electronBuff = new double [totalElectrons*8];
-        double* positronBuff = new double [totalPositrons*8];
-        double* photonBuff   = new double [totalPhotons*8];
+        double* electronBuff = new double [totalElectrons*9];
+        double* positronBuff = new double [totalPositrons*9];
+        double* photonBuff   = new double [totalPhotons*9];
         unsigned int electronIndex = 0;
         unsigned int psoitronIndex = 0;
         unsigned int photonIndex = 0;
@@ -372,54 +380,57 @@ void OutputManager::OutputEvents(bool outSource, bool outTrack)
         {
             for (unsigned int j = 0; j < m_electronCount[i]; j++)
             {
-                electronBuff[electronIndex]   = m_electronEvent[i][j*8];
-                electronBuff[electronIndex+1] = m_electronEvent[i][j*8+1];
-                electronBuff[electronIndex+2] = m_electronEvent[i][j*8+2];
-                electronBuff[electronIndex+3] = m_electronEvent[i][j*8+3];
-                electronBuff[electronIndex+4] = m_electronEvent[i][j*8+4];
-                electronBuff[electronIndex+5] = m_electronEvent[i][j*8+5];
-                electronBuff[electronIndex+6] = m_electronEvent[i][j*8+6];
-                electronBuff[electronIndex+7] = m_electronEvent[i][j*8+7];
-                electronIndex += 8;
+                electronBuff[electronIndex]   = m_electronEvent[i][j*9];
+                electronBuff[electronIndex+1] = m_electronEvent[i][j*9+1];
+                electronBuff[electronIndex+2] = m_electronEvent[i][j*9+2];
+                electronBuff[electronIndex+3] = m_electronEvent[i][j*9+3];
+                electronBuff[electronIndex+4] = m_electronEvent[i][j*9+4];
+                electronBuff[electronIndex+5] = m_electronEvent[i][j*9+5];
+                electronBuff[electronIndex+6] = m_electronEvent[i][j*9+6];
+                electronBuff[electronIndex+7] = m_electronEvent[i][j*9+7];
+                electronBuff[electronIndex+8] = m_electronEvent[i][j*9+8];
+                electronIndex += 9;
             }
             for (unsigned int j = 0; j < m_positronCount[i]; j++)
             {
-                positronBuff[psoitronIndex]   = m_positronEvent[i][j*8];
-                positronBuff[psoitronIndex+1] = m_positronEvent[i][j*8+1];
-                positronBuff[psoitronIndex+2] = m_positronEvent[i][j*8+2];
-                positronBuff[psoitronIndex+3] = m_positronEvent[i][j*8+3];
-                positronBuff[psoitronIndex+4] = m_positronEvent[i][j*8+4];
-                positronBuff[psoitronIndex+5] = m_positronEvent[i][j*8+5];
-                positronBuff[psoitronIndex+6] = m_positronEvent[i][j*8+6];
-                positronBuff[psoitronIndex+7] = m_positronEvent[i][j*8+7];
-                psoitronIndex += 8;
+                positronBuff[psoitronIndex]   = m_positronEvent[i][j*9];
+                positronBuff[psoitronIndex+1] = m_positronEvent[i][j*9+1];
+                positronBuff[psoitronIndex+2] = m_positronEvent[i][j*9+2];
+                positronBuff[psoitronIndex+3] = m_positronEvent[i][j*9+3];
+                positronBuff[psoitronIndex+4] = m_positronEvent[i][j*9+4];
+                positronBuff[psoitronIndex+5] = m_positronEvent[i][j*9+5];
+                positronBuff[psoitronIndex+6] = m_positronEvent[i][j*9+6];
+                positronBuff[psoitronIndex+7] = m_positronEvent[i][j*9+7];
+                positronBuff[psoitronIndex+8] = m_positronEvent[i][j*9+8];
+                psoitronIndex += 9;
             }
             for (unsigned int j = 0; j < m_photonCount[i]; j++)
             {
-                photonBuff[photonIndex]   = m_photonEvent[i][j*8];
-                photonBuff[photonIndex+1] = m_photonEvent[i][j*8+1];
-                photonBuff[photonIndex+2] = m_photonEvent[i][j*8+2];
-                photonBuff[photonIndex+3] = m_photonEvent[i][j*8+3];
-                photonBuff[photonIndex+4] = m_photonEvent[i][j*8+4];
-                photonBuff[photonIndex+5] = m_photonEvent[i][j*8+5];
-                photonBuff[photonIndex+6] = m_photonEvent[i][j*8+6];
-                photonBuff[photonIndex+7] = m_photonEvent[i][j*8+7];
-                photonIndex += 8;
+                photonBuff[photonIndex]   = m_photonEvent[i][j*9];
+                photonBuff[photonIndex+1] = m_photonEvent[i][j*9+1];
+                photonBuff[photonIndex+2] = m_photonEvent[i][j*9+2];
+                photonBuff[photonIndex+3] = m_photonEvent[i][j*9+3];
+                photonBuff[photonIndex+4] = m_photonEvent[i][j*9+4];
+                photonBuff[photonIndex+5] = m_photonEvent[i][j*9+5];
+                photonBuff[photonIndex+6] = m_photonEvent[i][j*9+6];
+                photonBuff[photonIndex+7] = m_photonEvent[i][j*9+7];
+                photonBuff[photonIndex+8] = m_photonEvent[i][j*9+8];
+                photonIndex += 9;
             }               
         }
         if (totalElectrons > 0)
         {
-            m_outputFile->AddArray2D(electronBuff, totalElectrons, 8,
+            m_outputFile->AddArray2D(electronBuff, totalElectrons, 9,
                     "Particles/ParticleSource/Electrons");
         }
         if (totalPositrons > 0)
         {
-            m_outputFile->AddArray2D(positronBuff, totalPositrons, 8,
+            m_outputFile->AddArray2D(positronBuff, totalPositrons, 9,
                     "Particles/ParticleSource/Positrons");
         }
         if (totalPhotons > 0)
         {
-            m_outputFile->AddArray2D(photonBuff, totalPhotons, 8,
+            m_outputFile->AddArray2D(photonBuff, totalPhotons, 9,
                     "Particles/ParticleSource/Photons");
         }
         delete [] primeBuff;
@@ -570,7 +581,7 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
 
             // First start with primary sources
             int arraysize[nProc];
-            int totalSize = m_primaryEvent.size() * 8;
+            int totalSize = m_primaryEvent.size() * 9;
             // We need to know the size of the arrays that we are recieving
             for (int i = 1; i < nProc; ++i)
             {
@@ -585,17 +596,18 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
             // Fill the prime buff with own data
             for (long unsigned int i = 0; i < m_primaryEvent.size(); i++)
             {
-                primeBuff[i*8]   = m_primaryEvent[i][0];
-                primeBuff[i*8+1] = m_primaryEvent[i][1];
-                primeBuff[i*8+2] = m_primaryEvent[i][2];
-                primeBuff[i*8+3] = m_primaryEvent[i][3];
-                primeBuff[i*8+4] = m_primaryEvent[i][4];
-                primeBuff[i*8+5] = m_primaryEvent[i][5];
-                primeBuff[i*8+6] = m_primaryEvent[i][6];
-                primeBuff[i*8+7] = m_primaryEvent[i][7];
+                primeBuff[i*9]   = m_primaryEvent[i][0];
+                primeBuff[i*9+1] = m_primaryEvent[i][1];
+                primeBuff[i*9+2] = m_primaryEvent[i][2];
+                primeBuff[i*9+3] = m_primaryEvent[i][3];
+                primeBuff[i*9+4] = m_primaryEvent[i][4];
+                primeBuff[i*9+5] = m_primaryEvent[i][5];
+                primeBuff[i*9+6] = m_primaryEvent[i][6];
+                primeBuff[i*9+7] = m_primaryEvent[i][7];
+                primeBuff[i*9+8] = m_primaryEvent[i][8];
             }
 
-            int primeBuffIndex = m_primaryEvent.size() * 8;
+            int primeBuffIndex = m_primaryEvent.size() * 9;
             // Now fill with other
             for (int i = 1; i < nProc; ++i)
             {
@@ -603,21 +615,22 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
                 MPI_Status status;
                 MPI_Recv(procBuff, arraysize[i], MPI_DOUBLE, i,
                     primaryTag, MPI_COMM_WORLD, &status);
-                for (int j = 0; j < arraysize[i] / 8; j++)
+                for (int j = 0; j < arraysize[i] / 9; j++)
                 {
-                    primeBuff[primeBuffIndex]   = procBuff[j*8];
-                    primeBuff[primeBuffIndex+1] = procBuff[j*8+1];
-                    primeBuff[primeBuffIndex+2] = procBuff[j*8+2];
-                    primeBuff[primeBuffIndex+3] = procBuff[j*8+3];
-                    primeBuff[primeBuffIndex+4] = procBuff[j*8+4];
-                    primeBuff[primeBuffIndex+5] = procBuff[j*8+5];
-                    primeBuff[primeBuffIndex+6] = procBuff[j*8+6];
-                    primeBuff[primeBuffIndex+7] = procBuff[j*8+7];
-                    primeBuffIndex +=8;
+                    primeBuff[primeBuffIndex]   = procBuff[j*9];
+                    primeBuff[primeBuffIndex+1] = procBuff[j*9+1];
+                    primeBuff[primeBuffIndex+2] = procBuff[j*9+2];
+                    primeBuff[primeBuffIndex+3] = procBuff[j*9+3];
+                    primeBuff[primeBuffIndex+4] = procBuff[j*9+4];
+                    primeBuff[primeBuffIndex+5] = procBuff[j*9+5];
+                    primeBuff[primeBuffIndex+6] = procBuff[j*9+6];
+                    primeBuff[primeBuffIndex+7] = procBuff[j*9+7];
+                    primeBuff[primeBuffIndex+8] = procBuff[j*9+8];
+                    primeBuffIndex +=9;
                 }
                 delete[] procBuff;
             }
-            m_outputFile->AddArray2D(primeBuff, totalSize / 8, 8,
+            m_outputFile->AddArray2D(primeBuff, totalSize / 9, 9,
                 "Particles/ParticleSource/Primary");
             delete[] primeBuff;
 
@@ -636,9 +649,9 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
             int electronArraysize[nProc];
             int positronArraysize[nProc];
             int photonArraysize[nProc];
-            int totalelectronSize = totalElectrons * 8;
-            int totalpositronSize = totalPositrons * 8;
-            int totalphotonSize = totalPhotons * 8;
+            int totalelectronSize = totalElectrons * 9;
+            int totalpositronSize = totalPositrons * 9;
+            int totalphotonSize = totalPhotons * 9;
             for (int i = 1; i < nProc; ++i)
             {
                 MPI_Status status;
@@ -665,39 +678,42 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
             {
                 for (unsigned int j = 0; j < m_electronCount[i]; j++)
                 {
-                    electronBuff[electronIndex]   = m_electronEvent[i][j*8];
-                    electronBuff[electronIndex+1] = m_electronEvent[i][j*8+1];
-                    electronBuff[electronIndex+2] = m_electronEvent[i][j*8+2];
-                    electronBuff[electronIndex+3] = m_electronEvent[i][j*8+3];
-                    electronBuff[electronIndex+4] = m_electronEvent[i][j*8+4];
-                    electronBuff[electronIndex+5] = m_electronEvent[i][j*8+5];
-                    electronBuff[electronIndex+6] = m_electronEvent[i][j*8+6];
-                    electronBuff[electronIndex+7] = m_electronEvent[i][j*8+7];
-                    electronIndex += 8;
+                    electronBuff[electronIndex]   = m_electronEvent[i][j*9];
+                    electronBuff[electronIndex+1] = m_electronEvent[i][j*9+1];
+                    electronBuff[electronIndex+2] = m_electronEvent[i][j*9+2];
+                    electronBuff[electronIndex+3] = m_electronEvent[i][j*9+3];
+                    electronBuff[electronIndex+4] = m_electronEvent[i][j*9+4];
+                    electronBuff[electronIndex+5] = m_electronEvent[i][j*9+5];
+                    electronBuff[electronIndex+6] = m_electronEvent[i][j*9+6];
+                    electronBuff[electronIndex+7] = m_electronEvent[i][j*9+7];
+                    electronBuff[electronIndex+8] = m_electronEvent[i][j*9+8];
+                    electronIndex += 9;
                 }
                 for (unsigned int j = 0; j < m_positronCount[i]; j++)
                 {
-                    positronBuff[positronIndex]   = m_positronEvent[i][j*8];
-                    positronBuff[positronIndex+1] = m_positronEvent[i][j*8+1];
-                    positronBuff[positronIndex+2] = m_positronEvent[i][j*8+2];
-                    positronBuff[positronIndex+3] = m_positronEvent[i][j*8+3];
-                    positronBuff[positronIndex+4] = m_positronEvent[i][j*8+4];
-                    positronBuff[positronIndex+5] = m_positronEvent[i][j*8+5];
-                    positronBuff[positronIndex+6] = m_positronEvent[i][j*8+6];
-                    positronBuff[positronIndex+7] = m_positronEvent[i][j*8+7];
-                    positronIndex += 8;
+                    positronBuff[positronIndex]   = m_positronEvent[i][j*9];
+                    positronBuff[positronIndex+1] = m_positronEvent[i][j*9+1];
+                    positronBuff[positronIndex+2] = m_positronEvent[i][j*9+2];
+                    positronBuff[positronIndex+3] = m_positronEvent[i][j*9+3];
+                    positronBuff[positronIndex+4] = m_positronEvent[i][j*9+4];
+                    positronBuff[positronIndex+5] = m_positronEvent[i][j*9+5];
+                    positronBuff[positronIndex+6] = m_positronEvent[i][j*9+6];
+                    positronBuff[positronIndex+7] = m_positronEvent[i][j*9+7];
+                    positronBuff[positronIndex+8] = m_positronEvent[i][j*9+8];
+                    positronIndex += 9;
                 }
                 for (unsigned int j = 0; j < m_photonCount[i]; j++)
                 {
-                    photonBuff[photonIndex]   = m_photonEvent[i][j*8];
-                    photonBuff[photonIndex+1] = m_photonEvent[i][j*8+1];
-                    photonBuff[photonIndex+2] = m_photonEvent[i][j*8+2];
-                    photonBuff[photonIndex+3] = m_photonEvent[i][j*8+3];
-                    photonBuff[photonIndex+4] = m_photonEvent[i][j*8+4];
-                    photonBuff[photonIndex+5] = m_photonEvent[i][j*8+5];
-                    photonBuff[photonIndex+6] = m_photonEvent[i][j*8+6];
-                    photonBuff[photonIndex+7] = m_photonEvent[i][j*8+7];
-                    photonIndex += 8;
+                    photonBuff[photonIndex]   = m_photonEvent[i][j*9];
+                    photonBuff[photonIndex+1] = m_photonEvent[i][j*9+1];
+                    photonBuff[photonIndex+2] = m_photonEvent[i][j*9+2];
+                    photonBuff[photonIndex+3] = m_photonEvent[i][j*9+3];
+                    photonBuff[photonIndex+4] = m_photonEvent[i][j*9+4];
+                    photonBuff[photonIndex+5] = m_photonEvent[i][j*9+5];
+                    photonBuff[photonIndex+6] = m_photonEvent[i][j*9+6];
+                    photonBuff[photonIndex+7] = m_photonEvent[i][j*9+7];
+                    photonBuff[photonIndex+8] = m_photonEvent[i][j*9+8];
+                    photonIndex += 9;
                 }
             }
             
@@ -708,17 +724,18 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
                 MPI_Status statusE;
                 MPI_Recv(procElectronBuff, electronArraysize[i], MPI_DOUBLE,
                     i, electronTag, MPI_COMM_WORLD, &statusE);
-                for (int j = 0; j < electronArraysize[i] / 8; j++)
+                for (int j = 0; j < electronArraysize[i] / 9; j++)
                 {
-                    electronBuff[electronIndex]   = procElectronBuff[j*8];
-                    electronBuff[electronIndex+1] = procElectronBuff[j*8+1];
-                    electronBuff[electronIndex+2] = procElectronBuff[j*8+2];
-                    electronBuff[electronIndex+3] = procElectronBuff[j*8+3];
-                    electronBuff[electronIndex+4] = procElectronBuff[j*8+4];
-                    electronBuff[electronIndex+5] = procElectronBuff[j*8+5];
-                    electronBuff[electronIndex+6] = procElectronBuff[j*8+6];
-                    electronBuff[electronIndex+7] = procElectronBuff[j*8+7];
-                    electronIndex +=8;
+                    electronBuff[electronIndex]   = procElectronBuff[j*9];
+                    electronBuff[electronIndex+1] = procElectronBuff[j*9+1];
+                    electronBuff[electronIndex+2] = procElectronBuff[j*9+2];
+                    electronBuff[electronIndex+3] = procElectronBuff[j*9+3];
+                    electronBuff[electronIndex+4] = procElectronBuff[j*9+4];
+                    electronBuff[electronIndex+5] = procElectronBuff[j*9+5];
+                    electronBuff[electronIndex+6] = procElectronBuff[j*9+6];
+                    electronBuff[electronIndex+7] = procElectronBuff[j*9+7];
+                    electronBuff[electronIndex+8] = procElectronBuff[j*9+8];
+                    electronIndex += 9;
                 }
                 delete[] procElectronBuff;
 
@@ -726,17 +743,18 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
                 MPI_Status statusP;
                 MPI_Recv(procPositronBuff, positronArraysize[i], MPI_DOUBLE, i,
                     positronTag, MPI_COMM_WORLD, &statusP);
-                for (int j = 0; j < positronArraysize[i] / 8; j++)
+                for (int j = 0; j < positronArraysize[i] / 9; j++)
                 {
-                    positronBuff[positronIndex]   = procPositronBuff[j*8];
-                    positronBuff[positronIndex+1] = procPositronBuff[j*8+1];
-                    positronBuff[positronIndex+2] = procPositronBuff[j*8+2];
-                    positronBuff[positronIndex+3] = procPositronBuff[j*8+3];
-                    positronBuff[positronIndex+4] = procPositronBuff[j*8+4];
-                    positronBuff[positronIndex+5] = procPositronBuff[j*8+5];
-                    positronBuff[positronIndex+6] = procPositronBuff[j*8+6];
-                    positronBuff[positronIndex+7] = procPositronBuff[j*8+7];
-                    positronIndex +=8;
+                    positronBuff[positronIndex]   = procPositronBuff[j*9];
+                    positronBuff[positronIndex+1] = procPositronBuff[j*9+1];
+                    positronBuff[positronIndex+2] = procPositronBuff[j*9+2];
+                    positronBuff[positronIndex+3] = procPositronBuff[j*9+3];
+                    positronBuff[positronIndex+4] = procPositronBuff[j*9+4];
+                    positronBuff[positronIndex+5] = procPositronBuff[j*9+5];
+                    positronBuff[positronIndex+6] = procPositronBuff[j*9+6];
+                    positronBuff[positronIndex+7] = procPositronBuff[j*9+7];
+                    positronBuff[positronIndex+8] = procPositronBuff[j*9+8];
+                    positronIndex += 9;
                 }
                 delete[] procPositronBuff;
 
@@ -744,33 +762,34 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
                 MPI_Status statusG;
                 MPI_Recv(procPhotonnBuff, photonArraysize[i], MPI_DOUBLE, i,
                     photonTag, MPI_COMM_WORLD, &statusG);
-                for (int j = 0; j < photonArraysize[i] / 8; j++)
+                for (int j = 0; j < photonArraysize[i] / 9; j++)
                 {
-                    photonBuff[photonIndex]   = procPhotonnBuff[j*8];
-                    photonBuff[photonIndex+1] = procPhotonnBuff[j*8+1];
-                    photonBuff[photonIndex+2] = procPhotonnBuff[j*8+2];
-                    photonBuff[photonIndex+3] = procPhotonnBuff[j*8+3];
-                    photonBuff[photonIndex+4] = procPhotonnBuff[j*8+4];
-                    photonBuff[photonIndex+5] = procPhotonnBuff[j*8+5];
-                    photonBuff[photonIndex+6] = procPhotonnBuff[j*8+6];
-                    photonBuff[photonIndex+7] = procPhotonnBuff[j*8+7];
-                    photonIndex +=8;
+                    photonBuff[photonIndex]   = procPhotonnBuff[j*9];
+                    photonBuff[photonIndex+1] = procPhotonnBuff[j*9+1];
+                    photonBuff[photonIndex+2] = procPhotonnBuff[j*9+2];
+                    photonBuff[photonIndex+3] = procPhotonnBuff[j*9+3];
+                    photonBuff[photonIndex+4] = procPhotonnBuff[j*9+4];
+                    photonBuff[photonIndex+5] = procPhotonnBuff[j*9+5];
+                    photonBuff[photonIndex+6] = procPhotonnBuff[j*9+6];
+                    photonBuff[photonIndex+7] = procPhotonnBuff[j*9+7];
+                    photonBuff[photonIndex+8] = procPhotonnBuff[j*9+8];
+                    photonIndex += 9;
                 }
                 delete[] procPhotonnBuff;
             }
             if (totalelectronSize > 0)
             {
-                m_outputFile->AddArray2D(electronBuff, totalelectronSize / 8, 8,
+                m_outputFile->AddArray2D(electronBuff, totalelectronSize / 9, 9,
                         "Particles/ParticleSource/Electrons");
             }
             if (totalpositronSize > 0)
             {
-                m_outputFile->AddArray2D(positronBuff, totalpositronSize / 8, 8,
+                m_outputFile->AddArray2D(positronBuff, totalpositronSize / 9, 9,
                         "Particles/ParticleSource/Positrons");
             }
             if (totalphotonSize > 0)
             {
-                m_outputFile->AddArray2D(photonBuff, totalphotonSize / 8, 8,
+                m_outputFile->AddArray2D(photonBuff, totalphotonSize / 9, 9,
                         "Particles/ParticleSource/Photons");
             }
             delete [] electronBuff;
@@ -787,20 +806,21 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
         {
             // We are slave
             // Start with the primary source
-            double* primeBuff = new double [m_primaryEvent.size()*8];
+            double* primeBuff = new double [m_primaryEvent.size()*9];
             for (unsigned int i = 0; i < m_primaryEvent.size(); i++)
             {
-                primeBuff[i*8]   = m_primaryEvent[i][0];
-                primeBuff[i*8+1] = m_primaryEvent[i][1];
-                primeBuff[i*8+2] = m_primaryEvent[i][2];
-                primeBuff[i*8+3] = m_primaryEvent[i][3];
-                primeBuff[i*8+4] = m_primaryEvent[i][4];
-                primeBuff[i*8+5] = m_primaryEvent[i][5];
-                primeBuff[i*8+6] = m_primaryEvent[i][6];
-                primeBuff[i*8+7] = m_primaryEvent[i][7];
+                primeBuff[i*9]   = m_primaryEvent[i][0];
+                primeBuff[i*9+1] = m_primaryEvent[i][1];
+                primeBuff[i*9+2] = m_primaryEvent[i][2];
+                primeBuff[i*9+3] = m_primaryEvent[i][3];
+                primeBuff[i*9+4] = m_primaryEvent[i][4];
+                primeBuff[i*9+5] = m_primaryEvent[i][5];
+                primeBuff[i*9+6] = m_primaryEvent[i][6];
+                primeBuff[i*9+7] = m_primaryEvent[i][7];
+                primeBuff[i*9+8] = m_primaryEvent[i][8];
             }
             // Sed over primary buff data
-            MPI_Send(primeBuff, m_primaryEvent.size() * 8, MPI_DOUBLE, 0,
+            MPI_Send(primeBuff, m_primaryEvent.size() * 9, MPI_DOUBLE, 0,
                 primaryTag, MPI_COMM_WORLD);
             delete[] primeBuff;
 
@@ -817,9 +837,9 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
                 totalPositrons += m_positronCount[i];
                 totalPhotons   += m_photonCount[i];
             }
-            double* electronBuff = new double[totalElectrons*8];
-            double* positronBuff = new double[totalPositrons*8];
-            double* photonBuff   = new double[totalPhotons*8];
+            double* electronBuff = new double[totalElectrons*9];
+            double* positronBuff = new double[totalPositrons*9];
+            double* photonBuff   = new double[totalPhotons*9];
 
             long unsigned int electronIndex = 0;
             long unsigned int psoitronIndex = 0;
@@ -829,45 +849,48 @@ void OutputManager::OutputEventsMPI(bool outSource, bool outTrack)
             {
                 for (unsigned int j = 0; j < m_electronCount[i]; j++)
                 {
-                    electronBuff[electronIndex]   = m_electronEvent[i][j*8];
-                    electronBuff[electronIndex+1] = m_electronEvent[i][j*8+1];
-                    electronBuff[electronIndex+2] = m_electronEvent[i][j*8+2];
-                    electronBuff[electronIndex+3] = m_electronEvent[i][j*8+3];
-                    electronBuff[electronIndex+4] = m_electronEvent[i][j*8+4];
-                    electronBuff[electronIndex+5] = m_electronEvent[i][j*8+5];
-                    electronBuff[electronIndex+6] = m_electronEvent[i][j*8+6];
-                    electronBuff[electronIndex+7] = m_electronEvent[i][j*8+7];
-                    electronIndex += 8;
+                    electronBuff[electronIndex]   = m_electronEvent[i][j*9];
+                    electronBuff[electronIndex+1] = m_electronEvent[i][j*9+1];
+                    electronBuff[electronIndex+2] = m_electronEvent[i][j*9+2];
+                    electronBuff[electronIndex+3] = m_electronEvent[i][j*9+3];
+                    electronBuff[electronIndex+4] = m_electronEvent[i][j*9+4];
+                    electronBuff[electronIndex+5] = m_electronEvent[i][j*9+5];
+                    electronBuff[electronIndex+6] = m_electronEvent[i][j*9+6];
+                    electronBuff[electronIndex+7] = m_electronEvent[i][j*9+7];
+                    electronBuff[electronIndex+8] = m_electronEvent[i][j*9+8];
+                    electronIndex += 9;
                 }
                 for (unsigned int j = 0; j < m_positronCount[i]; j++)
                 {
-                    positronBuff[psoitronIndex]   = m_positronEvent[i][j*8];
-                    positronBuff[psoitronIndex+1] = m_positronEvent[i][j*8+1];
-                    positronBuff[psoitronIndex+2] = m_positronEvent[i][j*8+2];
-                    positronBuff[psoitronIndex+3] = m_positronEvent[i][j*8+3];
-                    positronBuff[psoitronIndex+4] = m_positronEvent[i][j*8+4];
-                    positronBuff[psoitronIndex+5] = m_positronEvent[i][j*8+5];
-                    positronBuff[psoitronIndex+6] = m_positronEvent[i][j*8+6];
-                    positronBuff[psoitronIndex+7] = m_positronEvent[i][j*8+7];
-                    psoitronIndex += 8;
+                    positronBuff[psoitronIndex]   = m_positronEvent[i][j*9];
+                    positronBuff[psoitronIndex+1] = m_positronEvent[i][j*9+1];
+                    positronBuff[psoitronIndex+2] = m_positronEvent[i][j*9+2];
+                    positronBuff[psoitronIndex+3] = m_positronEvent[i][j*9+3];
+                    positronBuff[psoitronIndex+4] = m_positronEvent[i][j*9+4];
+                    positronBuff[psoitronIndex+5] = m_positronEvent[i][j*9+5];
+                    positronBuff[psoitronIndex+6] = m_positronEvent[i][j*9+6];
+                    positronBuff[psoitronIndex+7] = m_positronEvent[i][j*9+7];
+                    positronBuff[psoitronIndex+8] = m_positronEvent[i][j*9+8];
+                    psoitronIndex += 9;
                 }
                 for (unsigned int j = 0; j < m_photonCount[i]; j++)
                 {
-                    photonBuff[photonIndex]   = m_photonEvent[i][j*8];
-                    photonBuff[photonIndex+1] = m_photonEvent[i][j*8+1];
-                    photonBuff[photonIndex+2] = m_photonEvent[i][j*8+2];
-                    photonBuff[photonIndex+3] = m_photonEvent[i][j*8+3];
-                    photonBuff[photonIndex+4] = m_photonEvent[i][j*8+4];
-                    photonBuff[photonIndex+5] = m_photonEvent[i][j*8+5];
-                    photonBuff[photonIndex+6] = m_photonEvent[i][j*8+6];
-                    photonBuff[photonIndex+7] = m_photonEvent[i][j*8+7];
-                    photonIndex += 8;
+                    photonBuff[photonIndex]   = m_photonEvent[i][j*9];
+                    photonBuff[photonIndex+1] = m_photonEvent[i][j*9+1];
+                    photonBuff[photonIndex+2] = m_photonEvent[i][j*9+2];
+                    photonBuff[photonIndex+3] = m_photonEvent[i][j*9+3];
+                    photonBuff[photonIndex+4] = m_photonEvent[i][j*9+4];
+                    photonBuff[photonIndex+5] = m_photonEvent[i][j*9+5];
+                    photonBuff[photonIndex+6] = m_photonEvent[i][j*9+6];
+                    photonBuff[photonIndex+7] = m_photonEvent[i][j*9+7];
+                    photonBuff[photonIndex+8] = m_photonEvent[i][j*9+8];
+                    photonIndex += 9;
                 }
             }
         // Send over array sizes
-        long unsigned int electronSize = totalElectrons * 8;
-        long unsigned int positronSize = totalPositrons * 8;
-        long unsigned int photonSize = totalPhotons * 8;
+        long unsigned int electronSize = totalElectrons * 9;
+        long unsigned int positronSize = totalPositrons * 9;
+        long unsigned int photonSize = totalPhotons * 9;
         MPI_Send(&electronSize, 1, MPI_INT, 0, electronTag,
             MPI_COMM_WORLD);
         MPI_Send(&positronSize, 1, MPI_INT, 0, positronTag,

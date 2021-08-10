@@ -8,9 +8,9 @@
 #include "UnitsSystem.hh"
 
 
-NonLinearCompton::NonLinearCompton(EMField* field, double dt, bool track,
-    double eMin):
-m_eMin(eMin), Process(field, dt, track)
+NonLinearCompton::NonLinearCompton(EMField* field, double dt, double eMin,
+    bool importance, bool track):
+m_eMin(eMin), Process(field, dt, importance, track)
 {
     LoadTables();
 }
@@ -26,7 +26,6 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
     // First we need to update the optical depth of the particle based on 
     // local values
     double eta = CalculateEta(part);
-
     // Check for very small values of eta and skip interpolation
     double logh;
     if (eta < 1.0e-12)
@@ -44,48 +43,48 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
     // Now check if process has occured. If so then emmit and react
     if (part->GetOpticalDepth() < 0.0)
     {
+
+        // Update track as normal
+        double chi = CalculateChi(eta);
+        double gammaE = 2.0 * chi * part->GetGamma() / eta;
+        ThreeVector gammaP = gammaE * part->GetDirection();
+        part->UpdateTrack(part->GetPosition(), part->GetMomentum()
+            - gammaP);
+        part->InitOpticalDepth();
+
         if (m_importance)
         {
-            for (unsigned int i = 0; i < m_samples; ++i)
+            if (eta > 1e-3) // stops extraoplation from table. Should fix soon
             {
-                double chi = CalculateChi(eta);
+                // Use uniform, may change later
+                double chi = MCTools::RandDouble(1e-4, eta / 2.0);
+                double weight = CalculateRate(eta, chi) * (eta / 2.0);
+                if (weight > 1e5)
+                {
+                    std::cout << chi << " " << eta << " " <<weight << std::endl;
+                }
+                //std::cout << weight * part->GetWeight() << std::endl;
                 double gammaE = 2.0 * chi * part->GetGamma() / eta;
                 ThreeVector gammaP = gammaE * part->GetDirection();
-                // Update electron with first sampled photon
-                if (i == 0)
+                if (gammaE > m_eMin)
                 {
-                    part->UpdateTrack(part->GetPosition(), part->GetMomentum()
-                        - gammaP);
+                    Photon* photon = new Photon(gammaE, part->GetPosition(),
+                        part->GetDirection(), weight * part->GetWeight(), 
+                        part->GetTime(), m_track);
+                    partList->AddParticle(photon);
                 }
-                // check if it made it through.
-                if(Numerics::Interpolate1D(m_groups, m_weights, m_nGroups,
-                    gammaE) > MCTools::RandDouble(0, 1))
-                {
-                    // Add new partles to the simulation
-                    if (gammaE > m_eMin)
-                    {
-                        Photon* photon = new Photon(gammaE, part->GetPosition(),
-                            part->GetDirection(), part->GetTime(), m_track);
-                        partList->AddParticle(photon);
-                    }
-                    part->InitOpticalDepth();
-                }
-            } 
+            }
         } else
         {
-            double chi = CalculateChi(eta);
-            double gammaE = 2.0 * chi * part->GetGamma() / eta;
-            ThreeVector gammaP = gammaE * part->GetDirection();
-            part->UpdateTrack(part->GetPosition(), part->GetMomentum()
-                - gammaP);
-            // Add new partles to the simulation
             if (gammaE > m_eMin)
             {
-                Photon* photon = new Photon(gammaE, part->GetPosition(),
-                    part->GetDirection(), part->GetTime(), m_track);
-                partList->AddParticle(photon);
+                if (eta > 1e-3 && chi > 1e-4) // stops extraoplation from table. Should fix soon
+                {
+                    Photon* photon = new Photon(gammaE, part->GetPosition(),
+                        part->GetDirection(), 1, part->GetTime(), m_track);
+                    partList->AddParticle(photon);
+                }
             }
-            part->InitOpticalDepth();
         }
     }
 }
@@ -101,6 +100,29 @@ double NonLinearCompton::CalculateEta(Particle* part) const
                            + std::pow(partDir.Dot(eField), 2.0) / (part->GetGamma() 
                             * part->GetGamma())) * part->GetGamma();
     return eta;
+}
+
+double NonLinearCompton::CalculateChiMin(Particle* part, double energyMin) const
+{
+    ThreeVector partDir = part->GetDirection();
+    ThreeVector eField, bField;
+    m_field->GetField(part->GetTime(), part->GetPosition(), eField, bField);
+    ThreeVector ePara = eField.Dot(partDir) * partDir;
+    ThreeVector ePerp = eField - ePara;
+    return 0.5 * energyMin * (ePerp + partDir.Cross(bField)).Mag();
+}
+
+double NonLinearCompton::CalculateRate(double eta, double chi) const
+{
+    int lowIndex;
+    double frac;
+    Numerics::ClosestPoints(m_log_eta_rate, m_rate_size_x, std::log10(eta),
+        lowIndex, frac);
+    double lowValue = Numerics::Interpolate1D(m_log_chi_rate[lowIndex], 
+        m_log_rate[lowIndex],m_rate_size_y, std::log10(chi));
+    double highValue = Numerics::Interpolate1D(m_log_chi_rate[lowIndex+1], 
+        m_log_rate[lowIndex+1], m_rate_size_y, std::log10(chi));
+    return std::pow(10.0, (1.0 - frac) * lowValue + frac * highValue);
 }
 
 double NonLinearCompton::CalculateChi(double eta) const
@@ -152,6 +174,25 @@ void NonLinearCompton::LoadTables()
         exit(1); 
     }
 
+    std::ifstream rateChiEtaFile(path + "/rateChiEta.table");
+    std::ifstream rateFile(path + "/rate.table");
+    if (m_importance)
+    {
+        if (!rateChiEtaFile)
+        {
+            std::cerr << "ERROR: Data table for eta-chi rate not found!" << std::endl;
+            std::cerr << "No file at: " << path + "/rateChiEta.table" << std::endl;
+            exit(1); 
+        }
+        if (!rateFile)
+        {
+            std::cerr << "ERROR: Data table for eta-chi rate not found!" << std::endl;
+            std::cerr << "No file at: " << path + "/rate.table" << std::endl;
+            exit(1); 
+        }
+    }
+
+
     // h table
     hFile >> m_h_length;
     m_h_dataTable = new double [m_h_length];
@@ -202,7 +243,35 @@ void NonLinearCompton::LoadTables()
         for (unsigned int j = 0; j < m_phEn_chiLength; j++)
         {
             phEnFile >> m_phEn_dataTable[i][j];
+        }
+    }
 
+    // Load rate table
+    if (m_importance)
+    {
+        rateChiEtaFile >> m_rate_size_x >> m_rate_size_y >> m_chi_min_rate;
+        m_log_eta_rate = new double [m_rate_size_x];
+        m_log_chi_rate = new double* [m_rate_size_x];
+        m_log_rate = new double* [m_rate_size_x];
+        for (unsigned int i = 0; i < m_rate_size_x; i++)
+        {
+            m_log_chi_rate[i] = new double[m_rate_size_y];
+            m_log_rate[i] = new double[m_rate_size_y];
+        }
+
+        double  logEta, logChi;
+        for (unsigned int i = 0; i < m_rate_size_x; i++)
+        {
+            rateChiEtaFile >> logEta;
+            m_log_eta_rate[i] = logEta;
+
+            double deltaChi = (logEta - std::log10(2.0) - 0.01 - m_chi_min_rate) 
+                / (m_rate_size_y - 1);
+            for (unsigned int j = 0; j < m_rate_size_y; j++)
+            {
+                rateFile >> m_log_rate[i][j];
+                m_log_chi_rate[i][j] = m_chi_min_rate + j * deltaChi;
+            }
         }
     }
 }
@@ -220,4 +289,14 @@ void NonLinearCompton::UnloadTables()
     delete [] m_phEn_etaAxis;
     delete [] m_phEn_chiAxis;
     delete [] m_phEn_dataTable;
+
+    if (m_importance)
+    {
+        delete m_log_eta_rate;
+        for (unsigned int i = 0; i < m_rate_size_x; i++)
+        {
+            delete[] m_log_rate[i];
+        }
+        delete[] m_log_rate;
+    }
 }

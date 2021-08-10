@@ -22,7 +22,6 @@ m_checkOutput(checkOutput)
     ReadField();
     ReadParticles();
     ReadProcess();
-    ReadImportance();
     ReadHistograms();
 }
 
@@ -70,6 +69,7 @@ void FileParser::ReadGeneral()
     m_general.pusher = m_reader->GetString("General", "pusher", "Lorentz"); 
     m_general.fileName = m_reader->GetString("General", "file_name", "out.h5");
     m_general.tracking = m_reader->GetBoolean("General", "tracking", false);
+    m_general.importance = m_reader->GetBoolean("General", "importance", false);
     m_general.minEnergy = m_reader->GetReal("General", "min_energy", 0) / m_units->RefEnergy();
 
     if (m_checkOutput == true)
@@ -81,6 +81,7 @@ void FileParser::ReadGeneral()
         m_checkFile << "Pusher      = " << m_general.pusher << "\n";
         m_checkFile << "Output file = " << m_general.fileName << "\n";
         m_checkFile << "Tracking    = " << m_general.tracking << "\n";
+        m_checkFile << "Importance    = " << m_general.tracking << "\n";
         m_checkFile << "Min energy    = " << m_general.minEnergy << "\n";
         m_checkFile << "\n\n";
     }
@@ -202,6 +203,7 @@ void FileParser::ReadProcess()
     }
 }
 
+/*
 void FileParser::ReadImportance()
 {
     m_importance.NLC_Importance = false;
@@ -314,6 +316,7 @@ void FileParser::ReadImportance()
         }
     }
 }
+*/
 
 void FileParser::ReadParticles()
 {

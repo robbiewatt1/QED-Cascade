@@ -79,7 +79,6 @@ int main(int argc, char* argv[])
     GeneralParameters inGeneral = input->GetGeneral();
     FieldParameters inField = input->GetField();
     ProcessParameters inProcess = input->GetProcess();
-    ImportancParameters inImportance = input->GetImportance();
     std::vector<ParticleParameters> inParticles = input->GetParticle();
     std::vector<HistogramParameters> inHistogram = input->GetHistograms();
     delete input;
@@ -132,23 +131,14 @@ int main(int argc, char* argv[])
     if (inProcess.NonLinearCompton == true)
     {
         NonLinearCompton* comptonNL = new NonLinearCompton(field,
-            inGeneral.timeStep, inGeneral.tracking, inGeneral.minEnergy);
-        if (inImportance.NLC_Importance == true)
-        {
-            comptonNL->AddImportance(inImportance.NLC_Samples,
-                inImportance.NLC_Groups, inImportance.NLC_Weights);
-        }
+            inGeneral.timeStep, inGeneral.minEnergy, inGeneral.importance, 
+            inGeneral.tracking);
         processList.push_back(comptonNL);
     }
     if (inProcess.NonLinearBreitWheeler == true)
     {
         NonLinearBreitWheeler* breitWheelerNL = new NonLinearBreitWheeler(field, 
             inGeneral.timeStep, inGeneral.tracking);
-        if (inImportance.NBW_Importance == true)
-        {
-            breitWheelerNL->AddImportance(inImportance.NBW_Samples,
-                inImportance.NBW_Groups, inImportance.NBW_Weights);
-        }
         processList.push_back(breitWheelerNL);
     }
 

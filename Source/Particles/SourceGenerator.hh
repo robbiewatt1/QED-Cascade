@@ -8,13 +8,11 @@
 class SourceGenerator
  {
  public:
-    SourceGenerator(std::string type, std::string distro, 
-                    unsigned int nPart, double energyMin,
-                    double energyMax, double deltaPos, 
-                    double deltaTau, double deltaDir,
-                    const ThreeVector &position,
-                    const ThreeVector &direction,
-                    bool track = false);
+    SourceGenerator(std::string type, std::string distro,
+        unsigned int nPart, double energyMin, double energyMax,
+        double deltaPos, double deltaTau, double deltaDir,
+        const ThreeVector &position, const ThreeVector &direction, 
+        bool track = false);
     
     ~SourceGenerator();
 

@@ -5,11 +5,13 @@ class Lepton: public Particle
 {
 public:
 	Lepton(double mass, double charge, const ThreeVector &position,
-		   const ThreeVector &momentum, double time = 0, bool tracking = false);
+		   const ThreeVector &momentum, double weight = 1, double time = 0,
+		   bool tracking = false);
 
 
 	Lepton(double mass, double charge, double energy, const ThreeVector &position,
-		   const ThreeVector &direction, double time = 0, bool tracking = false);
+		   const ThreeVector &direction, double weight = 1, double time = 0,
+		   bool tracking = false);
 
 	~Lepton();
 
