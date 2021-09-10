@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-project(IO C CXX)
-
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
 set(io_source_files
     Output/HDF5Output.cpp

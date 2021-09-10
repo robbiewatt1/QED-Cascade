@@ -20,10 +20,10 @@ m_type(type), m_nPart(nPart), m_partCount(0), m_track(track)
     m_zPos = MCTools::SampleNorm(0, deltaTau, nPart);
     m_thetaDir = MCTools::SampleNorm(0, deltaDir, nPart);
     m_phiDir = MCTools::SampleUniform(0, 2.0 * UnitsSystem::pi, nPart);
-    if (distro == "gaussian")
+    if (distro == "gaussian" || distro == "Gaussian")
     {
         m_energy = MCTools::SampleNorm(energy1, energy2, nPart);
-    } else if(distro == "linear")
+    } else if(distro == "linear" || distro == "Linear")
     {
         m_energy = MCTools::SampleUniform(energy1, energy2, nPart);
     } else

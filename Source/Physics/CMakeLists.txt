@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-project(PhysicsQED C CXX)
-
 set(physics_source_files
 	Fields/EMField/GaussianEMField.cpp
 	Fields/EMField/StaticEMField.cpp

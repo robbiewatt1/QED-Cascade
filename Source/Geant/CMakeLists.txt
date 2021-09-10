@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-project(GeantQED C CXX)
 find_package(Geant4 REQUIRED)
 
 set(geant_source_files

@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-project(Particles C CXX)
-
 set(particles_source_files
     Particle.cpp
     Photon.cpp
