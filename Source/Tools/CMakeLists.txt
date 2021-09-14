@@ -27,7 +27,9 @@ endif(BUILD_GEANT)
 
 target_include_directories(Tools PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+
 install(TARGETS Tools
-	LIBRARY DESTINATION lib)
+    LIBRARY DESTINATION lib)
 install(FILES ${tools_header_files}
         DESTINATION include)
+

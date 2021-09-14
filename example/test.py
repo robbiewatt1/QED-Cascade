@@ -13,12 +13,12 @@ peak_field = 2.00e+14
 wavelength = 0.8e-6
 duration_laser = 30.0e-15
 waist = 10e-6
-polerisation = 10e-6
+polarisation = 10e-6
 start = ThreeVector(0,0, 10.0e-6)
 focus = ThreeVector(0,0, 0e-6)
 
 ### Set particle source
-n_particles = 5000
+n_particles = 1000
 particle_type = "Electron"
 energy_dist = "gaussian"
 energy_mean = 8.176e-11
@@ -40,14 +40,14 @@ nonlinear_BreitWheeler = False
 run_manager = RunManager()
 run_manager.setTime(d_t, time)
 run_manager.setField(field_type, peak_field, wavelength,  duration_laser, waist, 
-    polerisation, start, focus)
+    polarisation, start, focus)
 run_manager.setPusher(pusher);
 run_manager.setPhysics(nonlinear_Compton, nonlinear_BreitWheeler)
 run_manager.setGenerator(n_particles, particle_type, energy_dist, energy_mean, 
     eneray_sig, spot_size, duration_part, divergence, position, diraction);
 
 ### Run simulation
-run_manager.beamOn(1)
+run_manager.beamOn(2)
 
 ### Get inputs / outputs
 init_electrons = run_manager.getInput()
