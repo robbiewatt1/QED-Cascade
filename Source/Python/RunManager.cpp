@@ -15,7 +15,8 @@
 
 
 
-RunManager::RunManager()
+RunManager::RunManager():
+m_timeStep(0), m_timeEnd(0)
 {
     // Update this if I ever add another unit system
     m_units = new UnitsSystem("SI");
@@ -100,12 +101,6 @@ void RunManager::setGenerator(int events, std::string particleType,
                                       divergence,
                                       position / m_units->RefLength(),
                                       direction);
-    
-    m_input_P_X = std::vector<double>(6 * events);
-    // reserve up to 10x secondaries
-    m_electron_P_X.reserve(60 * events);
-    m_positron_P_X.reserve(60 * events);
-    m_photon_P_X.reserve(60 * events);
 }
 
 void RunManager::setPhysics(bool NLC, bool NLBW)
@@ -130,14 +125,11 @@ void RunManager::setPhysics(bool NLC, bool NLBW)
 
 void RunManager::beamOn(int threads)
 {
-    // Check for previous run, if so then delete stored particles
-    if (m_input_P_X.size() != 0)
-    {
-        m_input_P_X.clear();
-        m_electron_P_X.clear();
-        m_positron_P_X.clear();
-        m_photon_P_X.clear();
-    }
+
+    m_input_P_X = std::vector<std::vector<double>>(threads);
+    m_electron_P_X = std::vector<std::vector<double>>(threads);
+    m_positron_P_X = std::vector<std::vector<double>>(threads);
+    m_photon_P_X = std::vector<std::vector<double>>(threads);
 
     long unsigned int nEvents = m_generator->GetSourceNumber();
     // Simulate events
@@ -145,17 +137,24 @@ void RunManager::beamOn(int threads)
     #pragma omp parallel for
     for (unsigned int i = 0; i < nEvents; i++) //loop primes
     {
+        int tid = omp_get_thread_num();
         ParticleList* event = m_generator->GenerateList();
 
         // Store inital particle properties
         for (unsigned int j = 0; j < event->GetNPart(); j++) // Loop particles
         {
-            m_input_P_X.push_back(event->GetParticle(j)->GetMomentum()[0]);
-            m_input_P_X.push_back(event->GetParticle(j)->GetMomentum()[1]);
-            m_input_P_X.push_back(event->GetParticle(j)->GetMomentum()[2]);
-            m_input_P_X.push_back(event->GetParticle(j)->GetPosition()[0]);
-            m_input_P_X.push_back(event->GetParticle(j)->GetPosition()[1]);
-            m_input_P_X.push_back(event->GetParticle(j)->GetPosition()[2]);
+            m_input_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[0]
+                * m_units->RefMomentum());
+            m_input_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[1]
+                * m_units->RefMomentum());
+            m_input_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[2]
+                * m_units->RefMomentum());
+            m_input_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[0]
+                * m_units->RefLength());
+            m_input_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[1]
+                * m_units->RefLength());
+            m_input_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[2]
+                * m_units->RefLength());
         }
 
         double time(0);
@@ -177,28 +176,46 @@ void RunManager::beamOn(int threads)
         {
             if (event->GetParticle(j)->GetCharge() == -1)
             {
-                m_electron_P_X.push_back(event->GetParticle(j)->GetMomentum()[0]);
-                m_electron_P_X.push_back(event->GetParticle(j)->GetMomentum()[1]);
-                m_electron_P_X.push_back(event->GetParticle(j)->GetMomentum()[2]);
-                m_electron_P_X.push_back(event->GetParticle(j)->GetPosition()[0]);
-                m_electron_P_X.push_back(event->GetParticle(j)->GetPosition()[1]);
-                m_electron_P_X.push_back(event->GetParticle(j)->GetPosition()[2]);
+                m_electron_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[0] 
+                    * m_units->RefMomentum());
+                m_electron_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[1]
+                    * m_units->RefMomentum());
+                m_electron_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[2]
+                    * m_units->RefMomentum());
+                m_electron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[0]
+                    * m_units->RefLength());
+                m_electron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[1]
+                    * m_units->RefLength());
+                m_electron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[2]
+                    * m_units->RefLength());
             } else if (event->GetParticle(j)->GetCharge() == 0)
             {
-                m_photon_P_X.push_back(event->GetParticle(j)->GetMomentum()[0]);
-                m_photon_P_X.push_back(event->GetParticle(j)->GetMomentum()[1]);
-                m_photon_P_X.push_back(event->GetParticle(j)->GetMomentum()[2]);
-                m_photon_P_X.push_back(event->GetParticle(j)->GetPosition()[0]);
-                m_photon_P_X.push_back(event->GetParticle(j)->GetPosition()[1]);
-                m_photon_P_X.push_back(event->GetParticle(j)->GetPosition()[2]);
+                m_photon_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[0]
+                    * m_units->RefMomentum());
+                m_photon_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[1]
+                    * m_units->RefMomentum());
+                m_photon_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[2]
+                    * m_units->RefMomentum());
+                m_photon_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[0]
+                    * m_units->RefLength());
+                m_photon_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[1]
+                    * m_units->RefLength());
+                m_photon_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[2]
+                    * m_units->RefLength());
             } else if (event->GetParticle(j)->GetCharge() == 1)
             {
-                m_positron_P_X.push_back(event->GetParticle(j)->GetMomentum()[0]);
-                m_positron_P_X.push_back(event->GetParticle(j)->GetMomentum()[1]);
-                m_positron_P_X.push_back(event->GetParticle(j)->GetMomentum()[2]);
-                m_positron_P_X.push_back(event->GetParticle(j)->GetPosition()[0]);
-                m_positron_P_X.push_back(event->GetParticle(j)->GetPosition()[1]);
-                m_positron_P_X.push_back(event->GetParticle(j)->GetPosition()[2]);
+                m_positron_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[0]
+                    * m_units->RefMomentum());
+                m_positron_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[1]
+                    * m_units->RefMomentum());
+                m_positron_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[2]
+                    * m_units->RefMomentum());
+                m_positron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[0]
+                    * m_units->RefLength());
+                m_positron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[1]
+                    * m_units->RefLength());
+                m_positron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[2]
+                    * m_units->RefLength());
             }
         }
         m_generator->FreeSources(event);
@@ -207,33 +224,52 @@ void RunManager::beamOn(int threads)
 
 py::array_t<double> RunManager::getInput()
 {
-    int particles = m_input_P_X.size() / 6;
-    py::array_t<double> result = py::cast(m_input_P_X);
+    std::vector<double> accum;
+    for (auto& sub : m_input_P_X)
+    {
+        accum.insert(accum.end(), sub.begin(), sub.end());
+    }
+    int particles = accum.size() / 6;
+    py::array_t<double> result = py::cast(accum);
     result.resize({particles, 6});
     return result;
 }
 
-py::array_t<double> RunManager::getOutput(std::string particleType)
+py::array_t<double> RunManager::getElectrons()
 {
-    py::array_t<double> result;
-    if (particleType == "Electron" || particleType == "electron")
+    std::vector<double> accum;
+    for (auto& sub : m_electron_P_X)
     {
-        int particles = m_electron_P_X.size() / 6;
-        result = py::cast(m_electron_P_X);
-        result.resize({particles, 6});
-    } else if (particleType == "Positron" || particleType == "positron")
-    {
-        int particles = m_positron_P_X.size() / 6;
-        result = py::cast(m_positron_P_X);
-        result.resize({particles, 6});
-    } else if (particleType == "Photon" || particleType == "photon")
-    {
-        int particles = m_photon_P_X.size() / 6;
-        result = py::cast(m_photon_P_X);
-        result.resize({particles, 6});
-    } else
-    {
-        std::cerr << "Error: Unkown Particle Type" << std::endl;
+        accum.insert(accum.end(), sub.begin(), sub.end());
     }
+    int particles = accum.size() / 6;
+    py::array_t<double> result = py::cast(accum);
+    result.resize({particles, 6});
+    return result;
+}
+
+py::array_t<double> RunManager::getPositrons()
+{
+    std::vector<double> accum;
+    for (auto& sub : m_positron_P_X)
+    {
+        accum.insert(accum.end(), sub.begin(), sub.end());
+    }
+    int particles = accum.size() / 6;
+    py::array_t<double> result = py::cast(accum);
+    result.resize({particles, 6});
+    return result;
+}
+
+py::array_t<double> RunManager::getPhotons()
+{
+    std::vector<double> accum;
+    for (auto& sub : m_photon_P_X)
+    {
+        accum.insert(accum.end(), sub.begin(), sub.end());
+    }
+    int particles = accum.size() / 6;
+    py::array_t<double> result = py::cast(accum);
+    result.resize({particles, 6});
     return result;
 }

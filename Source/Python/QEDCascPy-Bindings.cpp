@@ -18,8 +18,12 @@ PYBIND11_MODULE(QEDCascPy, module)
             py::arg("threads") = 1)
         .def("getInput", &RunManager::getInput,
             "Get particle properties before interaction")
-        .def("getOutput", &RunManager::getOutput,
-            "Get particle properties before interaction");
+        .def("getElectrons", &RunManager::getElectrons,
+            "Get electron properties before interaction")
+        .def("getPositrons", &RunManager::getPositrons,
+            "Get electron properties before interaction")
+        .def("getPhotons", &RunManager::getPhotons,
+            "Get electron properties before interaction");
 
     py::class_<ThreeVector>(module, "ThreeVector")
         .def(py::init<double, double, double>());

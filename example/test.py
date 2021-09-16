@@ -8,7 +8,7 @@ time = 100e-15
 d_t = 0.05e-15
 
 ### Set Field Variables
-field_type = "focusing"
+field_type = "gaussian"
 peak_field = 2.00e+14
 wavelength = 0.8e-6
 duration_laser = 30.0e-15
@@ -18,7 +18,7 @@ start = ThreeVector(0,0, 10.0e-6)
 focus = ThreeVector(0,0, 0e-6)
 
 ### Set particle source
-n_particles = 1000
+n_particles = 10000
 particle_type = "Electron"
 energy_dist = "gaussian"
 energy_mean = 8.176e-11
@@ -47,29 +47,33 @@ run_manager.setGenerator(n_particles, particle_type, energy_dist, energy_mean,
     eneray_sig, spot_size, duration_part, divergence, position, diraction);
 
 ### Run simulation
-run_manager.beamOn(2)
+run_manager.beamOn(16)
 
 ### Get inputs / outputs
 init_electrons = run_manager.getInput()
-final_electrons = run_manager.getOutput("Electron")
-final_photon = run_manager.getOutput("Photon")
+final_electrons = run_manager.getElectrons()
+final_photon = run_manager.getPhotons()
 
 init_p_z = init_electrons[:,2]
 final_p_z = final_electrons[:,2]
 final_photon = final_photon[:,2]
 
-
 ### Plots
-fig, ax = plt.subplots()
-bins = np.linspace(0, 1500, 100)
-ax.hist(init_p_z, bins, histtype="step", lw=2)
+mev_c = 5.344286e-22
+bins = np.linspace(0, 800, 100)
 
 fig, ax = plt.subplots()
-ax.hist(final_p_z, 100, histtype="step", lw=2)
-ax.set_xlabel(r"$P_z \,\,(m_e)$")
+ax.hist(init_p_z / mev_c, bins, histtype="step", lw=2)
+ax.set_xlabel(r"$P_z \,\,(MeV/c)$")
 
 fig, ax = plt.subplots()
-ax.hist(final_photon, 100, histtype="step", lw=2)
-ax.set_xlabel(r"$P_z \,\,(m_e)$")
+ax.hist(final_p_z / mev_c, bins, histtype="step", lw=2)
+ax.set_xlabel(r"$P_z \,\,(MeV/c)$")
+
+fig, ax = plt.subplots()
+ax.hist(final_photon / mev_c, bins, histtype="step", lw=2)
+ax.set_xlabel(r"$P_z \,\,(MeV/c)$")
+ax.set_yscale('log')
+
 
 plt.show()

@@ -19,7 +19,7 @@ if(APPLE)
 elseif(UNIX)
   set(_rpath_value "$ORIGIN")
 endif()
-message(${_rpath_value})
+
 set_target_properties(QEDCascPy PROPERTIES
                         INSTALL_RPATH ${_rpath_value}/lib)
 

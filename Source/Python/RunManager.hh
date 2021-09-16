@@ -45,8 +45,14 @@ public:
     // Return input from simulation
     py::array_t<double> getInput();
 
-    // Return output from simulation
-    py::array_t<double> getOutput(std::string particleType);
+    // Return output electrons from simulation
+    py::array_t<double> getElectrons();
+
+    // Return output positrons from simulation
+    py::array_t<double> getPositrons();
+
+    // Return output photons from simulation
+    py::array_t<double> getPhotons();
 
 private:
 
@@ -55,10 +61,10 @@ private:
     SourceGenerator* m_generator;
     ParticlePusher* m_pusher;
     std::vector<Process*> m_processList;
-    std::vector<double> m_input_P_X;
-    std::vector<double> m_electron_P_X;
-    std::vector<double> m_positron_P_X;
-    std::vector<double> m_photon_P_X;
+    std::vector<std::vector<double>> m_input_P_X;
+    std::vector<std::vector<double>> m_electron_P_X;
+    std::vector<std::vector<double>> m_positron_P_X;
+    std::vector<std::vector<double>> m_photon_P_X;
     double m_timeStep;
     double m_timeEnd;
 };
