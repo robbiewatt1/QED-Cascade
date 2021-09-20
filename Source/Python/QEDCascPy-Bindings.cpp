@@ -15,7 +15,7 @@ PYBIND11_MODULE(QEDCascPy, module)
         .def("setPusher", &RunManager::setPusher, "Set the particle pusher")
         .def("setPhysics", &RunManager::setPhysics, "Select processes")
         .def("beamOn", &RunManager::beamOn, "Run the simulation", 
-            py::arg("threads") = 1)
+            py::arg("events"), py::arg("threads") = 1)
         .def("getInput", &RunManager::getInput,
             "Get particle properties before interaction")
         .def("getElectrons", &RunManager::getElectrons,

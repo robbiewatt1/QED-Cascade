@@ -1,9 +1,3 @@
-
-if(BUILD_OPENMP)
-    add_compile_definitions(USEOPENMP)
-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fopenmp")
-endif(BUILD_OPENMP)
-
 if(BUILD_MPI)
     add_compile_definitions(USEMPI)
     find_package(MPI)

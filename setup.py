@@ -24,7 +24,7 @@ setup(
     license="MIT",
     packages=find_packages(where = 'Source/Python'),
     package_dir={"": "Source/Python"},
-    cmake_args=["-DBUILD_PYTHON=ON"],
+    cmake_args=["-DBUILD_PYTHON=ON", "-DBUILD_OPENMP=OFF"],
     cmake_install_dir="Source/Python/QEDCascPy",
     include_package_data = True
 )
