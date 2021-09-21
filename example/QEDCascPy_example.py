@@ -26,7 +26,7 @@ eneray_sig = 8.176e-12
 spot_size = 0.
 duration_part = 0.
 divergence = 0
-position = ThreeVector(30e-6, 0, -10e-6)
+position = ThreeVector(0e-6, 0, -10e-6)
 diraction  = ThreeVector(0, 0, 1)
 
 ### Set particle pusher
@@ -47,7 +47,7 @@ run_manager.setGenerator(particle_type, energy_dist, energy_mean,
     eneray_sig, spot_size, duration_part, divergence, position, diraction);
 
 ### Run simulation
-run_manager.beamOn(events = 1000, threads = 1)
+run_manager.beamOn(events = 1000, threads = 2)
 
 ### Get inputs / outputs
 init_electrons = run_manager.getInput()
