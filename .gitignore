@@ -11,13 +11,9 @@ Tables/TensorflowGraphs
 
 bin/
 lib/
+include/
 
 *.h5
-*.xmf
-*.m
-*.ini
-*.dat
-*.jpg
 input-check.txt
 
 QEDCASC

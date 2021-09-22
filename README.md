@@ -18,7 +18,7 @@ cd QED-Cascade
 mkdir Build
 cd Build
 cmake ..
-make install
+make install -j
 ```
 
 To build with OpenMP or MPI replace "cmake .." with either:
