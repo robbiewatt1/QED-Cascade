@@ -12,12 +12,16 @@ option(BUILD_PYTHON "Build python library" OFF)
 option(BUILD_TENSORFLOW "Build the geant4 tensorflow package" OFF)
 set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
-# If apple turn openMP off by defult
-if(APPLE)
-  option(BUILD_OPENMP "Build openMP library" OFF)
-elseif(UNIX)
-  option(BUILD_OPENMP "Build openMP library" ON)
-endif()
+if(BUILD_PYTHON)
+    # If apple turn openMP off by defult
+    if(APPLE)
+      option(BUILD_OPENMP "Build openMP library" OFF)
+    elseif(UNIX)
+      option(BUILD_OPENMP "Build openMP library" ON)
+    endif()
+else()
+    option(BUILD_OPENMP "Build openMP library" OFF)
+endif(BUILD_PYTHON)
 
 if(BUILD_OPENMP)
     add_compile_definitions(USEOPENMP)
