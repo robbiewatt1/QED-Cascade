@@ -173,6 +173,7 @@ int main(int argc, char* argv[])
     }
 
 #ifdef USEOPENMP
+    std::cout.precision(2);
     std::cout << "Setup complete! " << nEvents << " events will be simulated.\n";
     std::cout << "Entering main loop using " << omp_get_max_threads();
     std::cout << " threads.\n";
@@ -253,7 +254,9 @@ int main(int argc, char* argv[])
 
             if (omp_get_thread_num() == 0 && j % 5 == 0)
             {
-                std::cout << "Approximately " << (double)j / threadEvents * 100.0 << "% complete \r";
+                std::cout << "Approximately " << 
+                (double) (j* omp_get_max_threads()) / threadEvents * 100.0 
+                << "% complete \r";
             }
 #endif
         }
@@ -266,7 +269,7 @@ int main(int argc, char* argv[])
 
 #ifdef USEOPENMP
     std::cout << "Simulation complete in time: "; 
-    std::cout << omp_get_wtime() - startTime << std::endl;
+    std::cout << omp_get_wtime() - startTime << " s" << std::endl;
     std::cout << "Saving data to file: " << inGeneral.fileName;
     std::cout << " and cleaning up...\n";
 #endif
