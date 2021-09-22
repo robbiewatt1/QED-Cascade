@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
+set(CMAKE_CXX_STANDARD 11)
 project(QEDCascade)
-set(CMAKE_CXX_STANDARD 17)
+
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+   message(SEND_ERROR "In-source builds are not allowed.")
+endif("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 
 option(BUILD_TESTS "Build test executables" OFF)
 option(BUILD_GEANT "Build geant executables" OFF)
