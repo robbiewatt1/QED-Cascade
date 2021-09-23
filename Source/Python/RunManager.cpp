@@ -2,7 +2,7 @@
 
 #include "GaussianEMField.hh"
 #include "FocusingField.hh"
-#include "NonLinearCompton.hh"
+#include "StochasticEmission.hh"
 #include "NonLinearBreitWheeler.hh"
 #include "LorentzPusher.hh"
 #include "LandauPusher.hh"
@@ -156,7 +156,7 @@ void RunManager::beamOn(int events, int threads)
     // set the physics
     if (m_NLC == true)
     {
-        NonLinearCompton* compton = new NonLinearCompton(m_field, m_timeStep,
+        StochasticEmission* compton = new StochasticEmission(m_field, m_timeStep,
                 false, 0);
         m_processList.push_back(compton);
     }

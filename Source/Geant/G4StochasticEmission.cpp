@@ -1,4 +1,4 @@
-#include "G4NonLinearCompton.hh"
+#include "G4StochasticEmission.hh"
 #include "G4Gamma.hh"
 #include "G4Material.hh"
 #include "GaussianEMField.hh"
@@ -7,7 +7,7 @@
 #include "StaticEMField.hh"
 #include "ThreeVector.hh"
 
-G4NonLinearCompton::G4NonLinearCompton(double dt, double tEnd,
+G4StochasticEmission::G4StochasticEmission(double dt, double tEnd,
                                        const G4String& name, G4ProcessType type):
 G4VDiscreteProcess(name, type), m_process(NULL), m_pusher(NULL)
 {
@@ -17,7 +17,7 @@ G4VDiscreteProcess(name, type), m_process(NULL), m_pusher(NULL)
     SetProcessSubType(1);
 }
 
-G4NonLinearCompton::~G4NonLinearCompton()
+G4StochasticEmission::~G4StochasticEmission()
 {
     delete m_field;
     delete m_part;
@@ -26,7 +26,7 @@ G4NonLinearCompton::~G4NonLinearCompton()
     delete m_pusher;
 }
 
-G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
+G4VParticleChange* G4StochasticEmission::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
 {
     const G4DynamicParticle *g4Part = aTrack.GetDynamicParticle();
     double mass = g4Part->GetMass() * m_units->G4Energy();
@@ -76,7 +76,7 @@ G4VParticleChange* G4NonLinearCompton::PostStepDoIt(const G4Track& aTrack, const
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 }
 
-G4double G4NonLinearCompton::GetMeanFreePath(const G4Track& track, G4double,
+G4double G4StochasticEmission::GetMeanFreePath(const G4Track& track, G4double,
                                              G4ForceCondition*)
 {
     // check if inside laser field
@@ -97,26 +97,26 @@ G4double G4NonLinearCompton::GetMeanFreePath(const G4Track& track, G4double,
     }
 }
 
-void G4NonLinearCompton::SetStaticField(double* EField, double* BField)
+void G4StochasticEmission::SetStaticField(double* EField, double* BField)
 {
     m_field = new StaticEMField(ThreeVector(EField[0], EField[1], EField[2]),
                                 ThreeVector(BField[0], BField[1], BField[2]));
-    m_process = new NonLinearCompton(m_field, m_dt, false);
+    m_process = new StochasticEmission(m_field, m_dt, false);
     m_pusher  = new LorentzPusher(m_field, m_dt);
 }
 
-void G4NonLinearCompton::SetPlaneField(double maxE, double wavelength, double polerisation,
+void G4StochasticEmission::SetPlaneField(double maxE, double wavelength, double polerisation,
                                        double* direction)
 {
     m_field = new PlaneEMField(maxE / m_units->RefEField(), 
                                wavelength / m_units->RefLength(),
                                polerisation,
                                ThreeVector(direction[0], direction[1], direction[2]));  
-    m_process = new NonLinearCompton(m_field, m_dt, false);
+    m_process = new StochasticEmission(m_field, m_dt, false);
     m_pusher  = new LorentzPusher(m_field, m_dt);
 }
 
-void G4NonLinearCompton::SetGaussianField(double maxE, double wavelength, double tau,
+void G4StochasticEmission::SetGaussianField(double maxE, double wavelength, double tau,
                                           double waist, double polerisation, double* start,
                                           double* focus)
 {
@@ -127,6 +127,6 @@ void G4NonLinearCompton::SetGaussianField(double maxE, double wavelength, double
                                   polerisation,
                                   ThreeVector(start[0], start[1], start[2]),
                                   ThreeVector(focus[0], focus[1], focus[2]));   
-    m_process = new NonLinearCompton(m_field, m_dt, false);
+    m_process = new StochasticEmission(m_field, m_dt, false);
     m_pusher  = new LorentzPusher(m_field, m_dt);
 }

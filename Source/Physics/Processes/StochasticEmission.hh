@@ -1,5 +1,5 @@
-#ifndef NONLINEARCOMPTON_HH
-#define NONLINEARCOMPTON_HH
+#ifndef StochasticEmission_HH
+#define StochasticEmission_HH
 
 #include "Process.hh"
 #include "EMField.hh"
@@ -7,13 +7,13 @@
 #include "ParticleList.hh"
 #include "UnitsSystem.hh"
 
-class NonLinearCompton: public Process
+class StochasticEmission: public Process
 {
 public:
-    NonLinearCompton(EMField* field, double dt, bool track = false,
+    StochasticEmission(EMField* field, double dt, bool track = false,
         double eMin = 0);
     
-   virtual ~NonLinearCompton();
+   virtual ~StochasticEmission();
 
     // Main function carrying out the process. The particle is the iunterafting 
     // particle and the particle list is where the new particle will be added.

@@ -1,1 +1,1 @@
-#include <GenerateTables.cpp>
+#include <GenerateTables.hh>

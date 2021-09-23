@@ -1,5 +1,5 @@
-#ifndef G4NONLINEARCOMPTON_HH
-#define G4NONLINEARCOMPTON_HH
+#ifndef G4StochasticEmission_HH
+#define G4StochasticEmission_HH
 
 #include "G4VDiscreteProcess.hh"
 #include "G4DynamicParticle.hh"
@@ -9,18 +9,19 @@
 #include "Particle.hh"
 #include "ParticleList.hh"
 #include "LorentzPusher.hh"
-#include "NonLinearCompton.hh"
+#include "StochasticEmission.hh"
 
-class G4NonLinearCompton: public G4VDiscreteProcess
+class G4StochasticEmission: public G4VDiscreteProcess
 {
 public:
-    explicit G4NonLinearCompton(double dt, double tEnd,
-                                const G4String& name = "NonLinearCompton",
+    explicit G4StochasticEmission(double dt, double tEnd,
+                                const G4String& name = "StochasticEmission",
                                 G4ProcessType type = fUserDefined);
 
-    ~G4NonLinearCompton() override;
+    ~G4StochasticEmission() override;
 
-    G4VParticleChange* PostStepDoIt(const G4Track& aTrack, const G4Step& aStep) override;
+    G4VParticleChange* PostStepDoIt(const G4Track& aTrack, 
+        const G4Step& aStep) override;
 
     G4double GetMeanFreePath(const G4Track& track, G4double,
                                      G4ForceCondition*) override;
@@ -29,7 +30,8 @@ public:
     void SetStaticField(double* EField, double* BField);
 
     // Sets a plane laser field
-    void SetPlaneField(double maxE, double wavelength, double polerisation, double* direction);
+    void SetPlaneField(double maxE, double wavelength, double polerisation, 
+        double* direction);
 
     // sets a gaussian laser pulse
     void SetGaussianField(double maxE, double wavelength, double tau, double waist,
@@ -44,7 +46,7 @@ private:
     Particle* m_part;               // qed particle 
     ParticleList* m_photonList;     // list of secondaries
     EMField* m_field;               // field which particles are pushed through
-    NonLinearCompton* m_process;    // non linear compton process
+    StochasticEmission* m_process;  // Stochastic emission
     LorentzPusher* m_pusher;        // particle poshuer
     
     G4DynamicParticle* m_g4_part;   // g4 particle

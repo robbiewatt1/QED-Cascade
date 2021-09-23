@@ -1,26 +1,26 @@
 #include <cmath>
 #include <fstream>
 
-#include "NonLinearCompton.hh"
+#include "StochasticEmission.hh"
 #include "Photon.hh"
 #include "Numerics.hh"
 #include "MCTools.hh"
 #include "UnitsSystem.hh"
 
 
-NonLinearCompton::NonLinearCompton(EMField* field, double dt, bool track,
+StochasticEmission::StochasticEmission(EMField* field, double dt, bool track,
 	double eMin):
 m_eMin(eMin), Process(field, dt, track)
 {
 	LoadTables();
 }
 
-NonLinearCompton::~NonLinearCompton()
+StochasticEmission::~StochasticEmission()
 {
 	UnloadTables();
 }
 
-void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
+void StochasticEmission::Interact(Particle *part, ParticleList *partList) const
 {
 	if (part->GetMass() == 0 || part->IsAlive() == false) return;
 	// First we need to update the optical depth of the particle based on local values
@@ -59,7 +59,7 @@ void NonLinearCompton::Interact(Particle *part, ParticleList *partList) const
 	}
 }
 
-double NonLinearCompton::CalculateEta(Particle* part) const
+double StochasticEmission::CalculateEta(Particle* part) const
 {
 	ThreeVector partDir = part->GetDirection();
 	ThreeVector eField, bField;
@@ -72,7 +72,7 @@ double NonLinearCompton::CalculateEta(Particle* part) const
 	return eta;
 }
 
-double NonLinearCompton::CalculateChi(double eta) const
+double StochasticEmission::CalculateChi(double eta) const
 {
 	double rand = MCTools::RandDouble(0, 1);
 	int lowIndex;
@@ -86,14 +86,15 @@ double NonLinearCompton::CalculateChi(double eta) const
 	return std::pow(10.0, (1.0 - frac) * lowValue + frac * highValue);
 }
 
-void NonLinearCompton::LoadTables()
+void StochasticEmission::LoadTables()
 {
 	char* tablePath(getenv("QED_TABLES_PATH"));
 	if (tablePath == NULL)
 	{
 		std::cout << "Error: Enviromental variable \"QED_TABLES_PATH\" "; 
 		std::cout << "is not set!" << std::endl;
-		std::cout <<  "Please set QED_TABLES_PATH to point to tables directory." << std::endl;
+		std::cout <<  "Please set QED_TABLES_PATH to point to tables directory."
+		          << std::endl;
 	}
 
 	std::string path(tablePath);
@@ -109,14 +110,16 @@ void NonLinearCompton::LoadTables()
 	std::ifstream phEnFile(path + "/ksi_sokolov.table");
 	if (!phEnFile)
 	{
-		std::cerr << "ERROR: Data table for photon energy sampling not found!" << std::endl;
+		std::cerr << "ERROR: Data table for photon energy sampling not found!" 
+			      << std::endl;
 		std::cerr << "No file at: " << path + "/ksi_sokolov.table" << std::endl;
 		exit(1); 
 	}
 	std::ifstream chiMinFile(path + "/chimin.table");
 	if (!chiMinFile)
 	{
-		std::cerr << "ERROR: Data table for chimin energy sampling not found!" << std::endl;
+		std::cerr << "ERROR: Data table for chimin energy sampling not found!" 
+		          << std::endl;
 		std::cerr << "No file at: " << path + "/chimin.table" << std::endl;
 		exit(1); 
 	}
@@ -176,7 +179,7 @@ void NonLinearCompton::LoadTables()
 	}
 }
 
-void NonLinearCompton::UnloadTables()
+void StochasticEmission::UnloadTables()
 {
 	delete [] m_h_dataTable;
 	delete [] m_h_etaAxis;

@@ -12,7 +12,7 @@
 #include "StaticEMField.hh"
 #include "PlaneEMField.hh"
 #include "FocusingField.hh"
-#include "NonLinearCompton.hh"
+#include "StochasticEmission.hh"
 #include "NonLinearBreitWheeler.hh"
 #include "FileParser.hh"
 
@@ -89,9 +89,9 @@ G4VUserPrimaryGeneratorAction(), m_currentEvent(0), m_currentSecondary(-1)
         inParticles.Direction, false);
 
     // Set up the Physics list
-    if (inProcess.NonLinearCompton == true)
+    if (inProcess.StochasticEmission == true)
     {
-        NonLinearCompton* comptonNL = new NonLinearCompton(m_field,
+        StochasticEmission* comptonNL = new StochasticEmission(m_field,
             inGeneral.timeStep, inGeneral.tracking, inGeneral.minEnergy);
         m_processList.push_back(comptonNL);
     }

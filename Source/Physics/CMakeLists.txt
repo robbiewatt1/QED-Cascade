@@ -3,7 +3,7 @@ set(physics_source_files
 	Fields/EMField/StaticEMField.cpp
 	Fields/EMField/PlaneEMField.cpp
         Fields/EMField/FocusingField.cpp
-	Processes/NonLinearCompton.cpp
+	Processes/StochasticEmission.cpp
 	Processes/NonLinearBreitWheeler.cpp
 	ParticlePushers/ParticlePusher.cpp
         ParticlePushers/ParticlePusher.cpp
@@ -17,7 +17,7 @@ set(physics_header_files
         Fields/EMField/PlaneEMField.hh
         Fields/EMField/FocusingField.hh
         Processes/Process.hh
-	Processes/NonLinearCompton.hh
+	Processes/StochasticEmission.hh
 	Processes/NonLinearBreitWheeler.hh
         ParticlePushers/ParticlePusher.hh
         ParticlePushers/LandauPusher.hh

@@ -8,7 +8,6 @@
 #include "Particle.hh"
 #include "ParticleList.hh"
 #include "EMField.hh"
-#include "NonLinearCompton.hh"
 #include "UnitsSystem.hh"
 #include "Histogram.hh"
 

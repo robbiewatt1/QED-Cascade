@@ -14,7 +14,7 @@
 #include "ParticleList.hh"
 #include "SourceGenerator.hh"
 
-#include "NonLinearCompton.hh"
+#include "StochasticEmission.hh"
 #include "NonLinearBreitWheeler.hh"
 
 #include "FileParser.hh"
@@ -128,11 +128,11 @@ int main(int argc, char* argv[])
     
     // Set up the Physics list
     std::vector<Process*> processList;
-    if (inProcess.NonLinearCompton == true)
+    if (inProcess.StochasticEmission == true)
     {
-        NonLinearCompton* comptonNL = new NonLinearCompton(field, inGeneral.timeStep,
+        StochasticEmission* emission = new StochasticEmission(field, inGeneral.timeStep,
                 inGeneral.tracking, inGeneral.minEnergy);
-        processList.push_back(comptonNL);
+        processList.push_back(emission);
     }
     if (inProcess.NonLinearBreitWheeler == true)
     {

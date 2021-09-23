@@ -185,7 +185,7 @@ void FileParser::ReadField()
 
 void FileParser::ReadProcess()
 {
-    m_process.NonLinearCompton = m_reader->GetBoolean("Process", "NonLinearCompton", false);
+    m_process.StochasticEmission = m_reader->GetBoolean("Process", "StochasticEmission", false);
     m_process.NonLinearBreitWheeler = m_reader->GetBoolean("Process", "NonLinearBreitWheeler",
                                                            false);
     m_process.Trident = m_reader->GetBoolean("Process", "Trident", false);
@@ -195,7 +195,7 @@ void FileParser::ReadProcess()
     if (m_checkOutput == true)
     {
         m_checkFile << "Processes turned on \n";
-        m_checkFile << "NonLinearCompton      = " << m_process.NonLinearCompton << "\n";
+        m_checkFile << "StochasticEmission    = " << m_process.StochasticEmission << "\n";
         m_checkFile << "NonLinearBreitWheeler = " << m_process.NonLinearBreitWheeler << "\n";
         m_checkFile << "Trident               = " << m_process.Trident << "\n";
         m_checkFile << "LinearCompton         = " << m_process.LinearCompton << "\n";

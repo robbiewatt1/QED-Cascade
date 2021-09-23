@@ -50,7 +50,7 @@ struct ParticleParameters
 
 struct ProcessParameters
 {
-    bool NonLinearCompton;      // Turn on non-linear comnpton
+    bool StochasticEmission;    // Turn on non-linear comnpton
     bool NonLinearBreitWheeler; // Turn on non-linear Breit-Wheeler
     bool Trident;               // Turn on Trident process
     bool LinearCompton;         // Turn on linear compton
