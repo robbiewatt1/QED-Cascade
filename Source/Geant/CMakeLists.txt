@@ -2,10 +2,10 @@ find_package(Geant4 REQUIRED)
 
 set(geant_source_files
     G4CascadeGenerator.cpp
-    G4NonLinearCompton.cpp)
+    G4StochasticEmission.cpp)
 set(geant_header_files
     G4CascadeGenerator.hh
-    G4NonLinearCompton.hh)
+    G4StochasticEmission.hh)
 
 if(BUILD_TENSORFLOW)
     find_package(TensorflowCC REQUIRED)

@@ -8,15 +8,15 @@
 class Process
 {
 public:
-	Process(EMField* field, double dt, bool track): m_field(field), m_dt(dt), m_track(track){ };
-	
-	virtual ~Process(){ };
+    Process(EMField* field, double dt, bool track): m_field(field), m_dt(dt), m_track(track){ };
+    
+    virtual ~Process(){ };
 
-	virtual void Interact(Particle *part, ParticleList *partList) const = 0;
+    virtual void Interact(Particle *part, ParticleList *partList) const = 0;
 
 protected:
-	EMField* m_field;
-	double m_dt;
-	bool m_track;
+    EMField* m_field;
+    double m_dt;
+    bool m_track;
 };
 #endif

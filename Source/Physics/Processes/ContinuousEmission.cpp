@@ -1,19 +1,28 @@
-#include "StochasticEmission.hh"
+#include <cmath>
+#include <fstream>
 
-StochasticEmission::StochasticEmission(EMField* field, double dt, bool track,
-    double eMin):
-StochasticEmission(field, dt, track, eMin)
+#include "ContinuousEmission.hh"
+#include "Photon.hh"
+#include "Numerics.hh"
+#include "MCTools.hh"
+#include "UnitsSystem.hh"
+
+
+ContinuousEmission::ContinuousEmission(EMField* field, double dt,
+    bool classical, bool track, double eMin):
+StochasticEmission(field, dt, track, eMin), m_classical(classical)
 {
 }
 
-StochasticEmission::~StochasticEmission()
+ContinuousEmission::~ContinuousEmission()
 {
 }
 
-void StochasticEmission::Interact(Particle *part, ParticleList *partList) const
+void ContinuousEmission::Interact(Particle *part, ParticleList *partList) const
 {
     if (part->GetMass() == 0 || part->IsAlive() == false) return;
     // First we need to update the optical depth of the particle based on local values
+    // Still need to decide of units and constants here
     double eta = CalculateEta(part);
 
     // Check for very small values of eta and skip interpolation
