@@ -6,8 +6,8 @@
 class ContinuousEmission: public PhotonEmission
 {
 public:
-    ContinuousEmission(EMField* field, double dt, bool classical = false, 
-        bool track = false, double eMin = 0);
+    ContinuousEmission(EMField* field, double dt, bool classical = false,
+        double sampleFrac = 1, double eMin = 0, bool track = false);
     
     virtual ~ContinuousEmission();
 

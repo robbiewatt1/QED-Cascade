@@ -36,10 +36,10 @@ void NonLinearBreitWheeler::Interact(Particle *part, ParticleList *partList) con
         double eEnergy = (1.0 - split) * part->GetEnergy();
         ThreeVector pMomentum =  std::sqrt(pEnergy * pEnergy - 1.0) * part->GetDirection();
         ThreeVector eMomentum =  std::sqrt(eEnergy * eEnergy - 1.0) * part->GetDirection();
-        Lepton* positron = new Lepton(1.0, 1.0, part->GetPosition(), 
-                                      pMomentum, part->GetTime(), m_track); 
-        Lepton* electron = new Lepton(1.0, -1.0, part->GetPosition(),
-                                      eMomentum, part->GetTime(), m_track);
+        Lepton* positron = new Lepton(1.0, 1.0, part->GetPosition(), pMomentum,
+            part->GetWeight(), part->GetTime(), m_track); 
+        Lepton* electron = new Lepton(1.0, -1.0, part->GetPosition(), eMomentum, 
+            part->GetWeight(), part->GetTime(), m_track);
         partList->AddParticle(positron);
         partList->AddParticle(electron);
         part->Kill();

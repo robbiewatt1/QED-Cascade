@@ -22,22 +22,25 @@ public:
     // Set the time-step and end time
     void setTime(double timeStep, double timeEnd);
 
-    // Set the field paramters
+    // Set the field parameters
     void setField(const std::string& fieldType, double maxField,
         double wavelength, double duration, double waist, double polarisation,
         const ThreeVector& start, const ThreeVector& focus);
 
-    // Set the particle source paramters
+    // Set the particle source parameters
     void setGenerator(const std::string& particleType,
         const std::string& energyDist, double energyParam1, double energyParam2,
         double radius, double duration, double divergence, 
         const ThreeVector& position, const ThreeVector& direction);
 
-    // Define the particle pusher (Lorentz / Landau / modified landau)
-    void setPusher(const std::string& pusherType);
-
     // Set if nonlinear Compton or nonlinear Breit-Wheeler are used
-    void setPhysics(bool NLC, bool NLBW);
+    void setPhysics(const std::string& physics);
+
+    // Set the fraction of photons that are tracked for continuous emission.
+    void setSampleFraction(double frac);
+
+    // Turn nonlinear Breit-Wheeler process on
+    void usePairProduction(bool useBW);
 
     // Simulates events
     void beamOn(int events, int threads = 1);
@@ -82,12 +85,12 @@ private:
     ThreeVector m_focus;
 
     // Pusher properties
-    bool m_pushSet;
-    std::string m_pusherType;
+    bool m_physSet;
+    std::string m_physics;
+    double m_sampleFrac;
 
     // Physics properties
-    bool m_NLC;
-    bool m_NLBW;
+    bool m_useBW;
 
     // Generator properties
     bool m_genSet;

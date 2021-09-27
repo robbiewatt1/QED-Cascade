@@ -6,8 +6,8 @@
 class StochasticEmission: public PhotonEmission
 {
 public:
-    StochasticEmission(EMField* field, double dt, bool track = false,
-        double eMin = 0);
+    StochasticEmission(EMField* field, double dt, double sampleFrac = 1,
+        double eMin = 0, bool track = false);
 
     virtual ~StochasticEmission();
 

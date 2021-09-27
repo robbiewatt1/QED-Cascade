@@ -8,9 +8,9 @@
 #include "UnitsSystem.hh"
 
 
-PhotonEmission::PhotonEmission(EMField* field, double dt, bool track,
-    double eMin):
-m_eMin(eMin), Process(field, dt, track)
+PhotonEmission::PhotonEmission(EMField* field, double dt, double sampleFrac, 
+    double eMin, bool track):
+m_sampleFrac(sampleFrac), m_eMin(eMin), Process(field, dt, track)
 {
     LoadTables();
 }

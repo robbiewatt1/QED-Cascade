@@ -2,6 +2,7 @@
 
 #include "GaussianEMField.hh"
 #include "FocusingField.hh"
+#include "ContinuousEmission.hh"
 #include "StochasticEmission.hh"
 #include "NonLinearBreitWheeler.hh"
 #include "LorentzPusher.hh"
@@ -15,8 +16,8 @@
 
 RunManager::RunManager():
 m_timeStep(0), m_timeEnd(0), m_field(nullptr), m_pusher(nullptr), 
-m_generator(nullptr), m_fieldSet(false), m_pushSet(false), m_genSet(false),
-m_NLC(false), m_NLBW(false)
+m_generator(nullptr), m_fieldSet(false), m_physSet(false), m_genSet(false),
+m_sampleFrac(1), m_useBW(false)
 {
     // Update this if I ever add another unit system
     m_units = new UnitsSystem("SI");
@@ -62,17 +63,19 @@ void RunManager::setField(const std::string& fieldType, double maxField,
     m_focus = focus / m_units->RefLength();
 }
 
-void RunManager::setPusher(const std::string& pusherType)
+void RunManager::setPhysics(const std::string& physics)
 {
-    if (pusherType == "Lorentz" || pusherType == "Landau" 
-        || pusherType == "ModifiedLandau")
+    if (physics == "Classical" || physics == "clasical" ||
+        physics == "Semiclassical" || physics == "semiclassical" ||
+        physics == "Quantum" || physics == "Quantum")
     {
-        m_pushSet = true;
-        m_pusherType = pusherType;
+        m_physSet = true;
+        m_physics = physics;
     } else
     {
-        m_pushSet = false;
-        std::cerr << "Error: Unkown Pusher Type" << std::endl;
+        m_physSet = false;
+        std::cerr << "Error: Unkown physics type. Choices are: \"Classical\", " 
+         "\"Semiclassical\" or \"Quantum\";" << std::endl;
         return;
     }
 }
@@ -94,12 +97,23 @@ void RunManager::setGenerator(const std::string& particleType,
     m_direction = direction;
 }
 
-void RunManager::setPhysics(bool NLC, bool NLBW)
+void RunManager::setSampleFraction(double sampleFrac)
 {
-    m_NLC = NLC;
-    m_NLBW = NLBW;
+    if (sampleFrac >= 0 && sampleFrac <= 1)
+    {
+        m_sampleFrac = sampleFrac;
+    } else
+    {
+        std::cerr << "Error: Sampling fraction must be between 0 and 1."
+                  << std::endl;
+    }
 }
 
+
+void RunManager::usePairProduction(bool useBW)
+{
+    m_useBW = useBW;
+}
 
 void RunManager::beamOn(int events, int threads)
 {
@@ -121,7 +135,7 @@ void RunManager::beamOn(int events, int threads)
     m_processList.clear();
 
     // Check for time / field properties
-    if (m_timeStep == 0 || !m_fieldSet || !m_pushSet || !m_genSet)
+    if (m_timeStep == 0 || !m_fieldSet || !m_physSet || !m_genSet)
     {
         std::cerr << "Error in beamOn(): RunManager.setTime(...), "
                       "RunManager.setGenerator(...) and RunManager.setField(...) "
@@ -141,26 +155,28 @@ void RunManager::beamOn(int events, int threads)
             m_waist, m_polarisation, m_start, m_focus);
     }
     
-    // Set the pusher
-    if (m_pusherType == "Lorentz")
-    {
-        m_pusher = new LorentzPusher(m_field, m_timeStep);
-    } else if (m_pusherType == "Landau")
+    // Set the physics
+    if (m_physics == "Classical" || m_physics == "classical")
     {
         m_pusher = new LandauPusher(m_field, m_timeStep);
-    } else
+        ContinuousEmission* emission = new ContinuousEmission(m_field,
+            m_timeStep, true, m_sampleFrac, false, 0);
+        m_processList.push_back(emission);
+    } else if (m_physics == "Semiclassical" || m_physics == "semiclassical")
     {
         m_pusher = new ModifiedLandauPusher(m_field, m_timeStep);
+        ContinuousEmission* emission = new ContinuousEmission(m_field,
+            m_timeStep, false, m_sampleFrac, false, 0);
+        m_processList.push_back(emission);
+    } else
+    {
+        m_pusher = new LorentzPusher(m_field, m_timeStep);
+        StochasticEmission* emission = new StochasticEmission(m_field,
+            m_timeStep, m_sampleFrac, false, 0);
+        m_processList.push_back(emission);
     }
 
-    // set the physics
-    if (m_NLC == true)
-    {
-        StochasticEmission* compton = new StochasticEmission(m_field, m_timeStep,
-                false, 0);
-        m_processList.push_back(compton);
-    }
-    if (m_NLBW == true)
+    if (m_useBW == true)
     {
         NonLinearBreitWheeler* breitWheeler = new NonLinearBreitWheeler(m_field, 
             m_timeStep, false);
@@ -240,6 +256,7 @@ void RunManager::beamOn(int events, int threads)
                     * m_units->RefLength());
                 m_electron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[2]
                     * m_units->RefLength());
+                m_electron_P_X[tid].push_back(event->GetParticle(j)->GetWeight());
             } else if (event->GetParticle(j)->GetCharge() == 0)
             {
                 m_photon_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[0]
@@ -254,6 +271,7 @@ void RunManager::beamOn(int events, int threads)
                     * m_units->RefLength());
                 m_photon_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[2]
                     * m_units->RefLength());
+                m_photon_P_X[tid].push_back(event->GetParticle(j)->GetWeight());
             } else if (event->GetParticle(j)->GetCharge() == 1)
             {
                 m_positron_P_X[tid].push_back(event->GetParticle(j)->GetMomentum()[0]
@@ -268,6 +286,7 @@ void RunManager::beamOn(int events, int threads)
                     * m_units->RefLength());
                 m_positron_P_X[tid].push_back(event->GetParticle(j)->GetPosition()[2]
                     * m_units->RefLength());
+                m_positron_P_X[tid].push_back(event->GetParticle(j)->GetWeight());
             }
         }
         m_generator->FreeSources(event);
@@ -294,9 +313,9 @@ py::array_t<double> RunManager::getElectrons()
     {
         accum.insert(accum.end(), sub.begin(), sub.end());
     }
-    int particles = accum.size() / 6;
+    int particles = accum.size() / 7;
     py::array_t<double> result = py::cast(accum);
-    result.resize({particles, 6});
+    result.resize({particles, 7});
     return result;
 }
 
@@ -307,9 +326,9 @@ py::array_t<double> RunManager::getPositrons()
     {
         accum.insert(accum.end(), sub.begin(), sub.end());
     }
-    int particles = accum.size() / 6;
+    int particles = accum.size() / 7;
     py::array_t<double> result = py::cast(accum);
-    result.resize({particles, 6});
+    result.resize({particles, 7});
     return result;
 }
 
@@ -320,8 +339,8 @@ py::array_t<double> RunManager::getPhotons()
     {
         accum.insert(accum.end(), sub.begin(), sub.end());
     }
-    int particles = accum.size() / 6;
+    int particles = accum.size() / 7;
     py::array_t<double> result = py::cast(accum);
-    result.resize({particles, 6});
+    result.resize({particles, 7});
     return result;
 }

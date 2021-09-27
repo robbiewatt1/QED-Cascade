@@ -1,8 +1,11 @@
 #include "StochasticEmission.hh"
+#include <Numerics.hh>
+#include "Photon.hh"
+#include <MCTools.hh>
 
-StochasticEmission::StochasticEmission(EMField* field, double dt, bool track,
-    double eMin):
-StochasticEmission(field, dt, track, eMin)
+StochasticEmission::StochasticEmission(EMField* field, double dt,
+    double sampleFrac, double eMin, bool track):
+PhotonEmission(field, dt, sampleFrac, eMin, track)
 {
 }
 
@@ -20,7 +23,7 @@ void StochasticEmission::Interact(Particle *part, ParticleList *partList) const
     double logh;
     if (eta < 1.0e-12)
     {
-        logh = 5.24;
+        logh = 0.7193;
     } else
     {
         logh = Numerics::Interpolate1D(m_h_etaAxis, m_h_dataTable,
@@ -38,10 +41,11 @@ void StochasticEmission::Interact(Particle *part, ParticleList *partList) const
         ThreeVector gammaP = gammaE * part->GetDirection();
         part->UpdateTrack(part->GetPosition(), part->GetMomentum() - gammaP);
         // Add new partles to the simulation
-        if (gammaE > m_eMin)
+        if (gammaE > m_eMin && m_sampleFrac < MCTools::RandDouble(0, 1))
         {
             Photon* photon = new Photon(gammaE, part->GetPosition(), 
-                part->GetDirection(), part->GetTime(), m_track);
+                part->GetDirection(), part->GetWeight() / m_sampleFrac,
+                part->GetTime(), m_track);
             partList->AddParticle(photon);
         }
         part->InitOpticalDepth();

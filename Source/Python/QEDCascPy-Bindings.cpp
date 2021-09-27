@@ -12,8 +12,11 @@ PYBIND11_MODULE(QEDCascPy, module)
         .def("setTime", &RunManager::setTime, "Set the end time and time-step")
         .def("setField", &RunManager::setField, "Set the field properties")
         .def("setGenerator", &RunManager::setGenerator, "Set the particle source")
-        .def("setPusher", &RunManager::setPusher, "Set the particle pusher")
-        .def("setPhysics", &RunManager::setPhysics, "Select processes")
+        .def("setPhysics", &RunManager::setPhysics, "Select physics model")
+        .def("setSampleFraction", &RunManager::setSampleFraction,
+            "Set sampling fraction for continuos radiation")
+        .def("usePairProduction", &RunManager::usePairProduction,
+            "Turn pair production on.")
         .def("beamOn", &RunManager::beamOn, "Run the simulation", 
             py::arg("events"), py::arg("threads") = 1)
         .def("getInput", &RunManager::getInput,

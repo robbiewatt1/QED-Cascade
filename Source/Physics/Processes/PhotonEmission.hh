@@ -10,7 +10,8 @@
 class PhotonEmission: public Process
 {
 public:
-    PhotonEmission(EMField* field, double dt, bool track, double eMin);
+    PhotonEmission(EMField* field, double dt, double sampleFrac, 
+        double eMin, bool track);
     
     virtual ~PhotonEmission();
 
@@ -28,7 +29,8 @@ protected:
 
     void UnloadTables();
 
-
+    // Fraction of photons emitted
+    double m_sampleFrac;
     // Minimum energy of tracked photon
     double m_eMin;
 
