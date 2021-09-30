@@ -10,7 +10,6 @@ option(BUILD_TESTS "Build test executables" OFF)
 option(BUILD_GEANT "Build geant executables" OFF)
 option(BUILD_PYTHON "Build python library" OFF)
 option(BUILD_TENSORFLOW "Build the geant4 tensorflow package" OFF)
-set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
 if(BUILD_PYTHON)
     # If apple turn openMP off by defult
@@ -25,9 +24,9 @@ endif(BUILD_PYTHON)
 
 if(BUILD_OPENMP)
     add_compile_definitions(USEOPENMP)
-    set(CMAKE_CXX_FLAGS "-O3 -Wall -fopenmp")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -fopenmp")
 else()
-    set(CMAKE_CXX_FLAGS "-O3 -Wall") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall") 
 endif(BUILD_OPENMP)
 
 INCLUDE_DIRECTORIES(Source)
