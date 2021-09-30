@@ -14,7 +14,7 @@ peak_field = 1.00e+14
 wavelength = 0.8e-6
 duration_laser = 30.0e-15
 waist = 10e-6
-polarisation = 10e-6
+polarisation = 0
 start = ThreeVector(0, 0, 10.0e-6)
 focus = ThreeVector(0, 0, 0e-6)
 
