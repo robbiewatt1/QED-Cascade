@@ -21,7 +21,7 @@ m_checkOutput(checkOutput)
     ReadGeneral();
     ReadField();
     ReadParticles();
-    ReadProcess();
+    ReadPhysics();
     ReadHistograms();
 }
 
@@ -66,10 +66,8 @@ void FileParser::ReadGeneral()
     m_units = new UnitsSystem(m_general.units);
     m_general.timeStep = m_reader->GetReal("General", "time_step", 0) / m_units->RefTime();
     m_general.timeEnd = m_reader->GetReal("General", "time_end", 0) / m_units->RefTime();
-    m_general.pusher = m_reader->GetString("General", "pusher", "Lorentz"); 
     m_general.fileName = m_reader->GetString("General", "file_name", "out.h5");
     m_general.tracking = m_reader->GetBoolean("General", "tracking", false);
-    m_general.minEnergy = m_reader->GetReal("General", "min_energy", 0) / m_units->RefEnergy();
 
     if (m_checkOutput == true)
     {
@@ -77,10 +75,8 @@ void FileParser::ReadGeneral()
         m_checkFile << "Units       = " << m_general.units << "\n";
         m_checkFile << "Time step   = " << m_general.timeStep << "\n";
         m_checkFile << "Time end    = " << m_general.timeEnd << "\n";
-        m_checkFile << "Pusher      = " << m_general.pusher << "\n";
         m_checkFile << "Output file = " << m_general.fileName << "\n";
         m_checkFile << "Tracking    = " << m_general.tracking << "\n";
-        m_checkFile << "Min energy    = " << m_general.minEnergy << "\n";
         m_checkFile << "\n\n";
     }
 }
@@ -183,23 +179,21 @@ void FileParser::ReadField()
     }
 }
 
-void FileParser::ReadProcess()
+void FileParser::ReadPhysics()
 {
-    m_process.StochasticEmission = m_reader->GetBoolean("Process", "StochasticEmission", false);
-    m_process.NonLinearBreitWheeler = m_reader->GetBoolean("Process", "NonLinearBreitWheeler",
-                                                           false);
-    m_process.Trident = m_reader->GetBoolean("Process", "Trident", false);
-    m_process.LinearCompton = m_reader->GetBoolean("Process", "LinearCompton", false);
-    m_process.LinearBreitWheeler = m_reader->GetBoolean("Process", "LinearBreitWheeler", false);
+
+    m_physics.Physics = m_reader->GetString("Physics", "radiation_model", "");
+    m_physics.MinEnergy = m_reader->GetReal("Physics", "min_energy", 0) / m_units->RefEnergy();
+    m_physics.SampleFraction = m_reader->GetReal("Physics", "sample_fraction", 1);
+    m_physics.PairProduction = m_reader->GetBoolean("Physics", "pair_production", false);
 
     if (m_checkOutput == true)
     {
-        m_checkFile << "Processes turned on \n";
-        m_checkFile << "StochasticEmission    = " << m_process.StochasticEmission << "\n";
-        m_checkFile << "NonLinearBreitWheeler = " << m_process.NonLinearBreitWheeler << "\n";
-        m_checkFile << "Trident               = " << m_process.Trident << "\n";
-        m_checkFile << "LinearCompton         = " << m_process.LinearCompton << "\n";
-        m_checkFile << "LinearBreitWheeler    = " << m_process.LinearBreitWheeler << "\n";
+        m_checkFile << "Physics parameters \n";
+        m_checkFile << "Physics module used   = " << m_physics.Physics << "\n";
+        m_checkFile << "Pair production       = " << m_physics.PairProduction << "\n";
+        m_checkFile << "Sample fraction       = " << m_physics.SampleFraction << "\n";
+        m_checkFile << "Minimum photon energy = " << m_physics.MinEnergy << "\n";
         m_checkFile << "\n\n";
     }
 }

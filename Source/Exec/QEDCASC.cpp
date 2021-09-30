@@ -14,6 +14,7 @@
 #include "ParticleList.hh"
 #include "SourceGenerator.hh"
 
+#include "ContinuousEmission.hh"
 #include "StochasticEmission.hh"
 #include "NonLinearBreitWheeler.hh"
 
@@ -78,7 +79,7 @@ int main(int argc, char* argv[])
     // Get the input paramter structs
     GeneralParameters inGeneral = input->GetGeneral();
     FieldParameters inField = input->GetField();
-    ProcessParameters inProcess = input->GetProcess();
+    PhysicsParameters inPhysics = input->GetPhysics();
     std::vector<ParticleParameters> inParticles = input->GetParticle();
     std::vector<HistogramParameters> inHistogram = input->GetHistograms();
     delete input;
@@ -109,6 +110,46 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    // Set the physics
+    ParticlePusher* pusher;
+    std::vector<Process*> processList;
+    if (inPhysics.Physics == "Classical" || inPhysics.Physics == "classical")
+    {
+        pusher = new LandauPusher(field, inGeneral.timeStep);
+        ContinuousEmission* emission = new ContinuousEmission(field,
+            inGeneral.timeStep, true, inPhysics.SampleFraction,
+            inPhysics.MinEnergy, inGeneral.tracking);
+        processList.push_back(emission);
+    } else if (inPhysics.Physics == "Semiclassical" || inPhysics.Physics == "semiclassical")
+    {
+        pusher = new ModifiedLandauPusher(field, inGeneral.timeStep);
+        ContinuousEmission* emission = new ContinuousEmission(field,
+            inGeneral.timeStep, false, inPhysics.SampleFraction,
+            inPhysics.MinEnergy, inGeneral.tracking);
+        processList.push_back(emission);
+    } else if (inPhysics.Physics == "Quantum" || inPhysics.Physics == "quantum")
+    {
+        pusher = new LorentzPusher(field, inGeneral.timeStep);
+        StochasticEmission* emission = new StochasticEmission(field,
+            inGeneral.timeStep, inPhysics.SampleFraction, inPhysics.MinEnergy,
+            inGeneral.tracking);
+        processList.push_back(emission);
+    } else
+    {
+        std::cerr << "Error: Unknown physics module \"" << inPhysics.Physics 
+                  << "\"" << std::endl;
+        return 1; 
+    }
+
+    if (inPhysics.PairProduction == true)
+    {
+        NonLinearBreitWheeler* breitWheeler = new NonLinearBreitWheeler(field, 
+            inGeneral.timeStep, false);
+        processList.push_back(breitWheeler);
+    }
+
+
+/*
     // Set up the physics pusher
     ParticlePusher* pusher;
     if (inGeneral.pusher == "Lorentz")
@@ -140,6 +181,8 @@ int main(int argc, char* argv[])
             inGeneral.timeStep, inGeneral.tracking);
         processList.push_back(breitWheelerNL);
     }
+
+*/
 
     // set up the particle sources
     std::vector<SourceGenerator*> generators(inParticles.size());
@@ -185,8 +228,8 @@ int main(int argc, char* argv[])
         // set up the full event store
         if (inParticles[i].Output == true) out->InitSource(generators[i]->GetSourceNumber());
 
-        int threadEvents = generators[i]->GetSourceNumber();
 #ifdef USEOPENMP
+        int threadEvents = generators[i]->GetSourceNumber();
         #pragma omp parallel for
 #endif
         for (unsigned int j = 0; j < generators[i]->GetSourceNumber(); j++) // loop events

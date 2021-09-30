@@ -67,7 +67,7 @@ void RunManager::setPhysics(const std::string& physics)
 {
     if (physics == "Classical" || physics == "clasical" ||
         physics == "Semiclassical" || physics == "semiclassical" ||
-        physics == "Quantum" || physics == "Quantum")
+        physics == "Quantum" || physics == "quantum")
     {
         m_physSet = true;
         m_physics = physics;

@@ -11,10 +11,8 @@ struct GeneralParameters
     std::string units;
     double timeStep;        // time step
     double timeEnd;         // end of simulation
-    std::string pusher;     // Particle pusher used 
     std::string fileName;   // Output file name
     bool tracking;          // Turns on particle tracking
-    double minEnergy;       // Min energy of tracked particle
 };
 
 struct FieldParameters
@@ -48,13 +46,12 @@ struct ParticleParameters
     bool Output;            // Output individual particle data
 };
 
-struct ProcessParameters
+struct PhysicsParameters
 {
-    bool StochasticEmission;    // Turn on non-linear comnpton
-    bool NonLinearBreitWheeler; // Turn on non-linear Breit-Wheeler
-    bool Trident;               // Turn on Trident process
-    bool LinearCompton;         // Turn on linear compton
-    bool LinearBreitWheeler;    // turn on linear Breit-Wheeler
+    std::string Physics;    // Select radiation physics
+    double MinEnergy;       // Min energy of tracked particle
+    double SampleFraction;  // Down samples 
+    bool PairProduction;    // Turn on nonlinear Breit-Wheeler
 };
 
 struct HistogramParameters
@@ -79,7 +76,7 @@ public:
 
     FieldParameters GetField() const {return m_field;}
 
-    ProcessParameters GetProcess() const {return m_process;}
+    PhysicsParameters GetPhysics() const {return m_physics;}
 
     std::vector<ParticleParameters> GetParticle() const {return m_particles;}
 
@@ -95,7 +92,7 @@ private:
 
     void ReadField();
 
-    void ReadProcess();
+    void ReadPhysics();
 
     void ReadParticles();
 
@@ -105,7 +102,7 @@ private:
     std::vector<std::string> m_sections;
     GeneralParameters m_general;
     FieldParameters m_field;
-    ProcessParameters m_process;
+    PhysicsParameters m_physics;
     std::vector<ParticleParameters> m_particles;
     std::vector<HistogramParameters> m_histograms;
 
