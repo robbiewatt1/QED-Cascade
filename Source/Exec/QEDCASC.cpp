@@ -148,42 +148,6 @@ int main(int argc, char* argv[])
         processList.push_back(breitWheeler);
     }
 
-
-/*
-    // Set up the physics pusher
-    ParticlePusher* pusher;
-    if (inGeneral.pusher == "Lorentz")
-    {
-        pusher = new LorentzPusher(field, inGeneral.timeStep);
-    } else if (inGeneral.pusher == "Landau")
-    {
-        pusher = new LandauPusher(field, inGeneral.timeStep);
-    } else if (inGeneral.pusher == "ModifiedLandau")
-    {
-        pusher = new ModifiedLandauPusher(field, inGeneral.timeStep);
-    } else
-    {
-        std::cerr << "Error: Unkown Pusher Type" << std::endl;
-        return 1;
-    }
-    
-    // Set up the Physics list
-    std::vector<Process*> processList;
-    if (inProcess.StochasticEmission == true)
-    {
-        StochasticEmission* emission = new StochasticEmission(field, inGeneral.timeStep,
-                inGeneral.tracking, inGeneral.minEnergy);
-        processList.push_back(emission);
-    }
-    if (inProcess.NonLinearBreitWheeler == true)
-    {
-        NonLinearBreitWheeler* breitWheelerNL = new NonLinearBreitWheeler(field, 
-            inGeneral.timeStep, inGeneral.tracking);
-        processList.push_back(breitWheelerNL);
-    }
-
-*/
-
     // set up the particle sources
     std::vector<SourceGenerator*> generators(inParticles.size());
     for (unsigned int i = 0; i < inParticles.size(); ++i)
